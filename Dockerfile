@@ -3,10 +3,13 @@ FROM osrf/ros:humble-desktop-full
 RUN apt-get update && apt-get install -y nano && rm -rf /var/lib/apt/lists/*
 
 COPY config/ /site_config/
+COPY src/ /robot-ws/src/
 
 ARG USER_NAME=ros
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
+
+USER root
 
 # Create a non-root user
 RUN groupadd --gid $USER_GID $USER_NAME \
@@ -22,8 +25,8 @@ RUN apt-get update \
 
 COPY entrypoint.sh /entrypoint.sh
 
+ENTRYPOINT [ "bash", "/entrypoint.sh" ]
 
-
-ENTRYPOINT [ "/bin/bash", "/entrypoint.sh" ]
+CMD [ "bash" ]
 
 
