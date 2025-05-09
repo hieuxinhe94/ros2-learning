@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  ros2_jazzy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ros2-jazzy-dev
+    user: "ros"
+    network_mode: host
+    ipc: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./source:/source
+    stdin_open: true
+    tty: true

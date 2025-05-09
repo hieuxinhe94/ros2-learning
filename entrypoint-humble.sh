@@ -1,8 +1,9 @@
+
 #!/bin/bash
 
 set -e
 
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 
 echo "Provided argument $@"
 
@@ -10,7 +11,7 @@ echo "=========go to root"
 
 exec sudo su
 
-exec source /opt/ros/jazzy/setup.bash
+exec source /opt/ros/humble/setup.bash
 
 exec cd /robot-ws/src
 
@@ -18,7 +19,7 @@ exec colcon build
 
 exec source install/setup.bash
 
-exec cd /robot-ws/src && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash
+exec cd /robot-ws/src && source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash
 
 # docker image build -t my_ros .
 
@@ -26,9 +27,6 @@ exec cd /robot-ws/src && source /opt/ros/jazzy/setup.bash && colcon build && sou
 
 exec ros2 launch first_robot rsp.launch.py use_sim_time:=true
 exec ros2 launch first_robot launch_sim.launch.py use_sim_time:=true
-exec ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
 
 exec $@
-
-
-
