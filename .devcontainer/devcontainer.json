@@ -1,0 +1,22 @@
+{
+    "name": "ROS 2 GUI Dev",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "runArgs": [
+        "--net=host",
+        "--privileged",
+        "--env=DISPLAY=${env:DISPLAY}",
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+    ],
+    "mounts": [
+        "source=ros2_ws,target=/ros2_ws,type=volume"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+        "ms-iot.vscode-ros"
+    ],
+    "postCreateCommand": "sudo apt update && sudo apt install -y ros-humble-rqt ros-humble-rviz2"
+}
