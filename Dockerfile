@@ -1,6 +1,12 @@
 FROM osrf/ros:humble-desktop-full
 
 RUN apt-get update && apt-get install -y nano && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y \
+    ros-humble-gazebo-ros-pkgs \
+    gazebo \
+    ros-humble-gazebo-ros \
+    ros-humble-gazebo-plugins \
+    x11-apps 
 
 COPY config/ /site_config/
 COPY src/ /robot-ws/src/
@@ -22,6 +28,7 @@ RUN apt-get update \
     && chmod 0440 /etc/sudoers.d/$USER_NAME \ 
     && rm -rf /var/lib/apt/lists/*
 
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
 COPY entrypoint.sh /entrypoint.sh
 
