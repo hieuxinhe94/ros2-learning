@@ -84,7 +84,7 @@ def generate_launch_description():
     )
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "view_bot.rviz"]
+        [FindPackageShare(package_name), "config", "diffbot.rviz"]
     )
 
     rviz_node = Node(
@@ -161,6 +161,19 @@ def generate_launch_description():
             )
         ],
     )
+    
+    # Node random twist sau 5 giây
+    random_twist_node = TimerAction(
+        period=5.0,
+        actions=[
+            Node(
+                package=package_name,
+                executable='random_twist_publisher.py',
+                name='random_twist_node',
+                output='screen'
+            )
+        ]
+    )
 
     nodes = [
         control_node,
@@ -169,7 +182,8 @@ def generate_launch_description():
         delay_robot_base_after_pid_controller_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        send_cmd_vel
+        # send_cmd_vel
+        random_twist_node
     ]
     
     return LaunchDescription(declared_arguments + nodes)

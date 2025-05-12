@@ -49,6 +49,7 @@ def generate_launch_description():
     gui = LaunchConfiguration("gui")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     fixed_frame_id = LaunchConfiguration("fixed_frame_id")
+    world_path = os.path.join(package_name, "worlds", "obstacles.world")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -148,8 +149,7 @@ def generate_launch_description():
             )
         )
     )
-    
-    
+
     # Lệnh gửi cmd_vel sau 10 giây
     yaml_path = PathJoinSubstitution(
         [
@@ -163,18 +163,29 @@ def generate_launch_description():
         actions=[
             ExecuteProcess(
                 cmd=[
-                    'bash', '-c',
-                    'ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped '
-                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"'
+                    "bash",
+                    "-c",
+                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
+                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
                 ],
-                output='screen'
+                output="screen",
             )
         ],
     )
 
+    # Include the Gazebo launch file, provided by the gazebo_ros package
+    gz_sim = Node(
+        package='ros_gz_sim',
+        executable='gz_sim',
+        arguments=[world_path],
+        output='screen'
+    )
+
+
     nodes = [
         control_node,
         robot_state_pub_node,
+        gz_sim,
         # pid_controllers_spawner,
         robot_base_controller_spawner,
         # delay_robot_base_after_pid_controller_spawner,

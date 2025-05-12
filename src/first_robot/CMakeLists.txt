@@ -35,8 +35,13 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config description launch worlds
+  DIRECTORY config description launch worlds 
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(PROGRAMS
+  scripts/random_twist_publisher.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()
