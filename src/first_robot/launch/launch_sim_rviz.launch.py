@@ -13,7 +13,7 @@ from launch.substitutions import (
     LaunchConfiguration,
 )
 from launch_ros.substitutions import FindPackageShare
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.actions import TimerAction
 
@@ -174,18 +174,51 @@ def generate_launch_description():
     )
 
     # Include the Gazebo launch file, provided by the gazebo_ros package
-    gz_sim = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[world_path],
-        output='screen'
+    # gazebo
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+        ),
+        launch_arguments=[("gz_args", " -r -v 3 empty.sdf")],
+        condition=IfCondition(gui),
+    )
+    gazebo_headless = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+        ),
+        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 empty.sdf"])],
+        condition=UnlessCondition(gui),
+    )
+    # Gazebo bridge
+    gazebo_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+        output="screen",
     )
 
+    gz_spawn_entity = Node(
+        package="ros_gz_sim",
+        executable="create",
+        output="screen",
+        name="gz_spawn_entity",
+        arguments=[
+            "-topic",
+            "/robot_description",
+            "-name",
+            "robot",
+            "-allow_renaming",
+            "true",
+        ],
+    )
 
     nodes = [
         control_node,
         robot_state_pub_node,
-        gz_sim,
+        gazebo,
+        gazebo_headless,
+        gazebo_bridge,
+        gz_spawn_entity,
         # pid_controllers_spawner,
         robot_base_controller_spawner,
         # delay_robot_base_after_pid_controller_spawner,
