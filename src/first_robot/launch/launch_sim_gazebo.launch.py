@@ -3,7 +3,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.substitutions import (
@@ -13,9 +13,8 @@ from launch.substitutions import (
     LaunchConfiguration,
 )
 from launch_ros.substitutions import FindPackageShare
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
-from launch.actions import TimerAction
 
 
 def generate_launch_description():
@@ -49,7 +48,6 @@ def generate_launch_description():
     gui = LaunchConfiguration("gui")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     fixed_frame_id = LaunchConfiguration("fixed_frame_id")
-    world_path = os.path.join(package_name, "worlds", "obstacles.world")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -62,6 +60,8 @@ def generate_launch_description():
             " ",
             "use_mock_hardware:=",
             use_mock_hardware,
+            " ",
+            "use_gazebo:=true",
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -85,35 +85,22 @@ def generate_launch_description():
         parameters=[robot_description],
     )
 
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "view_bot.rviz"]
-    )
-
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file, "-f", fixed_frame_id],
-        condition=IfCondition(gui),
-    )
-
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster"],
     )
 
-    # pid_controllers_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=[
-    #         "pid_controller_left_wheel_joint",
-    #         "pid_controller_right_wheel_joint",
-    #         "--param-file",
-    #         robot_controllers,
-    #     ],
-    # )
+    pid_controllers_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "pid_controller_left_wheel_joint",
+            "pid_controller_right_wheel_joint",
+            "--param-file",
+            robot_controllers,
+        ],
+    )
     robot_base_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -126,20 +113,12 @@ def generate_launch_description():
         ],
     )
 
-    # Delay rviz start after `joint_state_broadcaster`
-    delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+    delay_robot_base_after_pid_controller_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_spawner,
-            on_exit=[rviz_node],
+            target_action=pid_controllers_spawner,
+            on_exit=[robot_base_controller_spawner],
         )
     )
-
-    # delay_robot_base_after_pid_controller_spawner = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=pid_controllers_spawner,
-    #         on_exit=[robot_base_controller_spawner],
-    #     )
-    # )
 
     delay_joint_state_broadcaster_after_robot_base_controller_spawner = (
         RegisterEventHandler(
@@ -150,16 +129,8 @@ def generate_launch_description():
         )
     )
 
-    # Lệnh gửi cmd_vel sau 10 giây
-    yaml_path = PathJoinSubstitution(
-        [
-            FindPackageShare(package_name),
-            "config",
-            "twist_cmd.yaml",
-        ]
-    )
     send_cmd_vel = TimerAction(
-        period=5.0,  # delay 10 giây
+        period=15.0,  # delay 10 giây
         actions=[
             ExecuteProcess(
                 cmd=[
@@ -173,24 +144,57 @@ def generate_launch_description():
         ],
     )
 
-    # Include the Gazebo launch file, provided by the gazebo_ros package
-    gz_sim = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[world_path],
-        output='screen'
+    # gazebo
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+        ),
+        launch_arguments=[("gz_args", " -r -v 3 empty.sdf")],
+        condition=IfCondition(gui),
+    )
+    gazebo_headless = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+        ),
+        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 empty.sdf"])],
+        condition=UnlessCondition(gui),
+    )
+    # Gazebo bridge
+    gazebo_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+        output="screen",
     )
 
+    gz_spawn_entity = Node(
+        package="ros_gz_sim",
+        executable="create",
+        output="screen",
+        name="gz_spawn_entity",
+        arguments=[
+            "-topic",
+            "/robot_description",
+            "-name",
+            "robot",
+            "-allow_renaming",
+            "true",
+        ],
+    )
 
     nodes = [
-        control_node,
+        gazebo,
+        gazebo_headless,
+        gazebo_bridge,
         robot_state_pub_node,
-        gz_sim,
-        # pid_controllers_spawner,
+        gz_spawn_entity,
+        
+        control_node,
         robot_base_controller_spawner,
-        # delay_robot_base_after_pid_controller_spawner,
-        delay_rviz_after_joint_state_broadcaster_spawner,
+        delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
+        
+        
         send_cmd_vel,
     ]
 

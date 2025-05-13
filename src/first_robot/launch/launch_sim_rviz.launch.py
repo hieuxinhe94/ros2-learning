@@ -3,7 +3,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, TimerAction
+from launch.actions import IncludeLaunchDescription, ExecuteProcess
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.substitutions import (
@@ -15,6 +15,7 @@ from launch.substitutions import (
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
+from launch.actions import TimerAction
 
 
 def generate_launch_description():
@@ -48,6 +49,7 @@ def generate_launch_description():
     gui = LaunchConfiguration("gui")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     fixed_frame_id = LaunchConfiguration("fixed_frame_id")
+    world_path = os.path.join(package_name, "worlds", "obstacles.world")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -67,7 +69,7 @@ def generate_launch_description():
         [
             FindPackageShare(package_name),
             "config",
-            "controller_manager.yaml",
+            "controller_simple.yaml",
         ]
     )
     control_node = Node(
@@ -84,7 +86,7 @@ def generate_launch_description():
     )
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "diffbot.rviz"]
+        [FindPackageShare(package_name), "config", "view_bot.rviz"]
     )
 
     rviz_node = Node(
@@ -102,16 +104,16 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster"],
     )
 
-    pid_controllers_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "pid_controller_left_wheel_joint",
-            "pid_controller_right_wheel_joint",
-            "--param-file",
-            robot_controllers,
-        ],
-    )
+    # pid_controllers_spawner = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=[
+    #         "pid_controller_left_wheel_joint",
+    #         "pid_controller_right_wheel_joint",
+    #         "--param-file",
+    #         robot_controllers,
+    #     ],
+    # )
     robot_base_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -132,12 +134,12 @@ def generate_launch_description():
         )
     )
 
-    delay_robot_base_after_pid_controller_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=pid_controllers_spawner,
-            on_exit=[robot_base_controller_spawner],
-        )
-    )
+    # delay_robot_base_after_pid_controller_spawner = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=pid_controllers_spawner,
+    #         on_exit=[robot_base_controller_spawner],
+    #     )
+    # )
 
     delay_joint_state_broadcaster_after_robot_base_controller_spawner = (
         RegisterEventHandler(
@@ -147,9 +149,17 @@ def generate_launch_description():
             )
         )
     )
-    
+
+    # Lệnh gửi cmd_vel sau 10 giây
+    yaml_path = PathJoinSubstitution(
+        [
+            FindPackageShare(package_name),
+            "config",
+            "twist_cmd.yaml",
+        ]
+    )
     send_cmd_vel = TimerAction(
-        period=5.0,  # delay 10 giây
+        period=15.0,  # delay 10 giây
         actions=[
             ExecuteProcess(
                 cmd=[
@@ -162,18 +172,26 @@ def generate_launch_description():
             )
         ],
     )
-    
-  
+
+    # Include the Gazebo launch file, provided by the gazebo_ros package
+    gz_sim = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[world_path],
+        output='screen'
+    )
+
 
     nodes = [
         control_node,
         robot_state_pub_node,
-        pid_controllers_spawner,
-        delay_robot_base_after_pid_controller_spawner,
+        gz_sim,
+        # pid_controllers_spawner,
+        robot_base_controller_spawner,
+        # delay_robot_base_after_pid_controller_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        
-        send_cmd_vel
+        send_cmd_vel,
     ]
-    
+
     return LaunchDescription(declared_arguments + nodes)
