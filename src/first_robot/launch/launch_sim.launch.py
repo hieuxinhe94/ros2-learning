@@ -153,27 +153,17 @@ def generate_launch_description():
         actions=[
             ExecuteProcess(
                 cmd=[
-                    'bash', '-c',
-                    'ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped '
-                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"'
+                    "bash",
+                    "-c",
+                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
+                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
                 ],
-                output='screen'
+                output="screen",
             )
         ],
     )
     
-    # Node random twist sau 5 giây
-    random_twist_node = TimerAction(
-        period=5.0,
-        actions=[
-            Node(
-                package=package_name,
-                executable='random_twist_publisher.py',
-                name='random_twist_node',
-                output='screen'
-            )
-        ]
-    )
+  
 
     nodes = [
         control_node,
@@ -182,8 +172,8 @@ def generate_launch_description():
         delay_robot_base_after_pid_controller_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        # send_cmd_vel
-        random_twist_node
+        
+        send_cmd_vel
     ]
     
     return LaunchDescription(declared_arguments + nodes)

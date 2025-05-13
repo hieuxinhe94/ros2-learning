@@ -176,7 +176,7 @@ def generate_launch_description():
     # Include the Gazebo launch file, provided by the gazebo_ros package
     gz_sim = Node(
         package='ros_gz_sim',
-        executable='gz_sim',
+        executable='create',
         arguments=[world_path],
         output='screen'
     )
