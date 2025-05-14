@@ -72,14 +72,14 @@ def generate_launch_description():
             "controller_simple.yaml",
         ]
     )
-    
+
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[robot_controllers],
         output="both",
     )
-    
+
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -92,7 +92,7 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_state_broadcaster"],
     )
-    
+
     # forward_position_broadcaster_spawner = Node(
     #     package="controller_manager",
     #     executable="spawner",
@@ -109,7 +109,7 @@ def generate_launch_description():
             robot_controllers,
         ],
     )
-    
+
     robot_base_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -148,6 +148,18 @@ def generate_launch_description():
                     "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
                     '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
                 ],
+                output="screen",
+            )
+        ],
+    )
+
+    random_move = TimerAction(
+        period=15.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="random_mover.py",
+                name="random_mover",
                 output="screen",
             )
         ],
@@ -205,9 +217,9 @@ def generate_launch_description():
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
-        
         #
-        #send_cmd_vel,
+        # send_cmd_vel,
+        random_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)

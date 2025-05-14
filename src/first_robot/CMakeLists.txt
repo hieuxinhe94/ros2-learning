@@ -35,12 +35,16 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config description launch worlds scripts
+  DIRECTORY config description launch worlds scripts move
   DESTINATION share/${PROJECT_NAME}
 )
 
 install(PROGRAMS
   scripts/random_twist_publisher.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+install(PROGRAMS
+  move/random_mover.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
