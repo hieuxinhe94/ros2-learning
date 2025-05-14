@@ -72,12 +72,14 @@ def generate_launch_description():
             "controller_simple.yaml",
         ]
     )
+    
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[robot_controllers],
         output="both",
     )
+    
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -90,6 +92,12 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_state_broadcaster"],
     )
+    
+    # forward_position_broadcaster_spawner = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["forward_position_controller", "--param-file", robot_controllers],
+    # )
 
     pid_controllers_spawner = Node(
         package="controller_manager",
@@ -101,6 +109,7 @@ def generate_launch_description():
             robot_controllers,
         ],
     )
+    
     robot_base_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -188,14 +197,17 @@ def generate_launch_description():
         gazebo_bridge,
         robot_state_pub_node,
         gz_spawn_entity,
-        
+        #
         control_node,
+        #
         robot_base_controller_spawner,
+        # forward_position_broadcaster_spawner,
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
+        #
         
-        
-        send_cmd_vel,
+        #
+        #send_cmd_vel,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

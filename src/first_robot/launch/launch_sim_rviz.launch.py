@@ -114,6 +114,7 @@ def generate_launch_description():
     #         robot_controllers,
     #     ],
     # )
+    
     robot_base_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -158,6 +159,7 @@ def generate_launch_description():
             "twist_cmd.yaml",
         ]
     )
+    
     send_cmd_vel = TimerAction(
         period=15.0,  # delay 10 giây
         actions=[
@@ -224,6 +226,7 @@ def generate_launch_description():
         # delay_robot_base_after_pid_controller_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
+        #
         send_cmd_vel,
     ]
 
