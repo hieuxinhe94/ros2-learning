@@ -1,0 +1,18 @@
+amcl:
+  ros__parameters:
+    use_map_topic: true
+    scan_topic: /lidar_scan
+
+controller_server:
+  ros__parameters:
+    use_sim_time: true
+    controller_frequency: 10.0
+    min_vel_x: 0.0
+    max_vel_x: 0.26
+    ...
+    
+planner_server:
+  ros__parameters:
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
