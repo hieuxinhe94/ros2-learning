@@ -37,18 +37,4 @@
       <parameters>$(find first_robot)/config/controller_simple.yaml</parameters>
     </plugin>
   </gazebo>
-
-  <!-- <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboRosControlPlugin">
-    <ros>
-      <namespace>/</namespace>
-      <parameter name="robot_description">robot_description</parameter>
-    </ros>
-  </plugin>
-
-  <plugin name="diff_drive_controller" filename="libgazebo_ros_diff_drive.so">
-    <ros>
-      <remapping>cmd_vel:=/diffbot_base_controller/cmd_vel_unstamped</remapping>
-    </ros>
-  </plugin> -->
-
 </robot>

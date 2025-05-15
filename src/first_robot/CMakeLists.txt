@@ -34,9 +34,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# main program
 install(
-  DIRECTORY config description launch worlds scripts move
+  DIRECTORY config description launch worlds 
   DESTINATION share/${PROJECT_NAME}
+)
+
+
+
+# actionable program
+install(
+  DIRECTORY scripts move
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 install(PROGRAMS
@@ -44,7 +53,7 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 install(PROGRAMS
-  move/random_mover.py
+  move/random_mover.py move/patrol_mover.py 
   DESTINATION lib/${PROJECT_NAME}
 )
 

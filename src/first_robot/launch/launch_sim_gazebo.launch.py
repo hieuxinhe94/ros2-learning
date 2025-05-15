@@ -76,7 +76,7 @@ def generate_launch_description():
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[robot_controllers],
+        parameters=[{'use_sim_time': True}, robot_controllers],
         output="both",
     )
 
@@ -158,8 +158,8 @@ def generate_launch_description():
         actions=[
             Node(
                 package=package_name,
-                executable="random_mover.py",
-                name="random_mover",
+                executable="patrol_mover.py",
+                name="patrol_mover",
                 output="screen",
             )
         ],
