@@ -1,12 +1,13 @@
 ## Mục tiêu
 - Xây dựng robot có khả năng di chuyển tự động, sử dụng các tool gazebo (mô phỏng vật lý) + rviz (mô phỏng dữ liệu).
-- Chạy thử trên 2 loại môi trường Linux Ubuntu 24.04  (sau này deploy vào Rapper PI) và Docker (môi trường ảo hóa giúp làm việc với team/ triển khai nhanh chóng với số lượng lớn).
+- Chạy thử trên 2 loại môi trường Linux Ubuntu 24.04  (sau này deploy vào Raspberry PI) và Docker (môi trường ảo hóa giúp làm việc với team/ triển khai nhanh chóng với số lượng lớn).
 
+Toàn bộ khóa học được cung cấp ở đây: https://hieuxinhe94.github.io/general/overview/ 
 
 ## Linux Ubuntu 24.04
 > Trong ví dụ này tôi đang sử dụng wsl (ảo hóa Ubuntu trên windows) nhưng nếu được bạn cũng có thể cài hẳn Ubuntu lên máy tính lập trình, hoặc cài thẳng Ubuntu vào Raspberry Pi (bộ não robot của bạn). 
 
-> **Lưu ý: Nếu bạn chưa cài ros2 jazzy và gazebo humble, hãy cài đặt theo các bước ở hướng dẫn này....** 
+> **Lưu ý: Nếu bạn chưa cài ros2 jazzy và gazebo humble, hãy cài đặt theo các bước ở hướng dẫn này https://hieuxinhe94.github.io/blog/2025/04/01/h%C6%B0%E1%BB%9Bng-d%E1%BA%ABn-c%C3%A0i-%C4%91%E1%BA%B7t-ros2/  .** 
 
 Source lại ros2 và truy cập vào thư mục source code. 
 
@@ -27,12 +28,10 @@ Bắt đầu chạy code
 
 
 ### Docker
-  
-> Trong ví dụ này tôi đang sử dụng wsl (ảo hóa Ubuntu trên windows) nhưng nếu được bạn cũng có thể cài hẳn Ubuntu lên máy tính lập trình, hoặc cài thẳng Ubuntu vào Raspberry Pi (bộ não robot của bạn). 
 
-> **Lưu ý: Bạn hãy cài docker** 
+> **Lưu ý: Bạn hãy cài docker đúng với OS của bạn** 
 
-Source lại ros2 và truy cập vào thư mục source code. 
+Build image từ source code ứng dụng. 
 
     docker image build -t my_first_robot .
 Run container của image vừa build và truy cập vào bin/bash của container đó (tôi đã tích hợp tự động truy cập bash của container sau khi run)
