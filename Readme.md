@@ -1,6 +1,10 @@
 ## Mục tiêu
+> Dựa trên cơ sở:
 - Xây dựng robot có khả năng di chuyển tự động, sử dụng các tool gazebo (mô phỏng vật lý) + rviz (mô phỏng dữ liệu).
 - Chạy thử trên 2 loại môi trường Linux Ubuntu 24.04  (sau này deploy vào Raspberry PI) và Docker (môi trường ảo hóa giúp làm việc với team/ triển khai nhanh chóng với số lượng lớn).
+> Bổ sung:
+- Sử dụng laser dò quét địa hình, chướng ngại vật
+- Sử dụng AI model dùng để nhớ map và tìm đường đến với địa điểm được yêu cầu.
 
 Toàn bộ khóa học được cung cấp ở đây: https://hieuxinhe94.github.io/general/overview/ 
 
@@ -24,7 +28,7 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_sim_gazebo.launch.py
+    ros2 launch first_robot launch_grade2_gazebo.launch.py
 
 
 ### Docker
@@ -46,7 +50,7 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_sim_gazebo.launch.py
+    ros2 launch first_robot launch_grade2_gazebo.launch.py
 
 ### Kết quả
 ![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
