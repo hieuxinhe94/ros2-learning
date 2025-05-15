@@ -16,7 +16,7 @@ class PatrolMover(Node):
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
 
         self.state = PatrolState.FORWARD
-        self.state_duration = 3.0
+        self.state_duration = 6.0
         self.state_timer = 0.0
 
         self.timer = self.create_timer(0.1, self.update_callback)

@@ -72,6 +72,13 @@ def generate_launch_description():
             "controller_simple.yaml",
         ]
     )
+    world_with_obstacles = PathJoinSubstitution(
+        [
+            FindPackageShare(package_name),
+            "worlds",
+            "obstacles.world",
+        ]
+    )
 
     control_node = Node(
         package="controller_manager",
@@ -138,21 +145,6 @@ def generate_launch_description():
         )
     )
 
-    send_cmd_vel = TimerAction(
-        period=15.0,  # delay 10 giây
-        actions=[
-            ExecuteProcess(
-                cmd=[
-                    "bash",
-                    "-c",
-                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
-                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
-                ],
-                output="screen",
-            )
-        ],
-    )
-
     random_move = TimerAction(
         period=15.0,  # delay 10 giây
         actions=[
@@ -170,14 +162,14 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", " -r -v 3 empty.sdf")],
+        launch_arguments=[("gz_args", [" -r -v 3 ", world_with_obstacles])],
         condition=IfCondition(gui),
     )
     gazebo_headless = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 empty.sdf"])],
+        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 " , world_with_obstacles])],
         condition=UnlessCondition(gui),
     )
     # Gazebo bridge
@@ -196,10 +188,15 @@ def generate_launch_description():
         arguments=[
             "-topic",
             "/robot_description",
+            
             "-name",
             "robot",
+            
             "-allow_renaming",
             "true",
+            
+            "-r",
+            world_with_obstacles,
         ],
     )
 
