@@ -50,8 +50,8 @@ Bắt đầu chạy code
     ros2 launch first_robot launch_sim_gazebo.launch.py
 
 ### Kết quả
-![Gazebo demo](https://github.com/hieuxinhe94/hieuxinhe94.github.io/docs/first_robot_two_wheel_gazebo_rviz.gif)
+![Gazebo demo](https://github.com/hieuxinhe94/hieuxinhe94.github.io/blob/main/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
 
 video demo:
 
-![Rviz](https://github.com/hieuxinhe94/hieuxinhe94.github.io/docs/first_robot_two_wheel_gazebo_rviz.gif)
+![Rviz](https://github.com/hieuxinhe94/hieuxinhe94.github.io/blob/main/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
