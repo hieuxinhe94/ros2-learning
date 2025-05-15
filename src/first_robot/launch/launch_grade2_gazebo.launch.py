@@ -72,6 +72,13 @@ def generate_launch_description():
             "controller_simple.yaml",
         ]
     )
+    world_with_obstacles = PathJoinSubstitution(
+        [
+            FindPackageShare(package_name),
+            "worlds",
+            "maze_world.world",
+        ]
+    )
 
     control_node = Node(
         package="controller_manager",
@@ -92,12 +99,6 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_state_broadcaster"],
     )
-
-    # forward_position_broadcaster_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["forward_position_controller", "--param-file", robot_controllers],
-    # )
 
     pid_controllers_spawner = Node(
         package="controller_manager",
@@ -138,23 +139,8 @@ def generate_launch_description():
         )
     )
 
-    send_cmd_vel = TimerAction(
-        period=15.0,  # delay 10 giây
-        actions=[
-            ExecuteProcess(
-                cmd=[
-                    "bash",
-                    "-c",
-                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
-                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
-                ],
-                output="screen",
-            )
-        ],
-    )
-
     random_move = TimerAction(
-        period=15.0,  # delay 10 giây
+        period=20.0,  # delay 10 giây
         actions=[
             Node(
                 package=package_name,
@@ -170,14 +156,14 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", " -r -v 3 empty.sdf")],
+        launch_arguments=[("gz_args", [" -r -v 3 ", world_with_obstacles])],
         condition=IfCondition(gui),
     )
     gazebo_headless = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 empty.sdf"])],
+        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 " , world_with_obstacles])],
         condition=UnlessCondition(gui),
     )
     # Gazebo bridge
@@ -196,10 +182,29 @@ def generate_launch_description():
         arguments=[
             "-topic",
             "/robot_description",
+            
             "-name",
             "robot",
+            "-x", "0", "-y", "0", "-z", "0.3",  # 👈 nâng z lên chút
             "-allow_renaming",
             "true",
+            
+         
+        ],
+    )
+    
+    send_cmd_vel = TimerAction(
+        period=15.0,  # delay 100 giây
+        actions=[
+            ExecuteProcess(
+                cmd=[
+                    "bash",
+                    "-c",
+                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
+                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
+                ],
+                output="screen",
+            )
         ],
     )
 
@@ -213,12 +218,11 @@ def generate_launch_description():
         control_node,
         #
         robot_base_controller_spawner,
-        # forward_position_broadcaster_spawner,
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
         #
-        # send_cmd_vel,
+        #send_cmd_vel,
         random_move
     ]
 
