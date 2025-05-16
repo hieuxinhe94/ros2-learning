@@ -16,7 +16,7 @@ class PatrolMover(Node):
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
 
         self.state = PatrolState.FORWARD
-        self.state_duration = 2.0
+        self.state_duration = 4.0
         self.state_timer = 0.0
 
         self.timer = self.create_timer(0.1, self.update_callback)
@@ -28,14 +28,14 @@ class PatrolMover(Node):
         self.state_timer += 0.1
 
         if self.state == PatrolState.FORWARD:
-            msg.twist.linear.x = 0.4
+            msg.twist.linear.x = 0.2
             msg.twist.angular.z = 0.0
         elif self.state == PatrolState.TURN_LEFT:
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = 0.6
+            msg.twist.angular.z = 0.3
         elif self.state == PatrolState.TURN_RIGHT:
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = -0.6
+            msg.twist.angular.z = -0.3
 
         self.publisher.publish(msg)
 

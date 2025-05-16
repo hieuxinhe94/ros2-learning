@@ -25,6 +25,10 @@ Build lại code (xác nhận lại thư mục hiện tại là src/)
 Sau khi build hoàn thành, cần source thư mục code vừa build
 
     source  install/setup.bash
+Cài đặt các gói cần thiết:
+    
+    sudo apt install ros-jazzy-gz-ros2-control
+
 
 Bắt đầu chạy code
 

@@ -180,16 +180,13 @@ def generate_launch_description():
         output="screen",
         name="gz_spawn_entity",
         arguments=[
-            "-topic",
-            "/robot_description",
+            "-topic", "/robot_description",
             
-            "-name",
-            "robot",
+            "-name", "robot",
+            
             "-x", "0", "-y", "0", "-z", "0.3",  # 👈 nâng z lên chút
-            "-allow_renaming",
-            "true",
             
-         
+            "-allow_renaming", "true",
         ],
     )
     
@@ -220,7 +217,6 @@ def generate_launch_description():
         robot_base_controller_spawner,
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        #
         #
         #send_cmd_vel,
         random_move
