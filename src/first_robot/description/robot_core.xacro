@@ -60,6 +60,7 @@
     <!-- LEFT WHEEL LINK -->
 
     <joint name="left_wheel_joint" type="continuous">
+        <dynamics damping="0.5"/>
         <hardwareInterface>hardware_interface/velocity</hardwareInterface>
         <parent link="base_link" />
         <child link="left_wheel" />
@@ -87,6 +88,7 @@
     <!-- RIGHT WHEEL LINK -->
 
     <joint name="right_wheel_joint" type="continuous">
+        <dynamics damping="0.5"/>
         <hardwareInterface>hardware_interface/velocity</hardwareInterface>
         <parent link="base_link" />
         <child link="right_wheel" />
@@ -141,7 +143,7 @@
     <transmission name="left_wheel_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <actuator name="left_wheel_motor">
-            <mechanicalReduction>1</mechanicalReduction>
+            <mechanicalReduction>3</mechanicalReduction>
         </actuator>
         <joint name="left_wheel_joint" />
     </transmission>
@@ -149,7 +151,7 @@
     <transmission name="right_wheel_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <actuator name="right_wheel_motor">
-            <mechanicalReduction>1</mechanicalReduction>
+            <mechanicalReduction>3</mechanicalReduction>
         </actuator>
         <joint name="right_wheel_joint" />
     </transmission>

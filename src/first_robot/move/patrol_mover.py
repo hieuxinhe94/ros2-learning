@@ -9,6 +9,7 @@ class PatrolState(Enum):
     FORWARD = 1
     TURN_LEFT = 2
     TURN_RIGHT = 3
+    STOP = 4
 
 class PatrolMover(Node):
     def __init__(self):
@@ -16,7 +17,7 @@ class PatrolMover(Node):
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
 
         self.state = PatrolState.TURN_RIGHT
-        self.state_duration = 8.0
+        self.state_duration = 1.5
         self.state_timer = 0.0
 
         self.timer = self.create_timer(0.1, self.update_callback)
@@ -27,32 +28,39 @@ class PatrolMover(Node):
 
         self.state_timer += 0.1
 
+        # Chuyển động mượt hơn
         if self.state == PatrolState.FORWARD:
-            msg.twist.linear.x = 0.2
+            msg.twist.linear.x = 0.1
             msg.twist.angular.z = 0.0
         elif self.state == PatrolState.TURN_LEFT:
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = 0.3
+            msg.twist.angular.z = 0.2
         elif self.state == PatrolState.TURN_RIGHT:
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = -0.3
+            msg.twist.angular.z = -0.2
+        elif self.state == PatrolState.STOP:
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.0
 
         self.publisher.publish(msg)
 
-        if self.state_timer > self.state_duration:
+        if self.state_timer >= self.state_duration:
             self.state_timer = 0.0
             self.next_state()
 
     def next_state(self):
         if self.state == PatrolState.FORWARD:
+            self.state = PatrolState.STOP
+            self.state_duration = 0.8
+        elif self.state == PatrolState.STOP:
             self.state = PatrolState.TURN_LEFT
             self.state_duration = 1.5
         elif self.state == PatrolState.TURN_LEFT:
             self.state = PatrolState.FORWARD
-            self.state_duration = 3.0
+            self.state_duration = 4.0
         elif self.state == PatrolState.TURN_RIGHT:
             self.state = PatrolState.FORWARD
-            self.state_duration = 3.0
+            self.state_duration = 4.0
 
 def main(args=None):
     rclpy.init(args=args)
@@ -62,7 +70,6 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     node.destroy_node()
-    
     rclpy.shutdown()
 
 if __name__ == '__main__':
