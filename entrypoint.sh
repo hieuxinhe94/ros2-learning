@@ -14,9 +14,7 @@ exec source /opt/ros/jazzy/setup.bash
 
 exec cd /robot-ws/src
 
-exec rm -rf  build/ install/ log/
-
-exec colcon build
+exec rm -rf  build/ install/ log/ && colcon build
 
 exec source install/setup.bash
 

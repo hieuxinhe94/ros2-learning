@@ -4,7 +4,7 @@ import random
 # Maze config
 WIDTH = 15     # số ô ngang
 HEIGHT = 15    # số ô dọc
-CELL_SIZE = 1  # mỗi ô 1x1m
+CELL_SIZE = 3  # mỗi ô 1x1m
 WALL_HEIGHT = 1.5
 WALL_THICKNESS = 0.1
 

@@ -42,9 +42,10 @@ Bắt đầu chạy code
 Build image từ source code ứng dụng. 
 
     docker image build -t my_first_robot .
-Run container của image vừa build và truy cập vào bin/bash của container đó (tôi đã tích hợp tự động truy cập bash của container sau khi run)
+Run container của image vừa build và truy cập vào bin/bash của container đó (tôi đã tích hợp tự động truy cập bash của container sau khi run) 
+> Lưu ý quan trọng: $PWD/src:/robot-ws/src là dùng để Bind mount trực tiếp thư mục code ở máy local hiện tại vào container, nên sau này không cần build lại nhiều lần
 
-    docker run -it --env="DISPLAY=$DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged --network=host --ipc=host -v $PWD/source:/source my_first_robot:latest bash
+    docker run -it --env="DISPLAY=$DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged --network=host --ipc=host -v $PWD/src:/robot-ws/src my_first_robot:latest bash
 Build lại code (xác nhận lại thư mục hiện tại là /robot-ws/src)
 
     cd  /robot-ws/src && source  /opt/ros/jazzy/setup.bash && colcon  build
