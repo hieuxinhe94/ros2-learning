@@ -16,7 +16,7 @@ class PatrolMover(Node):
         super().__init__('patrol_mover')
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
 
-        self.state = PatrolState.TURN_RIGHT
+        self.state = PatrolState.TURN_LEFT
         self.state_duration = 1.5
         self.state_timer = 0.0
 

@@ -63,3 +63,14 @@ Bắt đầu chạy code
 video demo:
 
 ![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+
+
+## Lỗi 
+
+Update Dependencies:
+Ensure all ROS 2 Jazzy packages, Gazebo, and gz_ros2_control are up to date:
+bash
+
+Copy
+sudo apt update
+sudo apt upgrade
