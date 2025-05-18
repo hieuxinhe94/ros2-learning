@@ -44,7 +44,7 @@ install(
 
 # actionable program
 install(
-  DIRECTORY scripts move
+  DIRECTORY scripts move inteligent
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -52,8 +52,9 @@ install(PROGRAMS
   scripts/random_twist_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
 install(PROGRAMS
-  move/random_mover.py move/patrol_mover.py 
+  move/random_mover.py move/patrol_mover.py   inteligent/obstacle_avoid_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

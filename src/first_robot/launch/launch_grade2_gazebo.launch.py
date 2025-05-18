@@ -139,17 +139,7 @@ def generate_launch_description():
         )
     )
 
-    random_move = TimerAction(
-        period=20.0,  # delay 10 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="patrol_mover.py",
-                name="patrol_mover",
-                output="screen",
-            )
-        ],
-    )
+
 
     # gazebo
     gazebo = IncludeLaunchDescription(
@@ -170,7 +160,10 @@ def generate_launch_description():
     gazebo_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
-        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+      
+        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+                   '/camera@sensor_msgs/msg/Image@gz.msgs.Image',
+                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
         output="screen",
     )
 
@@ -197,9 +190,33 @@ def generate_launch_description():
                 cmd=[
                     "bash",
                     "-c",
-                    "ros2 topic pub --rate 20 /cmd_vel geometry_msgs/msg/TwistStamped "
+                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
                     '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
                 ],
+                output="screen",
+            )
+        ],
+    )
+    
+    random_move = TimerAction(
+        period=20.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="patrol_mover.py",
+                name="patrol_mover",
+                output="screen",
+            )
+        ],
+    )
+        
+    obstacle_move = TimerAction(
+        period=20.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="obstacle_avoid_node.py",
+                name="obstacle_avoid_node",
                 output="screen",
             )
         ],
@@ -218,8 +235,9 @@ def generate_launch_description():
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
-        send_cmd_vel,
-        #random_move
+        # send_cmd_vel,
+        # random_move,
+        obstacle_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)
