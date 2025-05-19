@@ -83,7 +83,7 @@ def generate_launch_description():
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{'use_sim_time': True}, robot_controllers],
+        parameters=[{"use_sim_time": True}, robot_controllers],
         output="both",
     )
 
@@ -139,8 +139,6 @@ def generate_launch_description():
         )
     )
 
-
-
     # gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -153,17 +151,28 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", ["--headless-rendering -s -r -v 3 " , world_with_obstacles])],
+        launch_arguments=[
+            ("gz_args", ["--headless-rendering -s -r -v 3 ", world_with_obstacles])
+        ],
         condition=UnlessCondition(gui),
     )
     # Gazebo bridge
     gazebo_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
-      
-        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-                   '/camera@sensor_msgs/msg/Image@gz.msgs.Image',
-                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
+        arguments=[
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            "/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image"
+            
+            # RGB camera (color image)
+            "/camera/color/image_raw@sensor_msgs/msg[Image@gz.msgs.Image",
+            # Depth image
+            "/camera/depth/image_raw@sensor_msgs/msg[Image@gz.msgs.Image",
+            
+            # Camera info (for both rgb & depth)
+            "/camera/color/camera_info@sensor_msgs/msg[CameraInfo@gz.msgs.CameraInfo",
+            "/camera/depth/camera_info@sensor_msgs/msg[CameraInfo@gz.msgs.CameraInfo",
+        ],
         output="screen",
     )
 
@@ -173,16 +182,21 @@ def generate_launch_description():
         output="screen",
         name="gz_spawn_entity",
         arguments=[
-            "-topic", "/robot_description",
-            
-            "-name", "robot",
-            
-            "-x", "0", "-y", "0", "-z", "0.3",  # 👈 nâng z lên chút
-            
-            "-allow_renaming", "true",
+            "-topic",
+            "/robot_description",
+            "-name",
+            "robot",
+            "-x",
+            "0",
+            "-y",
+            "0",
+            "-z",
+            "0.3",  # 👈 nâng z lên chút
+            "-allow_renaming",
+            "true",
         ],
     )
-    
+
     send_cmd_vel = TimerAction(
         period=15.0,  # delay 100 giây
         actions=[
@@ -197,7 +211,7 @@ def generate_launch_description():
             )
         ],
     )
-    
+
     random_move = TimerAction(
         period=20.0,  # delay 10 giây
         actions=[
@@ -209,14 +223,14 @@ def generate_launch_description():
             )
         ],
     )
-        
+
     obstacle_move = TimerAction(
         period=20.0,  # delay 10 giây
         actions=[
             Node(
                 package=package_name,
-                executable="obstacle_avoid_node.py",
-                name="obstacle_avoid_node",
+                executable="obstacle_avoid_node_by_depth_camera.py",
+                name="obstacle_avoid_node_by_depth_camera",
                 output="screen",
             )
         ],
@@ -237,7 +251,7 @@ def generate_launch_description():
         #
         # send_cmd_vel,
         # random_move,
-        obstacle_move
+        obstacle_move,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

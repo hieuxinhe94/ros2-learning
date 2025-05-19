@@ -36,25 +36,21 @@ endif()
 
 # main program
 install(
-  DIRECTORY config description launch worlds 
+  DIRECTORY config description launch worlds  ai_models
   DESTINATION share/${PROJECT_NAME}
 )
 
 
 
 # actionable program
-install(
-  DIRECTORY scripts move inteligent
+install( 
+  DIRECTORY scripts move inteligent ai_models
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(PROGRAMS
-  scripts/random_twist_publisher.py
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 install(PROGRAMS
-  move/random_mover.py move/patrol_mover.py   inteligent/obstacle_avoid_node.py
+  move/random_mover.py move/patrol_mover.py  inteligent/obstacle_avoid_node_by_camera.py inteligent/obstacle_avoid_node_by_depth_camera.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
