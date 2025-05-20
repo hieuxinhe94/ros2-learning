@@ -14,7 +14,7 @@ from launch.substitutions import (
 )
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnProcessStart
 
 
 def generate_launch_description():
@@ -77,6 +77,13 @@ def generate_launch_description():
             FindPackageShare(package_name),
             "worlds",
             "empty.world",
+        ]
+    )
+    slam_config = PathJoinSubstitution(
+        [
+            FindPackageShare(package_name),
+            "config",
+            "slam_config.yaml",
         ]
     )
 
@@ -162,16 +169,8 @@ def generate_launch_description():
         executable="parameter_bridge",
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-            "/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image"
-            
-            # RGB camera (color image)
-            "/camera/color/image_raw@sensor_msgs/msg[Image@gz.msgs.Image",
-            # Depth image
-            "/camera/depth/image_raw@sensor_msgs/msg[Image@gz.msgs.Image",
-            
-            # Camera info (for both rgb & depth)
-            "/camera/color/camera_info@sensor_msgs/msg[CameraInfo@gz.msgs.CameraInfo",
-            "/camera/depth/camera_info@sensor_msgs/msg[CameraInfo@gz.msgs.CameraInfo",
+            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+            "/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image",
         ],
         output="screen",
     )
@@ -185,13 +184,13 @@ def generate_launch_description():
             "-topic",
             "/robot_description",
             "-name",
-            "robot",
+            "my_robot",
             "-x",
             "0",
             "-y",
             "0",
             "-z",
-            "0.3",  # 👈 nâng z lên chút
+            "0.5",  # 👈 nâng z lên chút
             "-allow_renaming",
             "true",
         ],
@@ -236,6 +235,54 @@ def generate_launch_description():
         ],
     )
 
+    # MAP
+    # SLAM Toolbox
+    slam_toolbox = Node(
+        package="slam_toolbox",
+        executable="async_slam_toolbox_node",
+        name="slam_toolbox",
+        parameters=[{"use_sim_time": True}, slam_config],
+        remappings=[("scan", "/scan")],
+    )
+    # Khi node slam_toolbox bắt đầu, tự động gọi ros2 lifecycle set để configure + activate
+    configure_slam_toolbox = ExecuteProcess(
+        cmd=["ros2", "lifecycle", "set", "/slam_toolbox", "configure"], output="screen"
+    )
+
+    activate_slam_toolbox = ExecuteProcess(
+        cmd=["ros2", "lifecycle", "set", "/slam_toolbox", "activate"], output="screen"
+    )
+
+    delay_slam_toolbox = LaunchDescription(
+        [
+            TimerAction(
+                period=15.0,  # đợi cho node khởi tạo xong
+                actions=[slam_toolbox],
+            ),
+            TimerAction(
+                period=25.0,  # đợi cho node khởi tạo xong
+                actions=[configure_slam_toolbox],
+            ),
+            TimerAction(period=30.0, actions=[activate_slam_toolbox]),
+        ]
+    )
+
+    # NAV2 bringup
+    # nav2_params_path = PathJoinSubstitution(
+    #     [FindPackageShare(package_name), "config", "nav2_params.yaml"]
+    # )
+
+    # nav2_bringup = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         [FindPackageShare("nav2_bringup"), "/launch/bringup_launch.py"]
+    #     ),
+    #     launch_arguments={
+    #         "use_sim_time": "true",
+    #         "params_file": nav2_params_path,
+    #         "autostart": "true",
+    #     }.items(),
+    # )
+
     nodes = [
         gazebo,
         gazebo_headless,
@@ -250,8 +297,10 @@ def generate_launch_description():
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
         # send_cmd_vel,
-        # random_move,
-        obstacle_move,
+        random_move,
+        # obstacle_move,
+        # nav2_bringup,
+        delay_slam_toolbox,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

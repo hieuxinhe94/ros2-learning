@@ -1,18 +1,133 @@
 amcl:
   ros__parameters:
-    use_map_topic: true
-    scan_topic: /lidar_scan
+    use_sim_time: true
+    scan_topic: scan
+    min_particles: 500
+    max_particles: 2000
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2
+    laser_min_range: 0.0
+    laser_max_range: 8.0
+    update_min_d: 0.25
+    update_min_a: 0.2
+    resample_interval: 1
+    transform_tolerance: 0.5
+    set_initial_pose: true
+    odom_frame_id: odom
+    base_frame_id: laser_frame
+    global_frame_id: map
+
+map_server:
+  ros__parameters:
+    use_sim_time: true
+    yaml_filename: ""
+
+map_saver:
+  ros__parameters:
+    use_sim_time: true
+    save_map_timeout: 5.0
+    free_thresh_default: 0.25
+    occupied_thresh_default: 0.65
+    map_subscribe_transient_local: true
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: true
+    global_frame: map
+    robot_base_frame: base_link
+    default_bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
 
 controller_server:
   ros__parameters:
     use_sim_time: true
-    controller_frequency: 10.0
-    min_vel_x: 0.0
-    max_vel_x: 0.26
-    ...
-    
+    controller_plugins: ["FollowPath"]
+    FollowPath:
+      plugin: "nav2_controller::FollowPath"
+    min_theta_velocity: 0.4
+    max_theta_velocity: 1.0
+
 planner_server:
   ros__parameters:
+    use_sim_time: true
+    expected_planner_frequency: 5.0
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: true
+    behavior_plugins: ["spin", "backup", "wait"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: true
+      global_frame: odom
+      robot_base_frame: base_link
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      resolution: 0.05
+      width: 3
+      height: 3
+      rolling_window: true
+      plugins: ["voxel_layer", "inflation_layer"]
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: true
+        observation_sources: scan
+        scan:
+          topic: /scan
+          sensor_frame: lidar_link  # <-- sửa lại đúng frame_id bạn dùng
+          data_type: LaserScan
+          clearing: true
+          marking: true
+          obstacle_range: 2.5
+          raytrace_range: 3.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: true
+      global_frame: map
+      robot_base_frame: base_link
+      update_frequency: 2.5
+      publish_frequency: 1.0
+      resolution: 0.05
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        observation_sources: scan
+        scan:
+          topic: /scan
+          sensor_frame: lidar_link
+          data_type: LaserScan
+          clearing: true
+          marking: true
+          obstacle_range: 2.5
+          raytrace_range: 3.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+
+recoveries_server:
+  ros__parameters:
+    use_sim_time: true
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: true
+    loop_rate: 20
+    stop_on_failure: false
