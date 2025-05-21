@@ -19,6 +19,15 @@ from launch.substitutions import (
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 import os
+from nav_msgs.msg import Odometry
+import math
+from tf2_ros import (
+    Buffer,
+    TransformListener,
+    LookupException,
+    ConnectivityException,
+    ExtrapolationException,
+)
 
 
 class PatrolState(Enum):
@@ -26,101 +35,198 @@ class PatrolState(Enum):
     TURN_LEFT = 2
     TURN_RIGHT = 3
     STOP = 4
+    BACKWARD = 5
+
 
 class ObstacleAvoidanceNode(Node):
     def __init__(self):
-        super().__init__('obstacle_avoidance_node')
+        super().__init__("obstacle_avoidance_node")
         self.last_image_time = self.get_clock().now()
+
+        self.publisher = self.create_publisher(TwistStamped, "/cmd_vel", 10)
         
-        self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
+        # MobilenetSSD detect obstacle by  camera
+        # self.subscription = self.create_subscription(
+        #     Image, "/camera", self.depth_image_callback_mobilenetssd, 10
+        # )
 
         # MobilenetSSD detect obstacle by depth camera
-        # self.subscription = self.create_subscription(Image, '/camera', self.depth_image_callback_mobilenetssd, 10)
+        self.get_logger().info("Initialized - using subscription_rgb camera")
         self.subscription_rgb = self.create_subscription(Image, '/camera/color/image_raw', self.rgb_callback, 10)
+        self.get_logger().info("Initialized - using subscription_depth camera")
         self.subscription_depth = self.create_subscription(Image, '/camera/depth/image_raw', self.depth_callback, 10)
-
+        self.subscription = self.create_subscription(Image, "/camera", self.depth_image_callback_mobilenetssd, 10)
+        
         self.bridge = CvBridge()
         self.latest_rgb = None
         self.latest_depth = None
-        
+
+        # trạng thái di chuyển
         self.state = PatrolState.FORWARD
         self.state_timer = 0.0
         self.state_duration = 1.0
+        self.steer_direction = "forward"
 
+        # trạng thái bị kẹt
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+        # Biến theo dõi distance
+        self.last_check_time = self.get_clock().now()
+        self.last_position = None  # (x, y)
+        self.check_interval = 1.0  # giây
+        # Timer mỗi 0.5s để check
+        self.get_logger().info("Initialized - using Odometry to check lag")
+        # self.create_timer(Odometry, 0.5, self.check_lag_callback)
+        self.subscription_odom = self.create_subscription(Odometry, "/diffbot_base_controller/odom", self.check_lag_callback, 10)
         self.obstacle_detected = False
-        self.timer = self.create_timer(2, self.update_callback) # 0.5 giây một lần
- 
+        self.lag = False
+        self.timer = self.create_timer(2, self.update_callback)  # 0.5 giây một lần
+
+    def check_lag_callback(self, msg: Odometry):
+        current_time = self.get_clock().now()
+        current_position = msg.pose.pose.position
+
+        if (current_time - self.last_check_time).nanoseconds > 2e9:
+            self.get_logger().info("[***BUG_RESOLVER***] KIỂM TRA LAG ROBOT MỖI 2 giây...")
+
+            if self.last_position is not None:
+                # Tính khoảng cách thực sự di chuyển
+                dx = current_position.x - self.last_position.x
+                dy = current_position.y - self.last_position.y
+                distance = math.sqrt(dx * dx + dy * dy)
+                # Tính vận tốc thực tế
+                linear_velocity = math.sqrt(
+                    msg.twist.twist.linear.x**2 + msg.twist.twist.linear.y**2
+                )
+                self.get_logger().info(f"[***BUG_RESOLVER***][TF] Distance moved from the last {distance:.4f} m")
+                self.get_logger().info(f"[***BUG_RESOLVER***][VE] Linear velocity is {linear_velocity:.4f} m/s")
+
+                # Nếu cả 2 đều rất nhỏ → bị kẹt
+                if distance < 0.05 and linear_velocity < 0.01:
+                    self.get_logger().warn(">>> ROBOT CÓ THỂ BỊ KẸT <<<")
+                    self.lag = True
+                    self.state = PatrolState.STOP
+                    self.state_timer = 0.0
+                    self.state_duration = 1.0
+                else:
+                    self.lag = False
+            #
+            self.last_position = current_position
+            self.last_check_time = current_time
+
+    def get_current_position(self):
+        try:
+            now = rclpy.time.Time()
+            trans = self.tf_buffer.lookup_transform(
+                target_frame="map", source_frame="base_link", time=rclpy.time.Time()
+            )
+
+            x = trans.transform.translation.x
+            y = trans.transform.translation.y
+            return (x, y)
+
+        except (LookupException, ConnectivityException, ExtrapolationException) as e:
+            self.get_logger().warn(f"Không lấy được TF: {str(e)}")
+            return None
+
     def load_mobilenet_ssd(self):
         pkg_path = get_package_share_directory("first_robot")
-        model_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.caffemodel")
-        prototxt_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.prototxt")
+        model_path = os.path.join(
+            pkg_path, "ai_models", "MobileNetSSD_deploy.caffemodel"
+        )
+        prototxt_path = os.path.join(
+            pkg_path, "ai_models", "MobileNetSSD_deploy.prototxt"
+        )
 
         self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
         self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
     def rgb_callback(self, msg):
-        self.get_logger().info("depth_callback - using MobileNetSSD")        
+        self.get_logger().info("depth_callback - using MobileNetSSD")
         try:
-            self.latest_rgb = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            self.latest_rgb = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
             self.process_obstacle()
         except Exception as e:
             self.get_logger().error(f"RGB callback error: {e}")
-            
+
     def depth_callback(self, msg):
         self.get_logger().info("depth_callback - using MobileNetSSD")
         try:
-            self.latest_depth = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+            self.latest_depth = self.bridge.imgmsg_to_cv2(
+                msg, desired_encoding="passthrough"
+            )
         except Exception as e:
-            self.get_logger().error(f"Depth callback error: {e}")                    
- 
+            self.get_logger().error(f"Depth callback error: {e}")
+
     def depth_image_callback_mobilenetssd(self, msg):
         now = self.get_clock().now()
-        time_diff = (now - self.last_image_time).nanoseconds * 1e-9  # giây
+        time_diff = (now - self.last_image_time).nanoseconds * 2e-9  # giây
 
-        if time_diff < 1.0:  # chỉ xử lý ảnh mỗi 1 giây
+        if time_diff < 2.0:  # chỉ xử lý ảnh mỗi 2 giây
             return
+
+        self.get_logger().info("[***MOBILENET_SSD***] KIỂM TRA LAG ROBOT MỖI 2 giây...")
         self.last_image_time = now
-        self.get_logger().info(f"depth_image_callback_mobilenetssd self.latest_rgb is None: {self.latest_rgb is None } self.latest_depth is None: {self.latest_depth is None}")        
+        self.get_logger().info(
+            f"[**MOBILENET_SSD**]depth_image_callback_mobilenetssd self.latest_rgb is None: {self.latest_rgb is None } self.latest_depth is None: {self.latest_depth is None}"
+        )
         if self.latest_rgb is None or self.latest_depth is None:
             return
-    
+
         try:
             # cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
             frame = self.latest_rgb.copy()
-            
+
             # Load MobileNet SSD model if not already loaded
-            if not hasattr(self, 'net'):
-                self.get_logger().info("image_callback - loading MobileNetSSD for first time")
+            if not hasattr(self, "net"):
+                self.get_logger().info(
+                    "[**MOBILENET_SSD**] - loading MobileNetSSD for first time"
+                )
                 self.load_mobilenet_ssd()
-            self.get_logger().info("image_callback - Resize + normalize input for MobileNetSSD")
+            self.get_logger().info(
+                "[**MOBILENET_SSD**] - Resize + normalize input for MobileNetSSD"
+            )
             # Resize + normalize input for MobileNetSSD
             blob = cv2.dnn.blobFromImage(frame, 0.007843, (300, 300), 127.5)
-           
+
             self.net.setInput(blob)
             detections = self.net.forward()
 
             height, width = frame.shape[:2]
             self.obstacle_detected = False
             steer_direction = "forward"
-            
+
             for i in range(detections.shape[2]):
                 confidence = detections[0, 0, i, 2]
-                class_id = int(detections[0, 0, i, 1]) # class_id detected is mobilenetssd classes 
-                
+                class_id = int(
+                    detections[0, 0, i, 1]
+                )  # class_id detected is mobilenetssd classes
+
                 if confidence > 0.5:  # Ngưỡng confidence
-                    box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
+                    box = detections[0, 0, i, 3:7] * np.array(
+                        [width, height, width, height]
+                    )
                     (x1, y1, x2, y2) = box.astype("int")
-                    
+
                     center_x = (x1 + x2) // 2
                     center_y = (y1 + y2) // 2
-                    
+
                     # Lấy khoảng cách từ depth image
-                    if center_y < self.latest_depth.shape[0] and center_x < self.latest_depth.shape[1]:
-                        distance = self.latest_depth[center_y, center_x] / 1000.0  # mm -> m
-                        if 0.2 < distance < 1.5 and y2 > height * 0.6:  # chỉ xử lý vật cản gần
+                    if (
+                        center_y < self.latest_depth.shape[0]
+                        and center_x < self.latest_depth.shape[1]
+                    ):
+                        distance = (
+                            self.latest_depth[center_y, center_x] / 1000.0
+                        )  # mm -> m
+                        if (
+                            0.2 < distance < 1.5 and y2 > height * 0.6
+                        ):  # chỉ xử lý vật cản gần
                             self.obstacle_detected = True
-                            steer_direction = "left" if center_x > width // 2 else "right"
+                            steer_direction = (
+                                "left" if center_x > width // 2 else "right"
+                            )
                             break
 
                     # Optionally draw the box:
@@ -128,59 +234,106 @@ class ObstacleAvoidanceNode(Node):
 
                     # Check if the object is in ROI (vùng phía trước robot)
             self.steer_direction = steer_direction
-            self.get_logger().info(f"[SSD] Obstacle: {self.obstacle_detected} | Steer: {self.steer_direction}")
+            self.get_logger().info(
+                f"[**MOBILENET_SSD**] Obstacle: {self.obstacle_detected} | Steer: {self.steer_direction}"
+            )
             # Optionally: hiển thị ảnh debug
             # cv2.imshow("SSD Output", cv_image)
             # cv2.waitKey(1)
 
         except Exception as e:
             self.get_logger().error(f"Error in image_callback: {e}")
-        
-        
+
     def update_callback(self):
         self.get_logger().info("update_callback")
-        msg = TwistStamped()
-        msg.header.stamp = self.get_clock().now().to_msg()
-
         self.state_timer += 1
 
         # Nếu phát hiện vật cản → chuyển sang rẽ trái/phải
         if self.obstacle_detected:
-            self.get_logger().info(f"obstacle_detected: self.state {self.state} steer_direction {self.steer_direction}")
-            if self.state not in [PatrolState.TURN_LEFT, PatrolState.TURN_RIGHT]:
-                self.get_logger().info("Nếu phát hiện vật cản → chuyển sang rẽ trái/phải 3s")
+            self.get_logger().info(
+                f"update_callback Có vật cản đường: hiện tại self.state {self.state} steer_direction {self.steer_direction}"
+            )
+            if self.state not in [PatrolState.BACKWARD, PatrolState.STOP]:
+                self.get_logger().info(
+                    f"[**MOBILENET_SSD**] Nếu phát hiện vật cản và trạng thái {self.state} → dừng lại 1s"
+                )
+                self.state = PatrolState.STOP
+                self.state_timer = 0.0
+                self.state_duration = 1.0
+            elif self.state in [PatrolState.STOP]:
+                self.get_logger().info(
+                    f"[**MOBILENET_SSD**] Nếu phát hiện vật cản steer_direction {self.steer_direction} và trạng thái {self.state} → lùi/trái/phải lại 3s"
+                )
                 if self.steer_direction == "left":
                     self.state = PatrolState.TURN_RIGHT
                 elif self.steer_direction == "right":
                     self.state = PatrolState.TURN_LEFT
                 elif self.steer_direction == "forward":
-                    self.state = PatrolState.FORWARD
+                    self.state = PatrolState.BACKWARD
                 self.state_timer = 0.0
-                self.state_duration = 3.0
-        else:
+                self.state_duration = 2.0
+
+        elif self.lag and self.state not in [PatrolState.BACKWARD, PatrolState.STOP]:
+            self.get_logger().info(
+                "update_callback Nếu đang lag và trạng thái không phải lùi/dừng thì dừng ngay lập tức"
+            )
+            self.state = PatrolState.STOP
+            self.state_timer = 0.0
+            self.state_duration = 1.0
+        elif self.lag and self.state in [PatrolState.STOP]:
+            self.get_logger().info("update_callback Đi lùi sau khi dừng lại")
+            self.state = PatrolState.BACKWARD
+            self.state_timer = 0.0
+            self.state_duration = 1.0
+            self.lag = False
+        elif self.lag and self.state in [PatrolState.BACKWARD]:
+            self.get_logger().info("update_callback Tiếp tục đi thẳng sau khi lùi")
+            self.state = PatrolState.FORWARD
+            self.state_timer = 0.0
+            self.state_duration = 1.0
+        elif (
+            self.state in [PatrolState.TURN_LEFT, PatrolState.TURN_RIGHT]
+            and self.state_timer >= self.state_duration
+        ):
             # Khi rẽ xong mà không còn vật cản → đi thẳng tiếp
-            if self.state in [PatrolState.TURN_LEFT, PatrolState.TURN_RIGHT] and self.state_timer >= self.state_duration:
-                self.get_logger().info("Khi rẽ xong mà không còn vật cản → đi thẳng tiếp 2s")
-                self.state = PatrolState.FORWARD
-                self.state_timer = 3.0
-                self.state_duration = 5.0
+            self.get_logger().info(
+                "Khi rẽ xong mà không còn vật cản → tự động đi thẳng tiếp 2s"
+            )
+            self.state = PatrolState.FORWARD
+            self.state_timer = 3.0
+            self.state_duration = 5.0
+        else:
+            self.get_logger().info("Tự động đi thẳng tiếp 1s")
+            self.state = PatrolState.FORWARD
+            self.state_timer = 1.0
+            self.state_duration = 2.0
 
-        # Tạo lệnh tương ứng với trạng thái
-        self.get_logger().info(f"PatrolState action: {self.state}")
-        if self.state == PatrolState.FORWARD:
-            msg.twist.linear.x = 0.1
-            msg.twist.angular.z = 0.0
-        elif self.state == PatrolState.TURN_LEFT:
-            msg.twist.linear.x = 0.0
-            msg.twist.angular.z = 0.4
-        elif self.state == PatrolState.TURN_RIGHT:
-            msg.twist.linear.x = 0.0
-            msg.twist.angular.z = -0.4
-        elif self.state == PatrolState.STOP:
-            msg.twist.linear.x = 0.0
-            msg.twist.angular.z = 0.0
+        # PUBLISH MESSAGE STATES
+        publishStates(self)
 
-        self.publisher.publish(msg)
+def publishStates(self):
+    msg = TwistStamped()
+    msg.header.stamp = self.get_clock().now().to_msg()
+
+    # Tạo lệnh tương ứng với trạng thái
+    self.get_logger().info(f"PatrolState action: {self.state}")
+    if self.state == PatrolState.FORWARD:
+        msg.twist.linear.x = 0.05
+        msg.twist.angular.z = 0.0
+    elif self.state == PatrolState.TURN_LEFT:
+        msg.twist.linear.x = 0.0
+        msg.twist.angular.z = 0.4
+    elif self.state == PatrolState.TURN_RIGHT:
+        msg.twist.linear.x = 0.0
+        msg.twist.angular.z = -0.4
+    elif self.state == PatrolState.STOP:
+        msg.twist.linear.x = 0.0
+        msg.twist.angular.z = 0.0
+    elif self.state == PatrolState.BACKWARD:
+        msg.twist.linear.x = -0.1
+        msg.twist.angular.z = 0.0
+
+    self.publisher.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -192,5 +345,5 @@ def main(args=None):
     node.destroy_node()
     rclpy.shutdown()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

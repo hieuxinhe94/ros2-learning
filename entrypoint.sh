@@ -18,8 +18,4 @@ exec rm -rf  build/ install/ log/ && colcon build
 
 exec source install/setup.bash
 
-
 exec $@
-
-
-

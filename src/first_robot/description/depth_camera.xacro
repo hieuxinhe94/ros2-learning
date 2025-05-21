@@ -31,8 +31,8 @@
             <camera>
                 <horizontal_fov>1.047</horizontal_fov>
                 <image>
-                    <width>320</width>
-                    <height>240</height>
+                    <width>640</width>
+                    <height>480</height>
                 </image>
                 <clip>
                     <near>0.1</near>
@@ -42,13 +42,12 @@
             <always_on>1</always_on>
             <update_rate>30</update_rate>
             <visualize>true</visualize>
-            <topic>depth_camera</topic>
-            <!-- <plugin
-                filename="RosGzPointCloud"
-                name="ros_gz_point_cloud::PointCloud">
-                <topic>points</topic>
-                <frame_id>map</frame_id>
-            </plugin> -->
+            <topic>camera</topic>
+            <imageTopic>camera/depth/image_raw</imageTopic>
+            <depthImageTopic>camera/depth/image_raw</depthImageTopic>
+            <pointCloudTopic>camera/points</pointCloudTopic>
+            <cameraInfoTopic>camera/depth/camera_info</cameraInfoTopic>
+        
         </sensor>
 
 

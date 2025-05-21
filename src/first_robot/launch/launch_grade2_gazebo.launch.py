@@ -168,9 +168,20 @@ def generate_launch_description():
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
+            # Sim time
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            # SLAM toolbox
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
-            "/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image",
+            # camera thường
+            # "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
+            # "/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
+            # depth camera
+            "/camera/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image",
+            "/camera/depth/image_raw@sensor_msgs/msg/Image[gz.msgs.Image",
+            '/camera/color/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
+            '/camera/depth/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
+            # points cloud
+            # "/camera/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked",
         ],
         output="screen",
     )
@@ -195,7 +206,6 @@ def generate_launch_description():
             "true",
         ],
     )
-
     send_cmd_vel = TimerAction(
         period=15.0,  # delay 100 giây
         actions=[
@@ -210,7 +220,6 @@ def generate_launch_description():
             )
         ],
     )
-
     random_move = TimerAction(
         period=20.0,  # delay 10 giây
         actions=[
@@ -222,7 +231,6 @@ def generate_launch_description():
             )
         ],
     )
-
     obstacle_move = TimerAction(
         period=20.0,  # delay 10 giây
         actions=[
@@ -256,14 +264,14 @@ def generate_launch_description():
     delay_slam_toolbox = LaunchDescription(
         [
             TimerAction(
-                period=15.0,  # đợi cho node khởi tạo xong
+                period=10.0,  # đợi cho node khởi tạo xong
                 actions=[slam_toolbox],
             ),
             TimerAction(
-                period=25.0,  # đợi cho node khởi tạo xong
+                period=15.0,  # đợi cho node khởi tạo xong
                 actions=[configure_slam_toolbox],
             ),
-            TimerAction(period=30.0, actions=[activate_slam_toolbox]),
+            TimerAction(period=20.0, actions=[activate_slam_toolbox]),
         ]
     )
 
@@ -297,8 +305,8 @@ def generate_launch_description():
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
         # send_cmd_vel,
-        random_move,
-        # obstacle_move,
+        # random_move,
+        obstacle_move,
         # nav2_bringup,
         delay_slam_toolbox,
     ]
