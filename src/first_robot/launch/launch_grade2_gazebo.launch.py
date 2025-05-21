@@ -145,6 +145,12 @@ def generate_launch_description():
             )
         )
     )
+    # RQt
+    rqt = Node(
+        package="rqt_image_view",
+        executable="rqt_image_view",
+        arguments=["/camera"],
+    )
 
     # gazebo
     gazebo = IncludeLaunchDescription(
@@ -170,18 +176,14 @@ def generate_launch_description():
         arguments=[
             # Sim time
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            # depth camera
+            # '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
+            # '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            # RGB camera
+            # '/camera/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            # '/camera/color/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             # SLAM toolbox
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
-            # camera thường
-            # "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
-            # "/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
-            # depth camera
-            "/camera/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image",
-            "/camera/depth/image_raw@sensor_msgs/msg/Image[gz.msgs.Image",
-            '/camera/color/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
-            '/camera/depth/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
-            # points cloud
-            # "/camera/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked",
         ],
         output="screen",
     )
@@ -206,31 +208,7 @@ def generate_launch_description():
             "true",
         ],
     )
-    send_cmd_vel = TimerAction(
-        period=15.0,  # delay 100 giây
-        actions=[
-            ExecuteProcess(
-                cmd=[
-                    "bash",
-                    "-c",
-                    "ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/TwistStamped "
-                    '"{twist: {linear: {x: 0.7, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}}"',
-                ],
-                output="screen",
-            )
-        ],
-    )
-    random_move = TimerAction(
-        period=20.0,  # delay 10 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="patrol_mover.py",
-                name="patrol_mover",
-                output="screen",
-            )
-        ],
-    )
+
     obstacle_move = TimerAction(
         period=20.0,  # delay 10 giây
         actions=[
@@ -261,6 +239,24 @@ def generate_launch_description():
         cmd=["ros2", "lifecycle", "set", "/slam_toolbox", "activate"], output="screen"
     )
 
+    # NAV2 bringup
+    nav2_params_path = PathJoinSubstitution(
+        [FindPackageShare(package_name), "config", "nav2_params.yaml"]
+    )
+
+    nav2_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(PathJoinSubstitution([
+            FindPackageShare('nav2_bringup'),
+            'launch',
+            'navigation_launch.py'
+        ])),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'autostart': 'true',
+            'params_file': nav2_params_path
+        }.items()
+    )
+
     delay_slam_toolbox = LaunchDescription(
         [
             TimerAction(
@@ -272,24 +268,9 @@ def generate_launch_description():
                 actions=[configure_slam_toolbox],
             ),
             TimerAction(period=20.0, actions=[activate_slam_toolbox]),
+            TimerAction(period=23.0, actions=[nav2_launch]),
         ]
     )
-
-    # NAV2 bringup
-    # nav2_params_path = PathJoinSubstitution(
-    #     [FindPackageShare(package_name), "config", "nav2_params.yaml"]
-    # )
-
-    # nav2_bringup = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [FindPackageShare("nav2_bringup"), "/launch/bringup_launch.py"]
-    #     ),
-    #     launch_arguments={
-    #         "use_sim_time": "true",
-    #         "params_file": nav2_params_path,
-    #         "autostart": "true",
-    #     }.items(),
-    # )
 
     nodes = [
         gazebo,
@@ -303,12 +284,10 @@ def generate_launch_description():
         robot_base_controller_spawner,
         delay_robot_base_after_pid_controller_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        #
-        # send_cmd_vel,
-        # random_move,
-        obstacle_move,
+        # obstacle_move,
         # nav2_bringup,
         delay_slam_toolbox,
+        rqt,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

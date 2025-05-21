@@ -30,6 +30,7 @@ class PatrolState(Enum):
 class ObstacleAvoidanceNode(Node):
     def __init__(self):
         super().__init__('obstacle_avoidance_node')
+        self.get_logger().info("[HIEUPV] CHẠY TRÁNH VẬT CẢN BẰNG CAMERA THƯỜNG============================================")
         self.last_image_time = self.get_clock().now()
         
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
@@ -38,7 +39,7 @@ class ObstacleAvoidanceNode(Node):
         #self.subscription = self.create_subscription(Image, '/camera', self.image_callback_opencv, 10)
         
         # MobilenetSSD detect obstacle
-        self.subscription = self.create_subscription(Image, '/camera', self.depth_image_callback_mobilenetssd, 10)
+        self.subscription = self.create_subscription(Image, '/camera', self.image_callback_mobilenetssd, 10)
 
         self.bridge = CvBridge()
         self.state = PatrolState.FORWARD
@@ -148,83 +149,7 @@ class ObstacleAvoidanceNode(Node):
         except Exception as e:
             self.get_logger().error(f"Error in image_callback: {e}")
     
-    def depth_image_callback_mobilenetssd(self, msg):
-        now = self.get_clock().now()
-        time_diff = (now - self.last_image_time).nanoseconds * 1e-9  # giây
-
-        if time_diff < 1.0:  # chỉ xử lý ảnh mỗi 1 giây
-            return
-        self.last_image_time = now
-        
-        
-        try:
-            self.get_logger().info("image_callback - using MobileNetSSD")
-            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-
-            # Load MobileNet SSD model if not already loaded
-            if not hasattr(self, 'net'):
-                self.get_logger().info("image_callback - loading MobileNetSSD for first time")
-                pkg_path = get_package_share_directory("first_robot") 
-                
-                model_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.caffemodel")
-                prototxt_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.prototxt")
-
-                self.get_logger().info(f"model_path - {model_path}")
-                self.get_logger().info(f"prototxt_path - {prototxt_path}")
-                
-                self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
-                self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-                self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-
-            # Resize + normalize input for MobileNetSSD
-            blob = cv2.dnn.blobFromImage(cv_image, 0.007843, (300, 300), 127.5)
-            self.net.setInput(blob)
-            detections = self.net.forward()
-
-            height, width = cv_image.shape[:2]
-            self.obstacle_detected = False
-            steer_direction = "forward"
-            
-            for i in range(detections.shape[2]):
-                confidence = detections[0, 0, i, 2]
-                class_id = int(detections[0, 0, i, 1]) # class_id detected is mobilenetssd classes 
-                
-                if confidence > 0.5:  # Ngưỡng confidence
-                    box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
-                    (x1, y1, x2, y2) = box.astype("int")
-                    
-                    center_x = (x1 + x2) // 2
-                    center_y = (y1 + y2) // 2
-                    
-                    # Lấy khoảng cách từ depth image
-                    if center_y < self.depth_image.shape[0] and center_x < self.depth_image.shape[1]:
-                        distance = self.depth_image[center_y, center_x] / 1000.0  # mm -> m
-                        if 0.2 < distance < 1.5:  # chỉ xử lý vật cản gần
-                            obstacle_detected = True
-                            steer_direction = "left" if center_x > width // 2 else "right"
-                            cv2.rectangle(self.rgb_image, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                            cv2.putText(self.rgb_image, f"{self.classes[class_id]} {distance:.2f}m", 
-                                        (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
-                    
-                    # Optionally draw the box:
-                    cv2.rectangle(cv_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-                    # Check if the object is in ROI (vùng phía trước robot)
-                    if y2 > height * 0.6:
-                        self.obstacle_detected = True
-                        self.steer_direction = steer_direction
-                        break
-
-            self.get_logger().info(f"[SSD] Obstacle Detected: {self.obstacle_detected}")
-
-            # Optionally: hiển thị ảnh debug
-            # cv2.imshow("SSD Output", cv_image)
-            # cv2.waitKey(1)
-
-        except Exception as e:
-            self.get_logger().error(f"Error in image_callback: {e}")
-        
-        
+           
     def update_callback(self):
         self.get_logger().info("update_callback")
         msg = TwistStamped()
