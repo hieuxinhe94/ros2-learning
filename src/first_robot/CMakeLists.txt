@@ -50,7 +50,7 @@ install(
 
 
 install(PROGRAMS
-  move/random_mover.py move/patrol_mover.py  inteligent/obstacle_avoid_node_by_camera.py inteligent/obstacle_avoid_node_by_depth_camera.py 
+  move/random_mover.py move/patrol_mover.py  inteligent/obstacle_avoid_node_by_camera.py inteligent/obstacle_avoid_node_by_depth_camera.py  inteligent/semantic_explorer.py 
   DESTINATION lib/${PROJECT_NAME}
 )
 
