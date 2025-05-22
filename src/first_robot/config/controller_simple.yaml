@@ -1,15 +1,19 @@
 controller_manager:
   ros__parameters:
     update_rate: 10  # Hz
-
+    use_stamped_vel: false
+    
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     diffbot_base_controller:
       type: diff_drive_controller/DiffDriveController
+      ros__parameters:
+        use_stamped_vel: false
 
 diffbot_base_controller:
   ros__parameters:
+    use_stamped_vel: false   # <== rất quan trọng!
     left_wheel_names: ["left_wheel_joint", "left_rear_wheel_joint"]
     right_wheel_names: ["right_wheel_joint", "right_rear_wheel_joint"]
 

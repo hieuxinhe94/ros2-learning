@@ -87,18 +87,11 @@ def generate_launch_description():
         ]
     )
 
-    control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        parameters=[{"use_sim_time": True}, robot_controllers],
-        output="both",
-    )
-
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[robot_description],
+        parameters=[{"use_sim_time": True}, robot_description],
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -107,15 +100,17 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster"],
     )
 
-    pid_controllers_spawner = Node(
+    control_node = Node(
         package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "pid_controller_left_wheel_joint",
-            "pid_controller_right_wheel_joint",
-            "--param-file",
-            robot_controllers,
-        ],
+        executable="ros2_control_node",
+        parameters=[{"use_sim_time": True}, robot_description, robot_controllers],
+        output="both",
+    )
+    delay_control_node = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=robot_state_pub_node,
+            on_exit=[control_node],
+        )
     )
 
     robot_base_controller_spawner = Node(
@@ -127,24 +122,17 @@ def generate_launch_description():
             robot_controllers,
             "--controller-ros-args",
             "-r /diffbot_base_controller/cmd_vel:=/cmd_vel",
+            "-r /diffbot_base_controller/cmd_vel_out:=/cmd_vel_out",
         ],
     )
 
-    delay_robot_base_after_pid_controller_spawner = RegisterEventHandler(
+    delay_joint_state_after_base_controller_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=pid_controllers_spawner,
-            on_exit=[robot_base_controller_spawner],
+            target_action=robot_base_controller_spawner,
+            on_exit=[joint_state_broadcaster_spawner],
         )
     )
 
-    delay_joint_state_broadcaster_after_robot_base_controller_spawner = (
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=robot_base_controller_spawner,
-                on_exit=[joint_state_broadcaster_spawner],
-            )
-        )
-    )
     # RQt
     rqt = Node(
         package="rqt_image_view",
@@ -203,21 +191,9 @@ def generate_launch_description():
             "-y",
             "0",
             "-z",
-            "0.5",  # 👈 nâng z lên chút
+            "0.05",  # 👈 nâng z lên chút
             "-allow_renaming",
             "true",
-        ],
-    )
-
-    obstacle_move = TimerAction(
-        period=20.0,  # delay 10 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="obstacle_avoid_node_by_depth_camera.py",
-                name="obstacle_avoid_node_by_depth_camera",
-                output="screen",
-            )
         ],
     )
 
@@ -241,53 +217,84 @@ def generate_launch_description():
 
     # NAV2 bringup
     nav2_params_path = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "nav2_params.yaml"]
+        [
+            FindPackageShare(package_name),
+            "config",
+            "nav2_params.yaml",
+        ]  # too many error by custom config propeties
     )
 
     nav2_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(PathJoinSubstitution([
-            FindPackageShare('nav2_bringup'),
-            'launch',
-            'navigation_launch.py'
-        ])),
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [FindPackageShare("nav2_bringup"), "launch", "navigation_launch.py"]
+            )
+        ),
         launch_arguments={
-            'use_sim_time': 'true',
-            'autostart': 'true',
-            'params_file': nav2_params_path
-        }.items()
+            "use_sim_time": "true",
+            "autostart": "true",
+            "params_file": nav2_params_path,
+        }.items(),
     )
-
-    delay_slam_toolbox = LaunchDescription(
+    nav2_lifecycle_node = Node(
+        package="nav2_lifecycle_manager",
+        executable="lifecycle_manager",
+        name="lifecycle_manager_navigation",
+        output="screen",
+        parameters=[
+            {
+                "use_sim_time": True,
+                "autostart": True,
+                "node_names": [
+                    "controller_server",
+                    "planner_server",
+                    "behavior_server",
+                    "bt_navigator",
+                    "waypoint_follower",
+                    "smoother_server",
+                ],
+            }
+        ],
+    )
+    delay_slam_nav2_toolbox = LaunchDescription(
         [
-            TimerAction(
-                period=10.0,  # đợi cho node khởi tạo xong
-                actions=[slam_toolbox],
-            ),
-            TimerAction(
-                period=15.0,  # đợi cho node khởi tạo xong
-                actions=[configure_slam_toolbox],
-            ),
-            TimerAction(period=20.0, actions=[activate_slam_toolbox]),
-            TimerAction(period=23.0, actions=[nav2_launch]),
+            TimerAction(period=5.0, actions=[slam_toolbox]),
+            TimerAction(period=12.0, actions=[configure_slam_toolbox]),
+            TimerAction(period=15.0, actions=[activate_slam_toolbox]),
+            TimerAction(period=28.0, actions=[nav2_launch]),
+            TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
         ]
+    )
+    
+    # MOVE
+    random_move = TimerAction(
+        period=15.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="patrol_mover.py",
+                name="patrol_mover",
+                output="screen",
+            )
+        ],
     )
 
     nodes = [
         gazebo,
         gazebo_headless,
         gazebo_bridge,
+        #
         robot_state_pub_node,
+        delay_control_node,
+        #
         gz_spawn_entity,
         #
-        control_node,
-        #
         robot_base_controller_spawner,
-        delay_robot_base_after_pid_controller_spawner,
-        delay_joint_state_broadcaster_after_robot_base_controller_spawner,
-        # obstacle_move,
-        # nav2_bringup,
-        delay_slam_toolbox,
+        delay_joint_state_after_base_controller_spawner,
+        #
+        delay_slam_nav2_toolbox,
         rqt,
+        random_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)
