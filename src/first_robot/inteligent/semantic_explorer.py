@@ -3,6 +3,8 @@
 
 import os
 from ament_index_python import get_package_share_directory
+
+from action_scheduler import ActionScheduler
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, LaserScan
@@ -10,7 +12,6 @@ from geometry_msgs.msg import PoseStamped
 from std_srvs.srv import Empty
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
-
 import cv2
 from cv_bridge import CvBridge
 import numpy as np
@@ -18,9 +19,11 @@ import math
 import time
 from enum import Enum
 import random
+from geometry_msgs.msg import  TwistStamped
+import datetime
+import copy
 
-
-class PatrolState(Enum):
+class MoveTemplate(Enum):
     FORWARD = 1
     TURN_LEFT = 2
     TURN_RIGHT = 3
@@ -28,6 +31,10 @@ class PatrolState(Enum):
     BACKWARD = 5
     TURN_LEFT_BACK = 6
     TURN_RIGHT_BACK = 7
+    TURN_LEFT_AND_FORWARD = 10
+    TURN_RIGHT_AND_FORWARD = 11
+    TURN_LEFT_BACK_AND_FORWARD = 20
+    TURN_RIGHT_BACK_AND_FORWARD = 21
  
 
 class SemanticExplorer(Node):
@@ -35,7 +42,7 @@ class SemanticExplorer(Node):
         super().__init__('SemanticExplorer')
         self.get_logger().info("[SemanticExplorer] SmartMove============================================")
         self.bridge = CvBridge()
-        self.state = PatrolState.FORWARD
+        self.state = MoveTemplate.FORWARD
         self.state_timer = 0.0
         self.state_duration = 1.0
 
@@ -48,31 +55,55 @@ class SemanticExplorer(Node):
         self.get_logger().info("[SemanticExplorer] Initialize the lidar2d_subscription by /scan topic of lidar2d")
         self.lidar2d_subscription = self.create_subscription(LaserScan,'/scan',self.lidar_scan_callback,10)
         
-        self.timer = self.create_timer(1.0, self.processing_loop)  # 1Hz: mỗi 1s xử lý
+        self.nav_action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        self.cancel_bt_srv = self.create_client(Empty, '/bt_navigator/cancel')
         
         self.rgb_image = None
         self.scan_data = None
         self.goal_sent = False
+        self.last_process_time = self.get_clock().now().nanoseconds
+        self.pub = self.create_publisher(TwistStamped, '/cmd_vel_stamped', 10)
+        self.state_start_time = self.get_clock().now()
+        self.state_duration = 0.0
+        self.last_state_duration = 0.0
+        self.state = MoveTemplate.STOP
+        self.last_state = MoveTemplate.STOP
         
-        self.nav_action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
-        self.cancel_bt_srv = self.create_client(Empty, '/bt_navigator/cancel')
-        
+        #
+        self.timer = self.create_timer(1.0, self.processing_loop)  # 1Hz: mỗi 1s xử lý
 
     def processing_loop(self):
+        
+        # Tính thời gian giữa 2 lần xử lý
+        now = self.get_clock().now().nanoseconds
+        if now - self.last_process_time < 1e9:  # 1s = 1e9 nanoseconds
+            return
+        self.last_process_time = now
+        
+        self.get_logger().info("[SemanticExplorer] ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        self.get_logger().info("[SemanticExplorer] Processing loop each second")
+        
         if self.rgb_image is None or self.scan_data is None:
             return
 
+        if self.goal_sent:
+            return  # Đang tới mục tiêu
+
+        found_target = self.process_semantic_detection(self.rgb_image, self.scan_data)
+        if not found_target:
+            self.get_logger().info("[SemanticExplorer] random exploration")
+            self.random_exploration()
+        else: 
+            self.get_logger().info("[SemanticExplorer] go to target")            
         # Thực hiện xử lý semantic + gửi goal
-        self.get_logger().info("[SemanticExplorer] Processing loop each second")
-        self.process_semantic_detection(self.rgb_image, self.scan_data)
+        
 
     def lidar_scan_callback(self, msg):
         self.scan_data = msg
         
     def camera_image_callback(self, msg):
         self.rgb_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')        
-        
-        
+           
     def process_semantic_detection(self, rgb_image, scan_data):
         if self.goal_sent:
             return
@@ -107,13 +138,14 @@ class SemanticExplorer(Node):
                             y = math.sin(angle) * distance
                             self.get_logger().info(f"[SemanticExplorer]  send_goal  x: {x} - y: {y} confidence: {confidence} - label: {label}")
                             self.send_goal(x, y)
-                            break        
-
+                            break
 
     def load_mobilenet_ssd(self):
         pkg_path = get_package_share_directory("first_robot")
+        
         model_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.caffemodel")
         prototxt_path = os.path.join(pkg_path, "ai_models", "MobileNetSSD_deploy.prototxt")
+        
         self.classes = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
                         "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
@@ -123,7 +155,6 @@ class SemanticExplorer(Node):
         self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU) 
        
-
     def calculate_angle(self, pixel_x, width):
         fov = math.radians(60.0)
         center_offset = pixel_x - width / 2.0
@@ -147,6 +178,168 @@ class SemanticExplorer(Node):
         future = self.cancel_bt_srv.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         self.get_logger().info("[SemanticExplorer] 🛑 Canceled current Nav2 behavior tree")         
+  
+    def random_exploration(self):
+        min_distance = min(self.scan_data.ranges)
+        angle_range = len(self.scan_data.ranges)
+        front_index = angle_range // 2
+        front_distance = self.scan_data.ranges[front_index]
+
+        self.get_logger().info(f"[SemanticExplorer] front_distance = {front_distance}")           
+        if math.isinf(front_distance) or front_distance > 0.7:
+            self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Tiếp tục đi thẳng 1s")
+            self.state = MoveTemplate.FORWARD
+            self.state_duration = 1.0 
+        else:
+            # Nếu bị chắn phía trước
+            self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Nếu bị chắn phía trước front_distance = {front_distance}")           
+            if front_distance < 0.3:
+                if self.state in [MoveTemplate.TURN_LEFT_BACK_AND_FORWARD, MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD]:
+                    return
+                self.state = random.choice([MoveTemplate.TURN_LEFT_BACK_AND_FORWARD, MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD])
+                self.state_duration = 8.0
+            else:
+                self.state = random.choice([MoveTemplate.TURN_LEFT_AND_FORWARD, MoveTemplate.TURN_RIGHT_AND_FORWARD])
+                if self.state in [MoveTemplate.TURN_LEFT_AND_FORWARD, MoveTemplate.TURN_RIGHT_AND_FORWARD]:
+                    return
+                self.state_duration = 5.0
+
+        self.execute_movement(self.state, self.state_duration)  
+        
+    def execute_movement(self, state, duration):
+        self.get_logger().info(f"[Explorer] {self.get_current_time()} Đang yêu cầu 🤖 State: {state.name}, Duration: {duration:.2f}s")
+
+        # đếm thời gian hành động cũ đã làm xong chưa
+        now = self.get_clock().now()
+        elapsed = (now - self.state_start_time).nanoseconds / 1e9  # giây
+        if elapsed < self.last_state_duration:
+            self.get_logger().info(f"[Explorer] {self.get_current_time()} 🤖 Hành động cũ {self.last_state.name} trong {self.last_state_duration}s chưa xong, bỏ qua yêu cầu di chuyển")
+            return
+        
+        self.state_start_time = now  # Bắt đầu lại đồng hồ cho hành động mới
+        self.last_state_duration = self.state_duration 
+        self.last_state = self.state
+        
+        self.get_logger().info(f"[Explorer] {self.get_current_time()} Thực hiện hành động {state.name}, Duration: {duration:.2f}s")
+        msg = TwistStamped()
+        msg.header.stamp = self.get_clock().now().to_msg()
+
+        self.state_timer += 1                
+        if self.state == MoveTemplate.FORWARD:
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.0
+        elif self.state == MoveTemplate.TURN_LEFT:
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.4
+        elif self.state == MoveTemplate.TURN_RIGHT:
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = -0.4
+        elif self.state == MoveTemplate.STOP:
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.0
+            
+        elif state == MoveTemplate.TURN_LEFT_BACK:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Lùi
+            msg.twist.linear.x = -0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Quay trái
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.4
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.STOP
+
+        elif state == MoveTemplate.TURN_RIGHT_BACK:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Lùi
+            msg.twist.linear.x = -0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Quay phải
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = -0.4
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.STOP
+
+        elif state == MoveTemplate.TURN_LEFT_AND_FORWARD:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Quay trái
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.4
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Đi thẳng
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.STOP
+
+        elif state == MoveTemplate.TURN_RIGHT_AND_FORWARD:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Quay phải
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = -0.4
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Đi thẳng
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.STOP
+
+        elif state == MoveTemplate.TURN_LEFT_BACK_AND_FORWARD:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Lùi
+            msg.twist.linear.x = -0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Quay trái
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.4
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            # Đi thẳng
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(4.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.STOP
+
+        elif state == MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD:
+            node = ActionScheduler()
+            msg = TwistStamped()
+            # Lùi
+            msg.twist.linear.x = -0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(0.0, copy.deepcopy(msg))
+            # Quay phải
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = -0.4
+            node.set_timeout(2.0, copy.deepcopy(msg))
+            # Đi thẳng
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.0
+            node.set_timeout(4.0, copy.deepcopy(msg))
+            self.state = MoveTemplate.FORWARD  
+                               
+        elif state == MoveTemplate.STOP:
+            msg.twist.linear.x = 0.0
+            msg.twist.angular.z = 0.0  
+                                      
+        self.get_logger().info(f"execute_movement direction action: {self.state}")
+        self.pub.publish(msg)
+        pass
+
+    def get_current_time(self): 
+        now_ros = self.get_clock().now()
+        now_ns = now_ros.nanoseconds  # Thời gian tính từ epoch (1970) tính bằng nano giây
+        now_dt = datetime.datetime.fromtimestamp(now_ns / 1e9)
+
+        # Hiển thị dạng dễ đọc
+        formatted_time = now_dt.strftime("%H:%M:%S.%f")[:-3]  # bỏ bớt 3 số cuối (từ micro thành mili)
+        return formatted_time
   
 def main(args=None):
     rclpy.init(args=args)

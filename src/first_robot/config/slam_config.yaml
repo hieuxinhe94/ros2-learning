@@ -2,6 +2,7 @@ slam_toolbox:
   ros__parameters:
     use_sim_time: true
     message_filter_queue_size: 100
+    use_approximate_sync: true
 
     slam_mode: "mapping"
     map_frame: "map"

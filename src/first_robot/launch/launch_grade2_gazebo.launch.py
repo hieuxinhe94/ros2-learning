@@ -121,8 +121,8 @@ def generate_launch_description():
             "--param-file",
             robot_controllers,
             "--controller-ros-args",
-            "-r /diffbot_base_controller/cmd_vel:=/cmd_vel",
-            "-r /diffbot_base_controller/cmd_vel_out:=/cmd_vel_out",
+            "-r /diffbot_base_controller/cmd_vel:=/cmd_vel_stamped",
+          
         ],
     )
 
@@ -168,6 +168,7 @@ def generate_launch_description():
             # '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             # '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             # RGB camera
+            '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             # '/camera/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
             # '/camera/color/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             # SLAM toolbox
@@ -261,19 +262,31 @@ def generate_launch_description():
             TimerAction(period=5.0, actions=[slam_toolbox]),
             TimerAction(period=12.0, actions=[configure_slam_toolbox]),
             TimerAction(period=15.0, actions=[activate_slam_toolbox]),
-            TimerAction(period=28.0, actions=[nav2_launch]),
-            TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
+            # TimerAction(period=28.0, actions=[nav2_launch]),
+            # TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
         ]
     )
     
     # MOVE
-    random_move = TimerAction(
-        period=15.0,  # delay 10 giây
+    semantic_move = TimerAction(
+        period=10.0,  # delay 10 giây
         actions=[
             Node(
                 package=package_name,
-                executable="patrol_mover.py",
-                name="patrol_mover",
+                executable="semantic_explorer.py",
+                name="semantic_explorer",
+                output="screen",
+            )
+        ],
+    )
+
+    covert_to_twiststamped = TimerAction(
+        period=1.0,  # delay 0 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="twist_to_twiststamped_node.py",
+                name="covert_to_twiststamped",
                 output="screen",
             )
         ],
@@ -284,6 +297,8 @@ def generate_launch_description():
         gazebo_headless,
         gazebo_bridge,
         #
+        covert_to_twiststamped,
+        #
         robot_state_pub_node,
         delay_control_node,
         #
@@ -293,8 +308,8 @@ def generate_launch_description():
         delay_joint_state_after_base_controller_spawner,
         #
         delay_slam_nav2_toolbox,
-        rqt,
-        random_move
+        # rqt,
+        semantic_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)
