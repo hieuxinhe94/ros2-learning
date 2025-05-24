@@ -281,12 +281,12 @@ def generate_launch_description():
     )
   
     covert_to_twiststamped = TimerAction(
-        period=1.0,  # delay 0 giây
+        period=3.0,  # delay 3 giây
         actions=[
             Node(
                 package=package_name,
-                executable="twist_to_twiststamped_node.py",
-                name="covert_to_twiststamped",
+                executable="twist_to_twiststamped.py",
+                name="twist_to_twiststamped_node",
                 output="screen",
             )
         ],

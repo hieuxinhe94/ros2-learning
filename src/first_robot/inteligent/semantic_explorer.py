@@ -191,7 +191,7 @@ class SemanticExplorer(Node):
         self.get_logger().info(f"[SemanticExplorer] front_distance = {front_distance}")           
         if math.isinf(front_distance) or front_distance > 0.7:
             self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Tiếp tục đi thẳng 1s")
-            self.state = random.choice([MoveTemplate.FORWARD, MoveTemplate.TURN_LEFT, MoveTemplate.TURN_RIGHT, MoveTemplate.STOP])
+            self.state = random.choice([MoveTemplate.FORWARD, MoveTemplate.STOP])
             self.get_logger().info(f"[SemanticExplorer]  {self.get_current_time()} random di chuyển {self.state.name} ")           
             self.state_duration = 2.0 
             

@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, TwistStamped
 from std_msgs.msg import Header
 
-class TwistToTwistStampedNode(Node):
+class TwistToTwistStamped(Node):
     def __init__(self):
-        super().__init__('twist_to_twiststamped_node')
+        super().__init__('twist_to_twiststamped')
 
         self.get_logger().info(f'[twist_to_twiststamped_node] ============= INIT ============================')
 
-        self.declare_parameter('input_topic', '/cmd_vel')              # nơi Nav2/AI xuất Twist
-        self.declare_parameter('output_topic', '/cmd_vel_stamped')      # nơi robot/controller cần TwistStamped
+        self.declare_parameter('input_topic', '/cmd_vel')              # nơi Nav2AI xuất Twist
+        self.declare_parameter('output_topic', '/cmd_vel_stamped')      # nơi robotcontroller cần TwistStamped
         self.declare_parameter('frame_id', 'base_link')
 
         input_topic = self.get_parameter('input_topic').get_parameter_value().string_value
@@ -35,7 +34,7 @@ class TwistToTwistStampedNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = TwistToTwistStampedNode()
+    node = TwistToTwistStamped()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
