@@ -262,8 +262,8 @@ def generate_launch_description():
             TimerAction(period=5.0, actions=[slam_toolbox]),
             TimerAction(period=12.0, actions=[configure_slam_toolbox]),
             TimerAction(period=15.0, actions=[activate_slam_toolbox]),
-            # TimerAction(period=28.0, actions=[nav2_launch]),
-            # TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
+            TimerAction(period=28.0, actions=[nav2_launch]),
+            TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
         ]
     )
     
@@ -274,12 +274,12 @@ def generate_launch_description():
             Node(
                 package=package_name,
                 executable="semantic_explorer.py",
-                name="semantic_explorer",
+                name="semantic_explorer_move",
                 output="screen",
             )
         ],
     )
-
+  
     covert_to_twiststamped = TimerAction(
         period=1.0,  # delay 0 giây
         actions=[
@@ -309,6 +309,7 @@ def generate_launch_description():
         #
         delay_slam_nav2_toolbox,
         # rqt,
+      
         semantic_move
     ]
 

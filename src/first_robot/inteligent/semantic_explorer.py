@@ -39,7 +39,7 @@ class MoveTemplate(Enum):
 
 class SemanticExplorer(Node):
     def __init__(self):
-        super().__init__('SemanticExplorer')
+        super().__init__('SemanticExplorerNode')
         self.get_logger().info("[SemanticExplorer] SmartMove============================================")
         self.bridge = CvBridge()
         self.state = MoveTemplate.FORWARD
@@ -68,6 +68,9 @@ class SemanticExplorer(Node):
         self.last_state_duration = 0.0
         self.state = MoveTemplate.STOP
         self.last_state = MoveTemplate.STOP
+
+        self.scheduler_node = ActionScheduler(self)
+        self.scheduler_node.run_scheduler()
         
         #
         self.timer = self.create_timer(1.0, self.processing_loop)  # 1Hz: mỗi 1s xử lý
@@ -188,21 +191,42 @@ class SemanticExplorer(Node):
         self.get_logger().info(f"[SemanticExplorer] front_distance = {front_distance}")           
         if math.isinf(front_distance) or front_distance > 0.7:
             self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Tiếp tục đi thẳng 1s")
-            self.state = MoveTemplate.FORWARD
-            self.state_duration = 1.0 
+            self.state = random.choice([MoveTemplate.FORWARD, MoveTemplate.TURN_LEFT, MoveTemplate.TURN_RIGHT, MoveTemplate.STOP])
+            self.get_logger().info(f"[SemanticExplorer]  {self.get_current_time()} random di chuyển {self.state.name} ")           
+            self.state_duration = 2.0 
+            
+            # test
+            # node = ActionScheduler(self)
+            # msg = TwistStamped()
+            # msg.header.stamp = self.get_clock().now().to_msg()      
+            # # Tiến 1s
+            # msg.twist.linear.x = 0.1
+            # msg.twist.angular.z = 0.0
+            # self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Tiến lên 1s sau đó dừng lại")           
+            # node.set_timeout(0.0, copy.deepcopy(msg), note="Tiến lên 1s sau đó dừng lại")
+            # Sau 1s dừng lại
+            # msg = TwistStamped()
+            # msg.header.stamp = self.get_clock().now().to_msg()            
+            # msg.twist.linear.x = 0.10
+            # msg.twist.angular.z = 0.0
+            # node.set_timeout(1.0, copy.deepcopy(msg), note="")            
+
         else:
             # Nếu bị chắn phía trước
-            self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Nếu bị chắn phía trước front_distance = {front_distance}")           
+            self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} Nếu bị chắn phía trước front_distance = {front_distance}")
+            check_time_now = self.get_clock().now().nanoseconds           
             if front_distance < 0.3:
-                if self.state in [MoveTemplate.TURN_LEFT_BACK_AND_FORWARD, MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD]:
+                if self.state in [MoveTemplate.TURN_LEFT_BACK_AND_FORWARD, MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD] and check_time_now - self.state_start_time.nanoseconds >= 1e9:
+                    self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} State hiện tại {self.state} còn {check_time_now - self.state_start_time.nanoseconds}s đang khớp với dự định 1, bỏ qua = {front_distance}")           
                     return
                 self.state = random.choice([MoveTemplate.TURN_LEFT_BACK_AND_FORWARD, MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD])
-                self.state_duration = 8.0
+                self.state_duration = 10.0
             else:
+                if self.state in [MoveTemplate.TURN_LEFT_AND_FORWARD, MoveTemplate.TURN_RIGHT_AND_FORWARD] and check_time_now - self.state_start_time.nanoseconds >= 1e9:
+                    self.get_logger().info(f"[SemanticExplorer] {self.get_current_time()} State hiện tại {self.state} còn {check_time_now - self.state_start_time.nanoseconds}s  đang khớp với dự định 2, bỏ qua = {front_distance}")                               
+                    return                
                 self.state = random.choice([MoveTemplate.TURN_LEFT_AND_FORWARD, MoveTemplate.TURN_RIGHT_AND_FORWARD])
-                if self.state in [MoveTemplate.TURN_LEFT_AND_FORWARD, MoveTemplate.TURN_RIGHT_AND_FORWARD]:
-                    return
-                self.state_duration = 5.0
+                self.state_duration = 7.0
 
         self.execute_movement(self.state, self.state_duration)  
         
@@ -239,90 +263,95 @@ class SemanticExplorer(Node):
             msg.twist.angular.z = 0.0
             
         elif state == MoveTemplate.TURN_LEFT_BACK:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Lùi
             msg.twist.linear.x = -0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(0.0, copy.deepcopy(msg))
-            # Quay trái
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Lùi 2s")
+            #time = angle / speed = π/2 / 0.4 ≈ 3.93s ≈ 4s quay tại chỗ mới đạt ~90°
+            # Quay trái 5s
             msg.twist.linear.x = 0.0
             msg.twist.angular.z = 0.4
-            node.set_timeout(2.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.STOP
+            self.scheduler_node.set_timeout(2.0, copy.deepcopy(msg), note="Quay trái 5s")
+            # Đi thẳng            
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.4
+            self.scheduler_node.set_timeout(7.0, copy.deepcopy(msg), note="Đi thẳng 3s")
+           
 
         elif state == MoveTemplate.TURN_RIGHT_BACK:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Lùi
             msg.twist.linear.x = -0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(0.0, copy.deepcopy(msg))
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Lùi 2s")
             # Quay phải
             msg.twist.linear.x = 0.0
             msg.twist.angular.z = -0.4
-            node.set_timeout(2.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.STOP
+            self.scheduler_node.set_timeout(2.0, copy.deepcopy(msg), note="Quay phải 5s")
+            # Đi thẳng            
+            msg.twist.linear.x = 0.1
+            msg.twist.angular.z = 0.4
+            self.scheduler_node.set_timeout(7.0, copy.deepcopy(msg), note="Đi thẳng 3s")
 
         elif state == MoveTemplate.TURN_LEFT_AND_FORWARD:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Quay trái
             msg.twist.linear.x = 0.0
             msg.twist.angular.z = 0.4
-            node.set_timeout(0.0, copy.deepcopy(msg))
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Quay trái 5s")
             # Đi thẳng
             msg.twist.linear.x = 0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(2.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.STOP
+            self.scheduler_node.set_timeout(5.0, copy.deepcopy(msg), note="Đi thẳng 3s")
+ 
 
         elif state == MoveTemplate.TURN_RIGHT_AND_FORWARD:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Quay phải
             msg.twist.linear.x = 0.0
             msg.twist.angular.z = -0.4
-            node.set_timeout(0.0, copy.deepcopy(msg))
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Quay phải 5s")
             # Đi thẳng
             msg.twist.linear.x = 0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(2.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.STOP
+            self.scheduler_node.set_timeout(5.0, copy.deepcopy(msg), note="Đi thẳng 3s")
 
         elif state == MoveTemplate.TURN_LEFT_BACK_AND_FORWARD:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Lùi
             msg.twist.linear.x = -0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(0.0, copy.deepcopy(msg))
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Lùi 2s")
             # Quay trái
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = 0.4
-            node.set_timeout(2.0, copy.deepcopy(msg))
+            msg.twist.angular.z = 0.5
+            self.scheduler_node.set_timeout(2.0, copy.deepcopy(msg), note="Quay trái 5s")
             # Đi thẳng
             msg.twist.linear.x = 0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(4.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.STOP
+            self.scheduler_node.set_timeout(7.0, copy.deepcopy(msg), note="Đi thẳng 3s")
 
         elif state == MoveTemplate.TURN_RIGHT_BACK_AND_FORWARD:
-            node = ActionScheduler()
+            
             msg = TwistStamped()
             # Lùi
             msg.twist.linear.x = -0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(0.0, copy.deepcopy(msg))
+            self.scheduler_node.set_timeout(0.0, copy.deepcopy(msg), note="Lùi 2s")
             # Quay phải
             msg.twist.linear.x = 0.0
-            msg.twist.angular.z = -0.4
-            node.set_timeout(2.0, copy.deepcopy(msg))
+            msg.twist.angular.z = -0.5
+            self.scheduler_node.set_timeout(2.0, copy.deepcopy(msg), note="Quay phải 5s")
             # Đi thẳng
             msg.twist.linear.x = 0.1
             msg.twist.angular.z = 0.0
-            node.set_timeout(4.0, copy.deepcopy(msg))
-            self.state = MoveTemplate.FORWARD  
+            self.scheduler_node.set_timeout(7.0, copy.deepcopy(msg),    note="Đi thẳng 3s") 
                                
         elif state == MoveTemplate.STOP:
             msg.twist.linear.x = 0.0
