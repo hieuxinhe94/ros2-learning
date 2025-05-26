@@ -19,7 +19,7 @@ from launch.event_handlers import OnProcessExit, OnProcessStart
 
 def generate_launch_description():
 
-    package_name = "first_robot"  # Tên gói của bạn
+    package_name = "first_robot"  # Tên package
 
     declared_arguments = []
     declared_arguments.append(
@@ -69,7 +69,7 @@ def generate_launch_description():
         [
             FindPackageShare(package_name),
             "config",
-            "controller_simple.yaml",
+            "controller_simple_snipdog.yaml",
         ]
     )
     world_with_obstacles = PathJoinSubstitution(
@@ -94,12 +94,6 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True}, robot_description],
     )
 
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster"],
-    )
-
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -113,23 +107,16 @@ def generate_launch_description():
         )
     )
 
-    robot_base_controller_spawner = Node(
+    joint_trajectory_controller = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[
-            "diffbot_base_controller",
-            "--param-file",
-            robot_controllers,
-            "--controller-ros-args",
-            "-r /diffbot_base_controller/cmd_vel:=/cmd_vel_stamped",
-          
-        ],
+        arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
+        output="screen"
     )
-
-    delay_joint_state_after_base_controller_spawner = RegisterEventHandler(
+    delay__trajectory_after_control_node = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=robot_base_controller_spawner,
-            on_exit=[joint_state_broadcaster_spawner],
+            target_action=control_node,
+            on_exit=[joint_trajectory_controller],
         )
     )
 
@@ -165,12 +152,10 @@ def generate_launch_description():
             # Sim time
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             # depth camera
-            # '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
-            # '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+          
             # RGB camera
             '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
-            # '/camera/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
-            # '/camera/color/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+        
             # SLAM toolbox
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
         ],
@@ -280,37 +265,35 @@ def generate_launch_description():
         ],
     )
   
-    covert_to_twiststamped = TimerAction(
-        period=3.0,  # delay 3 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="twist_to_twiststamped.py",
-                name="twist_to_twiststamped_node",
-                output="screen",
-            )
-        ],
-    )
+    # covert_to_twiststamped = TimerAction(
+    #     period=3.0,  # delay 3 giây
+    #     actions=[
+    #         Node(
+    #             package=package_name,
+    #             executable="twist_to_twiststamped.py",
+    #             name="twist_to_twiststamped_node",
+    #             output="screen",
+    #         )
+    #     ],
+    # )
 
     nodes = [
         gazebo,
         gazebo_headless,
         gazebo_bridge,
         #
-        covert_to_twiststamped,
+        # covert_to_twiststamped,
         #
         robot_state_pub_node,
         delay_control_node,
         #
         gz_spawn_entity,
         #
-        robot_base_controller_spawner,
-        delay_joint_state_after_base_controller_spawner,
+        delay__trajectory_after_control_node,
         #
-        delay_slam_nav2_toolbox,
+        # delay_slam_nav2_toolbox,
         # rqt,
-      
-        semantic_move
+        # semantic_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)

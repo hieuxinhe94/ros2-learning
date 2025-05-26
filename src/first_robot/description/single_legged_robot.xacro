@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Macro để tạo một chân -->
+  <xacro:macro name="leg" params="prefix x y">
+    <!-- Hip joint -->
+    <joint name="${prefix}_hip_joint" type="revolute">
+      <parent link="chassis"/>
+      <child link="${prefix}_thigh"/>
+      <origin xyz="${x} ${y} 0.075"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+    <link name="${prefix}_thigh">
+      <visual>
+        <origin xyz="0 0 -0.075"/>
+        <geometry><box size="0.05 0.05 0.15"/></geometry>
+        <material name="blue"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -0.075"/>
+        <geometry><box size="0.05 0.05 0.15"/></geometry>
+      </collision>
+      <xacro:inertial_box mass="0.2" x="0.05" y="0.05" z="0.15"/>
+    </link>
+
+    <!-- Knee joint -->
+    <joint name="${prefix}_knee_joint" type="revolute">
+      <parent link="${prefix}_thigh"/>
+      <child link="${prefix}_shank"/>
+      <origin xyz="0 0 -0.15"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+    <link name="${prefix}_shank">
+      <visual>
+        <origin xyz="0 0 -0.075"/>
+        <geometry><box size="0.04 0.04 0.15"/></geometry>
+        <material name="red"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -0.075"/>
+        <geometry><box size="0.04 0.04 0.15"/></geometry>
+      </collision>
+      <xacro:inertial_box mass="0.2" x="0.04" y="0.04" z="0.15"/>
+    </link>
+
+    <!-- Foot (fixed) -->
+    <joint name="${prefix}_foot_joint" type="fixed">
+      <parent link="${prefix}_shank"/>
+      <child link="${prefix}_foot"/>
+      <origin xyz="0 0 -0.15"/>
+    </joint>
+
+    <link name="${prefix}_foot">
+      <visual>
+        <geometry><sphere radius="0.03"/></geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry><sphere radius="0.03"/></geometry>
+      </collision>
+      <xacro:inertial_sphere mass="0.1" radius="0.03"/>
+    </link>
+    
+  </xacro:macro>
+</robot>
