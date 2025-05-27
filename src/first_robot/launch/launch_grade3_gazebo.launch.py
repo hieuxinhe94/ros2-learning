@@ -177,7 +177,7 @@ def generate_launch_description():
             "-y",
             "0",
             "-z",
-            "0.05",  # 👈 nâng z lên chút
+            "0.5",  # 👈 nâng z lên chút
             "-allow_renaming",
             "true",
         ],

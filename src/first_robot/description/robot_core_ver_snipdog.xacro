@@ -17,6 +17,10 @@
         <color rgba="1 0 0 1" />
     </material>
 
+    <material name="grey">
+        <color rgba="0.5 0.5 0.5 1" />
+    </material>
+
     <!-- BASE LINK -->
     <link name="base_link"></link>
 
@@ -24,38 +28,63 @@
     <joint name="chassis_joint" type="fixed">
         <parent link="base_link" />
         <child link="chassis" />
-        <origin xyz="-0.1 0 0" />
+         <origin xyz="0 0 0" />
     </joint>
 
     <link name="chassis">
         <visual>
-            <origin xyz="0.15 0 0.075" />
+            <origin xyz="0 0 0.075" />
             <geometry>
-                <box size="0.3 0.3 0.15" />
+               <box size="0.5 0.2 0.15" />
             </geometry>
             <material name="white" />
         </visual>
         <collision>
             <origin xyz="0.15 0 0.075" />
             <geometry>
-                <box size="0.3 0.3 0.15" />
+                <box size="0.5 0.2 0.15" />
             </geometry>
         </collision>
-        <xacro:inertial_box mass="0.5" x="0.3" y="0.1" z="0.15">
-            <origin xyz="0.15 0 0.075" rpy="0 0 0" />
+        <xacro:inertial_box mass="0.5" x="0.5" y="0.2" z="0.15">
+             <origin xyz="0 0 0.075" rpy="0 0 0" />
         </xacro:inertial_box>
     </link>
 
     <!-- FL (Front Left) LEG -->
 
     <!-- IMPORT LEG PATTERN -->
-    <xacro:include filename="$(find first_robot)/description/leg_macro.xacro"/>
+    <xacro:include filename="$(find first_robot)/description/leg_block.xacro"/>
 
+    <!-- Gọi 4 chân: FL, FR, RL, RR -->
+    <xacro:leg prefix="left_front"  x=" 0.15" y=" 0.10" />
+    <xacro:leg prefix="right_front" x=" 0.15" y="-0.10" />
+    <xacro:leg prefix="left_rear"   x="-0.15" y=" 0.10" />
+    <xacro:leg prefix="right_rear"  x="-0.15" y="-0.10" />
 
-     <!-- Gọi 4 chân: FL, FR, RL, RR -->
-    <xacro:leg side="left"  pos="front" suffix="" base_link="base_link" hip_pos="0.1 0.05 0" hip_rpy="0 0 0" knee_pos="0 0 -0.05" knee_rpy="0 0 0" ankle_pos="0.0 0.0 -0.08" ankle_rpy="0 0 0" />
-    <xacro:leg side="right" pos="front" suffix="" base_link="base_link" hip_pos="0.1 -0.05 0" hip_rpy="0 0 0" knee_pos="0 0 -0.05" knee_rpy="0 0 0" ankle_pos="0.0 0.0 -0.08" ankle_rpy="0 0 0" />
-    <xacro:leg side="left"  pos="rear"  suffix="" base_link="base_link" hip_pos="-0.1 0.05 0" hip_rpy="0 0 0" knee_pos="0 0 -0.05" knee_rpy="0 0 0" ankle_pos="0.0 0.0 -0.08"  ankle_rpy="0 0 0" />
-    <xacro:leg side="right" pos="rear"  suffix="" base_link="base_link" hip_pos="-0.1 -0.05 0" hip_rpy="0 0 0" knee_pos="0 0 -0.05" knee_rpy="0 0 0" ankle_pos="0.0 0.0 -0.08" ankle_rpy="0 0 0"/>
+    <!-- HEAD LINK -->
+    <joint name="head_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="head" />
+        <origin xyz="0 0 0.15" />   
+    </joint>
+    <link name="head">
+        <visual>
+            <origin xyz="0 0 0.05" />
+            <geometry>
+                <box size="0.1 0.1 0.1" />
+            </geometry>
+            <material name="orange" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.05" />
+            <geometry>
+                <box size="0.1 0.1 0.1" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="0.2" x="0.1" y="0.1" z="0.1">
+            <origin xyz="0 0 0.05" rpy="0 0 0" />
+        </xacro:inertial_box>
+    </link>
+
 
 </robot>
