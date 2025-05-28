@@ -43,7 +43,7 @@
   <!-- Gazebo plugin config -->
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find first_robot)/config/controller_simple_snipdog.yaml</parameters>
+      <parameters>$(find first_robot)/config/controller_test_snipdog.yaml</parameters>
     </plugin>
   </gazebo>
 

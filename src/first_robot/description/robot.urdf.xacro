@@ -15,5 +15,5 @@
     <xacro:include filename="lidar_2d_camera.xacro" />
     <xacro:include filename="camera.xacro" />
     <!-- <xacro:include filename="depth_camera.xacro" /> -->
-
+    <xacro:include filename="imu_link.xacro" />
 </robot>

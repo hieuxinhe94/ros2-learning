@@ -69,7 +69,7 @@ def generate_launch_description():
         [
             FindPackageShare(package_name),
             "config",
-            "controller_simple_snipdog.yaml",
+            "controller_test_snipdog.yaml",
         ]
     )
     world_with_obstacles = PathJoinSubstitution(
@@ -107,17 +107,24 @@ def generate_launch_description():
         )
     )
 
+
     joint_trajectory_controller = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
         output="screen"
     )
-    delay__trajectory_after_control_node = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=control_node,
-            on_exit=[joint_trajectory_controller],
-        )
+    
+    delay__trajectory_after_control_node = TimerAction(
+        period=3.0,  # delay 3 giây
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
+                output="screen"
+            )
+        ]
     )
 
     # RQt
@@ -158,6 +165,9 @@ def generate_launch_description():
         
             # SLAM toolbox
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+            
+            # IMU
+            "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU",
         ],
         output="screen",
     )
@@ -252,14 +262,39 @@ def generate_launch_description():
         ]
     )
     
+    # delay_imu_node =  TimerAction(
+    #         period=8.0,  # delay 8 giây
+    #         actions=[Node(
+    #         package="tf2_ros",
+    #         executable="static_transform_publisher",
+    #         arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
+    #         output='screen'
+    #         )
+    #     ],
+    # )
+    
+    
+    
     # MOVE
-    semantic_move = TimerAction(
-        period=10.0,  # delay 10 giây
+    dog_gait_cycle_move = TimerAction(
+        period=8.0,  # delay 10 giây
         actions=[
             Node(
                 package=package_name,
-                executable="semantic_explorer.py",
-                name="semantic_explorer_move",
+                executable="dog_gait_cycle.py",
+                name="dog_gait_cycle",
+                output="screen",
+            )
+        ],
+    )
+    
+    dog_gait_cycle_publisher_move = TimerAction(
+        period=8.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="gait_cycle_publisher.py",
+                name="gait_cycle_publisher",
                 output="screen",
             )
         ],
@@ -289,11 +324,15 @@ def generate_launch_description():
         #
         gz_spawn_entity,
         #
+        # delay_imu_node,
+        
         delay__trajectory_after_control_node,
         #
         # delay_slam_nav2_toolbox,
         # rqt,
         # semantic_move
+        # dog_gait_cycle_move
+        dog_gait_cycle_publisher_move,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

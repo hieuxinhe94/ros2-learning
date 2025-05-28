@@ -74,3 +74,4 @@ bash
 Copy
 sudo apt update
 sudo apt upgrade
+chmod +x move/dog_gait_cycle.py

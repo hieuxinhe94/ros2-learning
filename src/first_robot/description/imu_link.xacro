@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <link name="imu_link">
+        <inertial>
+            <mass value="0.01"/>
+            <origin xyz="0 0 0"/>
+            <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
+    </link>
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 0.1"/>
+        <!-- Đặt IMU gần trọng tâm -->
+    </joint>
+
+
+    <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <topic>imu/data</topic>
+        <plugin name="gz::sim::systems::Imu" filename="gz-sim-imu-system">
+        <ros>
+            <namespace>/</namespace>
+          
+        </ros>
+        </plugin>
+    </sensor>
+    </gazebo>
+
+</robot>

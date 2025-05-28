@@ -2,6 +2,14 @@
 <sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
+    <surface>
+      <friction>
+         <ode>
+            <mu>1.5</mu>
+            <mu2>1.5</mu2>
+          </ode>
+      </friction>
+    </surface>
     <!-- Light -->
     <light name="sun" type="directional">
       <cast_shadows>true</cast_shadows>
@@ -14,22 +22,14 @@
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1.0</real_time_factor>
     </physics>
-    <plugin
-      filename="gz-sim-physics-system"
-      name="gz::sim::systems::Physics">
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics">
     </plugin>
-    <plugin
-      filename="gz-sim-sensors-system"
-      name="gz::sim::systems::Sensors">
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
       <render_engine>ogre2</render_engine>
     </plugin>
-    <plugin
-      filename="gz-sim-user-commands-system"
-      name="gz::sim::systems::UserCommands">
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands">
     </plugin>
-    <plugin
-      filename="gz-sim-scene-broadcaster-system"
-      name="gz::sim::systems::SceneBroadcaster">
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster">
     </plugin>
 
 
@@ -218,13 +218,13 @@
     <!-- Tường phía Bắc (trên) -->
     <model name="wall_north">
       <static>true</static>
-      <pose>0 4.5 0.75 0 0 0</pose> <!-- Cách tâm 4.5m theo trục Y -->
+      <pose>0 4.5 0.75 0 0 0</pose>      <!-- Cách tâm 4.5m theo trục Y -->
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
               <size>2.4 0.1 1.5</size>
-            </box> <!-- Tường ngắn lại để chừa hai góc -->
+            </box>            <!-- Tường ngắn lại để chừa hai góc -->
           </geometry>
         </collision>
         <visual name="visual">
@@ -268,7 +268,7 @@
     <!-- Tường phía Tây (trái) -->
     <model name="wall_west">
       <static>true</static>
-      <pose>-4.5 0 0.75 0 0 1.5708</pose> <!-- Xoay ngang -->
+      <pose>-4.5 0 0.75 0 0 1.5708</pose>      <!-- Xoay ngang -->
       <link name="link">
         <collision name="collision">
           <geometry>
@@ -293,7 +293,7 @@
     <!-- Tường phía Đông (phải) -->
     <model name="wall_east">
       <static>true</static>
-      <pose>4.5 0 0.75 0 0 1.5708</pose> <!-- Xoay ngang -->
+      <pose>4.5 0 0.75 0 0 1.5708</pose>      <!-- Xoay ngang -->
       <link name="link">
         <collision name="collision">
           <geometry>
@@ -363,7 +363,7 @@
       </link>
     </model>
 
-   
+
 
   </world>
 </sdf>

@@ -1,0 +1,50 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+      ros__parameters:
+        use_stamped_vel: true
+
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - left_front_hip_joint
+      - left_front_knee_joint
+      - left_front_ankle_joint
+      - right_front_hip_joint
+      - right_front_knee_joint
+      - right_front_ankle_joint
+      - left_rear_hip_joint
+      - left_rear_knee_joint
+      - left_rear_ankle_joint
+      - right_rear_hip_joint
+      - right_rear_knee_joint
+      - right_rear_ankle_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
+    interpolate_from_desired_state: true
+    state_tolerance: 0.2  # tăng lên cho thoải mái hơn
+    goal_tolerance: 0.05
+    constraints:
+      goal_time: 0.5
+      stopped_velocity_tolerance: 0.01
+      left_front_hip_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}  # Tăng trajectory
+      left_front_knee_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0 }
+      left_front_ankle_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
+      right_front_hip_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
+      right_front_knee_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}  # Khớp 4
+      right_front_ankle_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
+      left_rear_hip_joint: {trajectory: 0.2, goal: 0.1 , p: 400.0, i: 0.1, d: 5.0}
+      left_rear_knee_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}   # Khớp 7
+      left_rear_ankle_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
+      right_rear_hip_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
+      right_rear_knee_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}  # Khớp 10
+      right_rear_ankle_joint: {trajectory: 0.2, goal: 0.1, p: 400.0, i: 0.1, d: 5.0}
