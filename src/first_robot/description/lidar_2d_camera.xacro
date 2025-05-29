@@ -1,27 +1,18 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
-    <joint name="laser joint" type="fixed">
-
-        <parent link="chassis" />
-        <child link="laser_frame" />
+    <joint name="laser_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="lidar_link" />
         <origin xyz="0.1 0 0.175" rpy="0 0 0" />
-
     </joint>
 
-    <link name="laser_frame">
+    <link name="lidar_link">
         <visual>
             <geometry>
                 <cylinder radius="0.05" length="0.04" />
             </geometry>
-            <material name="orange" />
-        </visual>
-        <visual>
-            <origin xyz="0 0 -0.05" />
-            <geometry>
-                <cylinder radius="0.01" length="0.1" />
-            </geometry>
-            <material name="orange" />
+            <material name="red" />
         </visual>
         <collision>
             <geometry>
@@ -32,23 +23,29 @@
             <origin xyz="0 0 0" rpy="0 0 0" />
         </xacro:inertial_cylinder>
     </link>
-
-    <gazebo reference="laser_frame">
-        <material>Gazebo/Black</material>
-
-        <sensor name="lidar" type="gpu_lidar">
+   
+    <gazebo reference="lidar_link">
+        <sensor name="lidar_link" type="gpu_lidar">
             <always_on>true</always_on>
-            <update_rate>30</update_rate>
+            <update_rate>2</update_rate>
+            <topic>/scan</topic>
+
             <visualize>true</visualize>
-            <pose>0 0 0 0 0 0</pose>
-            <topic>/lidar_scan</topic>
+            <frame_id>lidar_link</frame_id>
+            <gz_frame_id>lidar_link</gz_frame_id>
+            <ign_frame_id>lidar_link</ign_frame_id>
+
+            <ros>
+                <namespace>/</namespace>
+                <remapping>scan:=scan</remapping>
+            </ros>
             <ray>
                 <scan>
                     <horizontal>
-                        <samples>360</samples>
+                        <samples>720</samples>
                         <resolution>1</resolution>
-                        <min_angle>-3.14</min_angle>
-                        <max_angle>3.14</max_angle>
+                        <min_angle>-1.5708</min_angle>
+                        <max_angle>1.5708</max_angle>
                     </horizontal>
                 </scan>
                 <range>
@@ -61,6 +58,12 @@
                     <stddev>0.01</stddev>
                 </noise>
             </ray>
+            <!-- <plugin
+                filename="gz-sim-sensors-system"
+                name="gz::sim::systems::Sensors">
+                <render_engine>ogre</render_engine>
+            </plugin> -->
+
         </sensor>
     </gazebo>
 

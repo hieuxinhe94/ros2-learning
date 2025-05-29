@@ -1,6 +1,10 @@
 ## Mục tiêu
+> Dựa trên cơ sở:
 - Xây dựng robot có khả năng di chuyển tự động, sử dụng các tool gazebo (mô phỏng vật lý) + rviz (mô phỏng dữ liệu).
 - Chạy thử trên 2 loại môi trường Linux Ubuntu 24.04  (sau này deploy vào Raspberry PI) và Docker (môi trường ảo hóa giúp làm việc với team/ triển khai nhanh chóng với số lượng lớn).
+> Bổ sung:
+- Sử dụng laser dò quét địa hình, chướng ngại vật
+- Sử dụng AI model dùng để nhớ map và tìm đường đến với địa điểm được yêu cầu.
 
 Toàn bộ khóa học được cung cấp ở đây: https://hieuxinhe94.github.io/general/overview/ 
 
@@ -21,10 +25,14 @@ Build lại code (xác nhận lại thư mục hiện tại là src/)
 Sau khi build hoàn thành, cần source thư mục code vừa build
 
     source  install/setup.bash
+Cài đặt các gói cần thiết:
+    
+    sudo apt install ros-jazzy-gz-ros2-control
+
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_sim_gazebo.launch.py
+    ros2 launch first_robot launch_grade2_gazebo.launch.py
 
 
 ### Docker
@@ -34,9 +42,10 @@ Bắt đầu chạy code
 Build image từ source code ứng dụng. 
 
     docker image build -t my_first_robot .
-Run container của image vừa build và truy cập vào bin/bash của container đó (tôi đã tích hợp tự động truy cập bash của container sau khi run)
+Run container của image vừa build và truy cập vào bin/bash của container đó (tôi đã tích hợp tự động truy cập bash của container sau khi run) 
+> Lưu ý quan trọng: $PWD/src:/robot-ws/src là dùng để Bind mount trực tiếp thư mục code ở máy local hiện tại vào container, nên sau này không cần build lại nhiều lần
 
-    docker run -it --env="DISPLAY=$DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged --network=host --ipc=host -v $PWD/source:/source my_first_robot:latest bash
+    docker run -it --env="DISPLAY=$DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged --network=host --ipc=host -v $PWD/src:/robot-ws/src my_first_robot:latest bash
 Build lại code (xác nhận lại thư mục hiện tại là /robot-ws/src)
 
     cd  /robot-ws/src && source  /opt/ros/jazzy/setup.bash && colcon  build
@@ -46,11 +55,23 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_sim_gazebo.launch.py
+    ros2 launch first_robot launch_grade2_gazebo.launch.py
 
 ### Kết quả
-![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
+![Gazebo demo grade 1](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
+![Gazebo demo grade 2](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/grade2_ML_robot_running_1.gif?raw=true)
+
 
 video demo:
-
 ![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+
+
+## Lỗi 
+
+Update Dependencies:
+Ensure all ROS 2 Jazzy packages, Gazebo, and gz_ros2_control are up to date:
+bash
+
+Copy
+sudo apt update
+sudo apt upgrade

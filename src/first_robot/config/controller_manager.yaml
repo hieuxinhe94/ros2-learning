@@ -1,7 +1,7 @@
 controller_manager:
   ros__parameters:
     update_rate: 10  # Hz
-    use_stamped_vel: false
+    use_stamped_vel: true
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -15,7 +15,7 @@ controller_manager:
     diffbot_base_controller:
       type: diff_drive_controller/DiffDriveController
       ros__parameters:
-        use_stamped_vel: false
+        use_stamped_vel: true
 
 
 pid_controller_left_wheel_joint:

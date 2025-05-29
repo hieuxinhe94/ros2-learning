@@ -11,7 +11,7 @@ class SmoothRandomMover(Node):
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
 
         # Thời gian cập nhật hướng mới (mỗi 3 giây)
-        self.update_interval = 3.0
+        self.update_interval = 6.0
         self.timer = self.create_timer(0.1, self.publish_twist)
 
         # Tốc độ hiện tại

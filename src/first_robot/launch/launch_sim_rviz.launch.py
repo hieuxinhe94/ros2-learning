@@ -161,7 +161,7 @@ def generate_launch_description():
     )
     
     send_cmd_vel = TimerAction(
-        period=15.0,  # delay 10 giây
+        period=15.0,  # delay 100 giây
         actions=[
             ExecuteProcess(
                 cmd=[
@@ -213,6 +213,18 @@ def generate_launch_description():
             "true",
         ],
     )
+    
+    random_move = TimerAction(
+        period=15.0,  # delay 10 giây
+        actions=[
+            Node(
+                package=package_name,
+                executable="patrol_mover.py",
+                name="patrol_mover",
+                output="screen",
+            )
+        ],
+    )
 
     nodes = [
         control_node,
@@ -227,7 +239,8 @@ def generate_launch_description():
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_base_controller_spawner,
         #
-        send_cmd_vel,
+        # send_cmd_vel,
+        random_move
     ]
 
     return LaunchDescription(declared_arguments + nodes)
