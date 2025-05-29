@@ -58,10 +58,11 @@ Bắt đầu chạy code
     ros2 launch first_robot launch_grade2_gazebo.launch.py
 
 ### Kết quả
-![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
+![Gazebo demo grade 1](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
+![Gazebo demo grade 2](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/grade2_ML_robot_running_1.gif?raw=true)
+
 
 video demo:
-
 ![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
 
 
