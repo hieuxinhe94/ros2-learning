@@ -78,8 +78,8 @@ def generate_launch_description():
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(package_name),
-            "config",
-            "controller_test_snipdog.yaml",
+            "config", "champ",
+            "ros_control.yaml",
         ]
     )
     world_with_obstacles = PathJoinSubstitution(
@@ -286,7 +286,7 @@ def generate_launch_description():
     gait_config = PathJoinSubstitution([FindPackageShare(package_name),"config", "champ", "gaits.yaml"])
     links_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "links.yaml"])
     joints_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "joints.yaml"])
-    urdf_config = PathJoinSubstitution([FindPackageShare(package_name),"descriptions","robot.urdf.xacro"])
+    urdf_config = PathJoinSubstitution([FindPackageShare(package_name),"description","robot.urdf.xacro"])
 
     TimerAction(
             period=8.0,  # delay 8 giây
