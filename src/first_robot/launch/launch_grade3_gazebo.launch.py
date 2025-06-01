@@ -20,8 +20,17 @@ from launch.event_handlers import OnProcessExit, OnProcessStart
 def generate_launch_description():
 
     package_name = "first_robot"  # Tên package
-
+    
+    
+    
     declared_arguments = []
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "use_sim_time",
+            default_value="true",
+            description="use_sim_time.",
+        )
+    )
     declared_arguments.append(
         DeclareLaunchArgument(
             "gui",
@@ -48,7 +57,8 @@ def generate_launch_description():
     gui = LaunchConfiguration("gui")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     fixed_frame_id = LaunchConfiguration("fixed_frame_id")
-
+    use_sim_time = LaunchConfiguration("use_sim_time")
+    
     # Get URDF via xacro
     robot_description_content = Command(
         [
@@ -91,13 +101,13 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[{"use_sim_time": True}, robot_description],
+        parameters=[{"use_sim_time": use_sim_time}, robot_description],
     )
 
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{"use_sim_time": True}, robot_description, robot_controllers],
+        parameters=[{"use_sim_time": use_sim_time}, robot_description, robot_controllers],
         output="both",
     )
     delay_control_node = RegisterEventHandler(
@@ -273,44 +283,63 @@ def generate_launch_description():
     #     ],
     # )
     
-    
-    
-    # MOVE
-    dog_gait_cycle_move = TimerAction(
-        period=8.0,  # delay 10 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="dog_gait_cycle.py",
-                name="dog_gait_cycle",
-                output="screen",
-            )
+    gait_config = PathJoinSubstitution([FindPackageShare(package_name),"config", "champ", "gaits.yaml"])
+    links_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "links.yaml"])
+    joints_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "joints.yaml"])
+    urdf_config = PathJoinSubstitution([FindPackageShare(package_name),"descriptions","robot.urdf.xacro"])
+
+    TimerAction(
+            period=8.0,  # delay 8 giây
+            actions=[
+                Node(
+                    package="tf2_ros",
+                    executable="static_transform_publisher",
+                    arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
+                    output='screen'
+                    )
         ],
     )
-    
-    dog_gait_cycle_publisher_move = TimerAction(
-        period=8.0,  # delay 10 giây
-        actions=[
-            Node(
-                package=package_name,
-                executable="gait_cycle_publisher.py",
-                name="gait_cycle_publisher",
-                output="screen",
-            )
+    # CHAMP controller nodes
+    quadruped_controller_node = TimerAction(
+            period=8.0,  # delay 5 giây
+                actions=[ 
+                    Node(
+                    package="champ_base",
+                    executable="quadruped_controller_node",
+                    output="screen",
+                    parameters=[
+                        {"use_sim_time": use_sim_time},
+                        {"gazebo": True},
+                        {"publish_joint_states": True},
+                        {"publish_joint_control": True},
+                        {"publish_foot_contacts": False},
+                        {"joint_controller_topic": "joint_group_effort_controller/joint_trajectory"},
+                        {"urdf": Command(['xacro ', urdf_config])},
+                        joints_config,
+                        links_config,
+                        gait_config,
+                        {"hardware_connected": False},
+                        {"publish_foot_contacts": False},
+                        {"close_loop_odom": True},
+                    ],
+                    remappings=[("/cmd_vel/smooth", "/cmd_vel")],
+            )]
+    )
+
+    state_estimator_node = Node(
+        package="champ_base",
+        executable="state_estimation_node",
+        output="screen",
+        parameters=[
+            {"use_sim_time": use_sim_time},
+            {"orientation_from_imu": True},
+            {"urdf": Command(['xacro ', urdf_config])},
+            joints_config,
+            links_config,
+            gait_config,
         ],
     )
-  
-    # covert_to_twiststamped = TimerAction(
-    #     period=3.0,  # delay 3 giây
-    #     actions=[
-    #         Node(
-    #             package=package_name,
-    #             executable="twist_to_twiststamped.py",
-    #             name="twist_to_twiststamped_node",
-    #             output="screen",
-    #         )
-    #     ],
-    # )
+ 
 
     nodes = [
         gazebo,
@@ -330,9 +359,8 @@ def generate_launch_description():
         #
         # delay_slam_nav2_toolbox,
         # rqt,
-        # semantic_move
-        # dog_gait_cycle_move
-        dog_gait_cycle_publisher_move,
+        quadruped_controller_node
+ 
     ]
 
     return LaunchDescription(declared_arguments + nodes)

@@ -9,7 +9,7 @@
     <!-- <xacro:include filename="robot_core_ver_four_wheel.xacro" /> -->
 
     <!-- ROBOT DOG  -->
-    <xacro:include filename="robot_core_ver_snipdog.xacro" />
+    <xacro:include filename="robot_core.xacro" />
 
     <xacro:include filename="gz_control_snipdog.xacro" />
     <xacro:include filename="lidar_2d_camera.xacro" />

@@ -33,7 +33,7 @@
           <cylinder radius="${radius}" length="${length}" />
         </geometry>
       </collision>
-      <xacro:inertial_box mass="0.2" box_size="${[radius*2, radius*2, length]}" />
+      <xacro:inertial_box mass="0.5" box_size="${[radius*2, radius*2, length]}" />
     </link>
 
     <joint name="${joint_name}" type="continuous">

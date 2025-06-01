@@ -17,17 +17,28 @@
 
 
     <gazebo reference="imu_link">
-    <sensor name="imu_sensor" type="imu">
-        <always_on>true</always_on>
-        <update_rate>100</update_rate>
-        <topic>imu/data</topic>
-        <plugin name="gz::sim::systems::Imu" filename="gz-sim-imu-system">
-        <ros>
-            <namespace>/</namespace>
-          
-        </ros>
-        </plugin>
-    </sensor>
+        <sensor name="imu_sensor" type="imu">
+            <always_on>true</always_on>
+            <update_rate>200</update_rate>
+            <topic>imu/data</topic>
+            <plugin name="gz::sim::systems::Imu" filename="gz-sim-imu-system">
+                <ros>
+                    <namespace>/</namespace>
+                </ros>
+            </plugin>
+            <imu>
+                <noise type="gaussian">
+                    <rate>
+                        <mean>0.0</mean>
+                        <stddev>0.005</stddev>                        <!-- Giảm nhiễu -->
+                    </rate>
+                    <accel>
+                        <mean>0.0</mean>
+                        <stddev>0.005</stddev>
+                    </accel>
+                </noise>
+            </imu>
+        </sensor>
     </gazebo>
 
 </robot>
