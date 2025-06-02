@@ -13,7 +13,7 @@
   </transmission>
   <transmission name="${prefix}_knee_trans">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="${prefix}_knee_joint">
+    <joint name="${prefix}_upper_leg_joint">
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="${prefix}_knee_motor">
@@ -23,7 +23,7 @@
   </transmission>
   <transmission name="${prefix}_ankle_trans">
     <type>transmission_interface/SimpleTransmission</type>
-    <joint name="${prefix}_ankle_joint">
+    <joint name="${prefix}_lower_leg_joint">
       <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     </joint>
     <actuator name="${prefix}_ankle_motor">

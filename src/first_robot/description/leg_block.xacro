@@ -102,7 +102,7 @@
   </joint>
 
   <!-- Knee Joint -->
-  <joint name="${prefix}_knee_joint" type="revolute">
+  <joint name="${prefix}_upper_leg_joint" type="revolute">
     <parent link="${prefix}_knee_motor_link"/>
     <child link="${prefix}_shank"/>
     <origin xyz="0 0 0"/>
@@ -158,7 +158,7 @@
   </joint>
 
   <!-- Ankle Joint -->
-  <joint name="${prefix}_ankle_joint" type="revolute">
+  <joint name="${prefix}_lower_leg_joint" type="revolute">
     <parent link="${prefix}_ankle_motor_link"/>
     <child link="${prefix}_foot"/>
     <origin xyz="0 0 0"/>

@@ -1,6 +1,4 @@
-<?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
   <xacro:arg name="use_mock_hardware" default="true" />
   <xacro:arg name="use_gazebo" default="true" />
 
@@ -10,7 +8,6 @@
     </hardware>
 
     <!-- Joint Definitions -->
-    <!-- Repeat for all leg joints -->
     <xacro:macro name="define_joint_interfaces" params="joint_name">
       <joint name="${joint_name}">
         <command_interface name="position"/>
@@ -21,30 +18,29 @@
 
     <!-- Front Left Leg -->
     <xacro:define_joint_interfaces joint_name="left_front_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_front_knee_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_front_ankle_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_front_upper_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_front_lower_leg_joint"/>
 
     <!-- Front Right Leg -->
     <xacro:define_joint_interfaces joint_name="right_front_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_front_knee_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_front_ankle_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_front_upper_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_front_lower_leg_joint"/>
 
     <!-- Rear Left Leg -->
     <xacro:define_joint_interfaces joint_name="left_rear_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_rear_knee_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_rear_ankle_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_rear_upper_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_rear_lower_leg_joint"/>
 
     <!-- Rear Right Leg -->
     <xacro:define_joint_interfaces joint_name="right_rear_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_rear_knee_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_rear_ankle_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_rear_upper_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_rear_lower_leg_joint"/>
+
   </ros2_control>
 
-  <!-- Gazebo plugin config -->
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find first_robot)/config/controller_test_snipdog.yaml</parameters>
+      <parameters>$(find first_robot)/config/ros_control.yaml</parameters>
     </plugin>
   </gazebo>
-
 </robot>

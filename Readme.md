@@ -16,6 +16,11 @@ Toàn bộ khóa học được cung cấp ở đây: https://hieuxinhe94.github
 Source lại ros2 và truy cập vào thư mục source code. 
 
     source  /opt/ros/jazzy/setup.bash
+
+>> nano ~/.bashrc
+>> source  /opt/ros/jazzy/setup.bash
+
+
 Truy cập vào thư mục src 
 
     cd  src

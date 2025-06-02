@@ -15,14 +15,13 @@ from launch.substitutions import (
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit, OnProcessStart
+import launch_ros
 
 
 def generate_launch_description():
 
     package_name = "first_robot"  # Tên package
-    
-    
-    
+
     declared_arguments = []
     declared_arguments.append(
         DeclareLaunchArgument(
@@ -58,7 +57,7 @@ def generate_launch_description():
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     fixed_frame_id = LaunchConfiguration("fixed_frame_id")
     use_sim_time = LaunchConfiguration("use_sim_time")
-    
+
     # Get URDF via xacro
     robot_description_content = Command(
         [
@@ -78,7 +77,7 @@ def generate_launch_description():
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(package_name),
-            "config", "champ",
+            "config",
             "ros_control.yaml",
         ]
     )
@@ -101,13 +100,24 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
+        # arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[{"use_sim_time": use_sim_time}, robot_description],
     )
 
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[{"use_sim_time": use_sim_time}, robot_description, robot_controllers],
+        # arguments=['--ros-args', '--log-level', 'debug'],
+        arguments=[
+            "--controller-manager-timeout",
+            "60",  # Longer timeout
+            "joint_group_effort_controller",  # No --inactive flag to ensure full activation
+        ],
+        parameters=[
+            {"use_sim_time": use_sim_time},
+            robot_description,
+            robot_controllers,
+        ],
         output="both",
     )
     delay_control_node = RegisterEventHandler(
@@ -117,21 +127,13 @@ def generate_launch_description():
         )
     )
 
-
-    joint_trajectory_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
-        output="screen"
-    )
-    
     delay__trajectory_after_control_node = TimerAction(
         period=3.0,  # delay 3 giây
         actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
+                arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager" , '--ros-args', '--log-level', 'debug'],
                 output="screen"
             )
         ]
@@ -169,15 +171,15 @@ def generate_launch_description():
             # Sim time
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             # depth camera
-          
             # RGB camera
-            '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
-        
+            "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
             # SLAM toolbox
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
-            
             # IMU
             "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU",
+            # ROS to Gazebo
+            "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
+            "/joint_group_effort_controller/joint_trajectory@trajectory_msgs/msg/JointTrajectory]gz.msgs.JointTrajectory",
         ],
         output="screen",
     )
@@ -271,7 +273,7 @@ def generate_launch_description():
             TimerAction(period=33.0, actions=[nav2_lifecycle_node]),
         ]
     )
-    
+
     # delay_imu_node =  TimerAction(
     #         period=8.0,  # delay 8 giây
     #         actions=[Node(
@@ -282,48 +284,65 @@ def generate_launch_description():
     #         )
     #     ],
     # )
-    
-    gait_config = PathJoinSubstitution([FindPackageShare(package_name),"config", "champ", "gaits.yaml"])
-    links_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "links.yaml"])
-    joints_config = PathJoinSubstitution([FindPackageShare(package_name),"config","champ", "joints.yaml"])
-    urdf_config = PathJoinSubstitution([FindPackageShare(package_name),"description","robot.urdf.xacro"])
+
+    this_package = launch_ros.substitutions.FindPackageShare(package=package_name).find(
+        package_name
+    )
+    gaits_config = os.path.join(this_package, "config/champ/gaits.yaml")
+    links_config = os.path.join(this_package, "config/champ/links.yaml")
+    joints_config = os.path.join(this_package, "config/champ/joints.yaml")
+    urdf_config = os.path.join(this_package, "description/robot.urdf.xacro")
 
     TimerAction(
-            period=8.0,  # delay 8 giây
-            actions=[
-                Node(
-                    package="tf2_ros",
-                    executable="static_transform_publisher",
-                    arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
-                    output='screen'
-                    )
+        period=8.0,  # delay 8 giây
+        actions=[
+            Node(
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                arguments=[
+                    "0",
+                    "0",
+                    "0.1",
+                    "0",
+                    "0",
+                    "0",
+                    "1",
+                    "base_link",
+                    "imu_link",
+                ],
+                output="screen",
+            )
         ],
     )
     # CHAMP controller nodes
     quadruped_controller_node = TimerAction(
-            period=8.0,  # delay 5 giây
-                actions=[ 
-                    Node(
-                    package="champ_base",
-                    executable="quadruped_controller_node",
-                    output="screen",
-                    parameters=[
-                        {"use_sim_time": use_sim_time},
-                        {"gazebo": True},
-                        {"publish_joint_states": True},
-                        {"publish_joint_control": True},
-                        {"publish_foot_contacts": False},
-                        {"joint_controller_topic": "joint_group_effort_controller/joint_trajectory"},
-                        {"urdf": Command(['xacro ', urdf_config])},
-                        joints_config,
-                        links_config,
-                        gait_config,
-                        {"hardware_connected": False},
-                        {"publish_foot_contacts": False},
-                        {"close_loop_odom": True},
-                    ],
-                    remappings=[("/cmd_vel/smooth", "/cmd_vel")],
-            )]
+        period=8.0,  # delay 5 giây
+        actions=[
+         
+            Node(
+                package="champ_base",
+                executable="quadruped_controller_node",
+                output="screen",
+                arguments=["--ros-args", "--log-level", "debug"],
+                parameters=[
+                    {"use_sim_time": use_sim_time},
+                    {"gazebo": True},
+                    {"publish_joint_states": True},
+                    {"publish_joint_control": True},
+                    {
+                        "joint_controller_topic": "joint_group_effort_controller/joint_trajectory"
+                    },
+                    {"urdf": Command(["xacro ", urdf_config])},
+                    joints_config,
+                    links_config,
+                    gaits_config,
+                    {"hardware_connected": False},
+                    {"publish_foot_contacts": False},
+                    {"close_loop_odom": True},
+                ],
+                remappings=[("/cmd_vel/smooth", "/cmd_vel")],
+            )
+        ],
     )
 
     state_estimator_node = Node(
@@ -333,34 +352,31 @@ def generate_launch_description():
         parameters=[
             {"use_sim_time": use_sim_time},
             {"orientation_from_imu": True},
-            {"urdf": Command(['xacro ', urdf_config])},
+            {"urdf": Command(["xacro ", urdf_config])},
             joints_config,
             links_config,
-            gait_config,
+            gaits_config,
         ],
     )
- 
 
     nodes = [
         gazebo,
+        #
         gazebo_headless,
+        #
         gazebo_bridge,
         #
-        # covert_to_twiststamped,
-        #
         robot_state_pub_node,
+        #
         delay_control_node,
         #
         gz_spawn_entity,
         #
-        # delay_imu_node,
-        
-        delay__trajectory_after_control_node,
+        # delay__trajectory_after_control_node,
         #
         # delay_slam_nav2_toolbox,
         # rqt,
-        quadruped_controller_node
- 
+        quadruped_controller_node,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

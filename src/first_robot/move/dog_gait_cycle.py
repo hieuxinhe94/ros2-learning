@@ -12,10 +12,10 @@ class GaitCyclePublisherV1(Node):
         self.step_state = 0
         self.time = 0.0
         self.joint_names = [
-            'left_front_hip_joint', 'left_front_knee_joint', 'left_front_ankle_joint',
-            'right_front_hip_joint', 'right_front_knee_joint', 'right_front_ankle_joint',
-            'left_rear_hip_joint', 'left_rear_knee_joint', 'left_rear_ankle_joint',
-            'right_rear_hip_joint', 'right_rear_knee_joint', 'right_rear_ankle_joint'
+            'left_front_hip_joint', 'left_front_upper_leg_joint', 'left_front_lower_leg_joint',
+            'right_front_hip_joint', 'right_front_upper_leg_joint', 'right_front_lower_leg_joint',
+            'left_rear_hip_joint', 'left_rear_upper_leg_joint', 'left_rear_lower_leg_joint',
+            'right_rear_hip_joint', 'right_rear_upper_leg_joint', 'right_rear_lower_leg_joint'
         ]
 
     def publish_gait_cycle(self):
