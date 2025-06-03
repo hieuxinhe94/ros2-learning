@@ -294,7 +294,7 @@ def generate_launch_description():
     urdf_config = os.path.join(this_package, "description/robot.urdf.xacro")
 
     TimerAction(
-        period=8.0,  # delay 8 giây
+        period=10.0,  # delay 8 giây
         actions=[
             Node(
                 package="tf2_ros",
@@ -323,7 +323,7 @@ def generate_launch_description():
                 package="champ_base",
                 executable="quadruped_controller_node",
                 output="screen",
-                arguments=["--ros-args", "--log-level", "debug"],
+                # arguments=["--ros-args", "--log-level", "debug"],
                 parameters=[
                     {"use_sim_time": use_sim_time},
                     {"gazebo": True},

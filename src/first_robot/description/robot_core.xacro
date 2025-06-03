@@ -56,8 +56,6 @@
         </xacro:inertial_box>
     </link>
 
-    <!-- FL (Front Left) LEG -->
-
     <!-- IMPORT LEG PATTERN -->
     <xacro:include filename="$(find first_robot)/description/leg_block.xacro"/>
 

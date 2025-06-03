@@ -80,3 +80,4 @@ Copy
 sudo apt update
 sudo apt upgrade
 chmod +x move/dog_gait_cycle.py
+    <!-- need to compose all to single file  run  xacro first_robot/description/robot.urdf.xacro > robot.urdf -->

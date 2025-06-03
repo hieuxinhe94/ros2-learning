@@ -42,6 +42,7 @@ QuadrupedController::QuadrupedController():
     leg_controller_(base_, rosTimeToChampTime(clock_.now())),
     kinematics_(base_)
 {
+    RCLCPP_INFO(this->get_logger(), "=====================  START QuadrupedController =========================");
     std::string joint_control_topic = "joint_group_position_controller/command";
     std::string knee_orientation;
     std::string urdf = "";
@@ -89,12 +90,58 @@ QuadrupedController::QuadrupedController():
     gait_config_.knee_orientation = knee_orientation.c_str();
     
     base_.setGaitConfig(gait_config_);
-    champ::URDF::loadFromString(base_, this->get_node_parameters_interface(), urdf);
-    joint_names_ = champ::URDF::getJointNames(this->get_node_parameters_interface());
+    
+    // Trong constructor, thay khối parse URDF bằng:
+    try {
+        RCLCPP_INFO(this->get_logger(), "===================== Quadruped Load URDF From String ======================");
+        //RCLCPP_INFO(this->get_logger(), "URDF content (all urdf.c_str()): %s", urdf.c_str());
+        RCLCPP_INFO(this->get_logger(), "URDF length: %zu", urdf.size());
+        if (urdf.find("<robot") == std::string::npos) {
+            RCLCPP_ERROR(this->get_logger(), "URDF does not contain '<robot' tag");
+            throw std::runtime_error("Invalid URDF format");
+        }
+        champ::URDF::loadFromString(base_, this->get_node_parameters_interface(), urdf);
+        RCLCPP_INFO(this->get_logger(), "Successfully parsed URDF");
+        // Kiểm tra base_.legs
+        bool legs_valid = true;
+        for (int i = 0; i < 4; ++i) {
+            if (base_.legs[i] == nullptr) {
+                RCLCPP_ERROR(this->get_logger(), "Leg %d is null", i);
+                legs_valid = false;
+            }
+        }
+        if (!legs_valid) {
+            RCLCPP_ERROR(this->get_logger(), "One or more legs failed to load from URDF");
+            throw std::runtime_error("URDF parsing failed: invalid legs");
+        }
+        RCLCPP_INFO(this->get_logger(), "Number of legs loaded: 4");
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to parse URDF: %s", e.what());
+        throw;
+    } catch (...) {
+        RCLCPP_ERROR(this->get_logger(), "Unknown error occurred while parsing URDF");
+        throw;
+    }
+
+    try {
+        RCLCPP_INFO(this->get_logger(), "===================== Quadruped Load Joint Names ======================");
+        joint_names_ = champ::URDF::getJointNames(this->get_node_parameters_interface());
+        if (joint_names_.empty()) {
+            RCLCPP_ERROR(this->get_logger(), "No joint names retrieved");
+            throw std::runtime_error("Failed to get joint names");
+        }
+        RCLCPP_INFO(this->get_logger(), "Joint names: %s", std::accumulate(
+            joint_names_.begin(), joint_names_.end(), std::string(),
+            [](const std::string& a, const std::string& b) { return a + (a.empty() ? "" : ", ") + b; }
+        ).c_str());
+    } catch (const std::exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to get joint names: %s", e.what());
+        throw;
+    }
+
     std::chrono::milliseconds period(static_cast<int>(1000/loop_rate));
 
-    loop_timer_ = this->create_wall_timer(
-         std::chrono::duration_cast<std::chrono::milliseconds>(period), std::bind(&QuadrupedController::controlLoop_, this));
+    loop_timer_ = this->create_wall_timer(std::chrono::duration_cast<std::chrono::milliseconds>(period), std::bind(&QuadrupedController::controlLoop_, this));
     req_pose_.position.z = gait_config_.nominal_height;
 }
 

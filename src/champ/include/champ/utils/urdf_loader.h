@@ -42,21 +42,39 @@ namespace champ
     {
         void getPose(urdf::Pose *pose, std::string ref_link, std::string end_link, urdf::Model &model)
         {
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Starting getPose: ref_link=%s, end_link=%s", ref_link.c_str(), end_link.c_str());
+            
+            if (!pose) {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Pose pointer is null");
+                throw std::runtime_error("Null pose pointer");
+            }
+            
             urdf::LinkConstSharedPtr ref_link_ptr = model.getLink(ref_link);
-
+            if (!ref_link_ptr) {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Reference link '%s' not found in URDF", ref_link.c_str());
+                throw std::runtime_error("Reference link not found");
+            }
+            
             std::string current_parent_name = end_link;
             urdf::LinkConstSharedPtr prev_link = model.getLink(current_parent_name);
+
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "End link found: %s", prev_link->name.c_str());
 
             while(ref_link_ptr->name != current_parent_name)
             {   
                 urdf::LinkConstSharedPtr current_link = model.getLink(current_parent_name);
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Current link: %s", current_link->name.c_str());
+
                 urdf::Pose current_pose = current_link->parent_joint->parent_to_joint_origin_transform;
-              
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Parent joint transform: x=%f, y=%f, z=%f", current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
                 current_parent_name = current_link->getParent()->name;
                 prev_link = model.getLink(current_parent_name);
                 pose->position.x += current_pose.position.x;
                 pose->position.y += current_pose.position.y;
                 pose->position.z += current_pose.position.z;
+
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Prev link: %s", prev_link->name.c_str());
             }
         }
 
@@ -67,7 +85,7 @@ namespace champ
             if (!success){
                 throw std::runtime_error("No links config file provided");
             }
-
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "fillLeg success");
             std::vector<std::string> links_param = links_param_.as_string_array();
 
             for (int i = 3; i > -1; i--){
@@ -77,15 +95,17 @@ namespace champ
                 }else {
                     ref_link = model.getRoot()->name;
                 }
-
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "ref_link %s", ref_link.c_str());
                 end_link = links_param[i];
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "end_link %s", end_link.c_str());
                 urdf::Pose pose;
                 getPose(&pose, ref_link, end_link, model);
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "getPose success pose: " );
                 double x,y,z;
                 x = pose.position.x;
                 y = pose.position.y;
                 z = pose.position.z;
-                
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "pose.position x: %f, y: %f, z: %f", x, y, z );
                 leg->joint_chain[i]->setTranslation(x,y,z);
             }
 
@@ -115,13 +135,14 @@ namespace champ
 
         void loadFromString(champ::QuadrupedBase &base, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr nh, const std::string& urdf_string)
         {
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Starting URDF parsing");
             urdf::Model model;
-            // TODO fix temp path
-            if (!model.initString(urdf_string)){
-                 RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to parse urdf string");
-            } 
+            if (!model.initString(urdf_string)) {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to parse urdf string");
+                throw std::runtime_error("Failed to parse URDF string");
+            }
             
-            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Successfully parsed urdf file");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Successfully initString urdf");
             std::vector<std::string> links_map;
 
             links_map.push_back("links_map.left_front");
@@ -129,10 +150,24 @@ namespace champ
             links_map.push_back("links_map.left_hind");
             links_map.push_back("links_map.right_hind");
             
-            for(int i = 0; i < 4; i++)
-            {
-                fillLeg(base.legs[i], nh, model, links_map[i]);
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Links map: %s, %s, %s, %s", links_map[0].c_str(), links_map[1].c_str(), links_map[2].c_str(), links_map[3].c_str());
+
+            if (!base.legs) {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "base.legs is null");
+                throw std::runtime_error("base.legs is null");
             }
+                            
+            for (int i = 0; i < 4; i++) {
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Processing leg %d with param %s", i, links_map[i].c_str());
+                if (base.legs[i] == nullptr) {
+                    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Leg %d is null before fillLeg", i);
+                    throw std::runtime_error("Uninitialized leg pointer");
+                }
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Start fillLeg for leg %d", i);
+                fillLeg(base.legs[i], nh, model, links_map[i]);
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Completed fillLeg for leg %d", i);
+            }
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Finished loading URDF");
         }
 
         std::vector<std::string> getJointNames(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr nh)

@@ -1,27 +1,38 @@
 /**:
   ros__parameters:
+    base_link: base_link
+    feet:
+      - left_front_foot
+      - right_front_foot
+      - left_rear_foot
+      - right_rear_foot
     links_map:
       base: base_link
       left_front:
-        - left_front_hip_link
-        - left_front_upper_leg_link
-        - left_front_lower_leg_link
-        - left_front_foot_link
-
+        [
+          "left_front_hip_motor_link",
+          "left_front_thigh",
+          "left_front_shank",
+          "left_front_foot",
+        ]
       right_front:
-        - right_front_hip_link
-        - right_front_upper_leg_link
-        - right_front_lower_leg_link
-        - right_front_foot_link
-
+        [
+          "right_front_hip_motor_link",
+          "right_front_thigh",
+          "right_front_shank",
+          "right_front_foot",
+        ]
       left_hind:
-        - left_rear_hip_link
-        - left_rear_upper_leg_link
-        - left_rear_lower_leg_link
-        - left_rear_foot_link
-
+        [
+          "left_rear_hip_motor_link",
+          "left_rear_thigh",
+          "left_rear_shank",
+          "left_rear_foot",
+        ]
       right_hind:
-        - right_rear_hip_link
-        - right_rear_upper_leg_link
-        - right_rear_lower_leg_link
-        - right_rear_foot_link
+        [
+          "right_rear_hip_motor_link",
+          "right_rear_thigh",
+          "right_rear_shank",
+          "right_rear_foot",
+        ]
