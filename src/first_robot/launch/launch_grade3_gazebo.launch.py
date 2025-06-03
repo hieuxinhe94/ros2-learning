@@ -111,7 +111,7 @@ def generate_launch_description():
         arguments=[
             "--controller-manager-timeout",
             "60",  # Longer timeout
-            "joint_group_effort_controller",  # No --inactive flag to ensure full activation
+            "joint_trajectory_controller",  # No --inactive flag to ensure full activation
         ],
         parameters=[
             {"use_sim_time": use_sim_time},
@@ -126,6 +126,13 @@ def generate_launch_description():
             on_exit=[control_node],
         )
     )
+    # Load controller
+    load_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_group_effort_controller", "--controller-manager", "/controller_manager"],
+        output="screen",
+    )
 
     delay__trajectory_after_control_node = TimerAction(
         period=3.0,  # delay 3 giây
@@ -133,7 +140,7 @@ def generate_launch_description():
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager" , '--ros-args', '--log-level', 'debug'],
+                arguments=["joint_group_effort_controller", "--controller-manager", "/controller_manager" , '--ros-args', '--log-level', 'debug'],
                 output="screen"
             )
         ]
@@ -369,10 +376,11 @@ def generate_launch_description():
         robot_state_pub_node,
         #
         delay_control_node,
+        # load_controller,
         #
         gz_spawn_entity,
         #
-        # delay__trajectory_after_control_node,
+        delay__trajectory_after_control_node,
         #
         # delay_slam_nav2_toolbox,
         # rqt,

@@ -2,13 +2,13 @@ controller_manager:
   ros__parameters:
     update_rate: 100
 
-    joint_trajectory_controller:
+    joint_group_effort_controller:
       type: joint_trajectory_controller/JointTrajectoryController
       ros__parameters:
         use_stamped_vel: true
 
 
-joint_trajectory_controller:
+joint_group_effort_controller:
   ros__parameters:
     joints:
       - left_front_hip_joint
