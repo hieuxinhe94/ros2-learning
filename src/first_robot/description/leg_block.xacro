@@ -20,14 +20,14 @@
   <!-- Hip Motor Link -->
   <link name="${prefix}_hip_motor_link">
     <visual>
-      <origin xyz="0 0 0.02"/>
+      <origin xyz="0 0 0.005"/>
       <geometry>
         <cylinder length="0.02" radius="0.015"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0.02"/>
+      <origin xyz="0 0 0.005"/>
       <geometry>
         <cylinder length="0.02" radius="0.015"/>
       </geometry>
@@ -42,7 +42,7 @@
   <joint name="${prefix}_hip_motor_fixed" type="fixed">
     <parent link="chassis"/>
     <child link="${prefix}_hip_motor_link"/>
-    <origin xyz="${x} ${y} 0.075"/>
+    <origin xyz="${x} ${y} -0.005"/>
   </joint>
 
   <!-- Hip Joint -->
@@ -51,26 +51,25 @@
     <child link="${prefix}_thigh"/>
     <origin xyz="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57"/>
+    <limit effort="5" velocity="2.0" lower="1.57" upper="-1.57"/><!-- Đảo dấu -->
   </joint>
 
   <!-- Thigh Link -->
   <link name="${prefix}_thigh">
     <visual>
-      <origin xyz="0 0 -0.075"/>
+      <origin xyz="0 0 -0.06"/>
       <geometry>
-        <box size="0.05 0.05 0.15"/>
+        <box size="0.03 0.03 0.12"/> <!-- Giảm kích thước -->
       </geometry>
       <material name="blue"/>
     </visual>
     <collision>
-      <origin xyz="0 0 -0.075"/>
+      <origin xyz="0 0 -0.06"/>
       <geometry>
-        <box size="0.05 0.05 0.15"/>
+        <box size="0.03 0.03 0.12"/>
       </geometry>
     </collision>
-    <xacro:inertial_box_leg mass="0.2" box_size="${[0.05, 0.05, 0.15]}"/>
-
+    <xacro:inertial_box_leg mass="0.1" box_size="${[0.03, 0.03, 0.12]}"/> <!-- Giảm khối lượng -->
   </link>
 
   <!-- Knee Motor Link -->
@@ -98,7 +97,7 @@
   <joint name="${prefix}_knee_motor_fixed" type="fixed">
     <parent link="${prefix}_thigh"/>
     <child link="${prefix}_knee_motor_link"/>
-    <origin xyz="0 0 -0.15"/>
+    <origin xyz="0 0 -0.12" rpy="0 0.3 0"/> <!-- Thêm góc nghiêng -->
   </joint>
 
   <!-- Knee Joint -->
@@ -107,26 +106,25 @@
     <child link="${prefix}_shank"/>
     <origin xyz="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57"/>
+    <limit effort="5" velocity="2.0" lower="-2.0" upper="2.0"/> <!-- Mở rộng góc -->
   </joint>
 
   <!-- Shank Link -->
   <link name="${prefix}_shank">
     <visual>
-      <origin xyz="0 0 -0.075"/>
+      <origin xyz="0 0 -0.06"/>
       <geometry>
-        <box size="0.04 0.04 0.15"/>
+        <box size="0.02 0.02 0.12"/> <!-- Giảm kích thước -->
       </geometry>
       <material name="red"/>
     </visual>
     <collision>
-      <origin xyz="0 0 -0.075"/>
+      <origin xyz="0 0 -0.06"/>
       <geometry>
-        <box size="0.04 0.04 0.15"/>
+        <box size="0.02 0.02 0.12"/>
       </geometry>
     </collision>
-    <xacro:inertial_box_leg mass="0.2" box_size="${[0.04, 0.04, 0.15]}"/>
-    
+    <xacro:inertial_box_leg mass="0.1" box_size="${[0.02, 0.02, 0.12]}"/> <!-- Giảm khối lượng -->
   </link>
 
   <!-- Ankle Motor Link -->
@@ -154,7 +152,7 @@
   <joint name="${prefix}_ankle_motor_fixed" type="fixed">
     <parent link="${prefix}_shank"/>
     <child link="${prefix}_ankle_motor_link"/>
-    <origin xyz="0 0 -0.15"/>
+    <origin xyz="0 0 -0.12" rpy="0 0.3 0"/> <!-- Thêm góc nghiêng -->
   </joint>
 
   <!-- Ankle Joint -->
@@ -163,7 +161,7 @@
     <child link="${prefix}_foot"/>
     <origin xyz="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57"/>
+    <limit effort="5" velocity="2.0" lower="-2.0" upper="2.0"/> <!-- Mở rộng góc -->
   </joint>
 
   <!-- Foot Link -->
@@ -183,6 +181,11 @@
        <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:inertial_sphere>
   </link>
+
+  <gazebo reference="${prefix}_foot">
+    <mu1>1.2</mu1> <!-- Tăng ma sát ngang -->
+    <mu2>1.2</mu2> <!-- Tăng ma sát dọc -->
+  </gazebo>
 
   <!-- IMPORT LEG PATTERN -->
   <xacro:include filename="$(find first_robot)/description/transmission_block.xacro"/>

@@ -385,6 +385,7 @@ def generate_launch_description():
         # delay_slam_nav2_toolbox,
         # rqt,
         quadruped_controller_node,
+        state_estimator_node
     ]
 
     return LaunchDescription(declared_arguments + nodes)
