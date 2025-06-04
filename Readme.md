@@ -38,7 +38,7 @@ Cài đặt các gói cần thiết:
 Bắt đầu chạy code
 
     ros2 launch first_robot launch_grade2_gazebo.launch.py
-
+    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/cmd_vel
 
 ### Docker
 
@@ -69,6 +69,80 @@ video demo:
 
 ![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
 
+
+### 1. Chi tiết cấu hình
+#### **Cấu trúc luồng khớp**:
+
+*   **Chassis** (khung thân robot, định nghĩa trong robot\_core.xacro):
+    *   Đây là liên kết gốc (root link) mà tất cả các chân được gắn vào.
+*   **Khớp: ${prefix}\_hip\_motor\_mount (fixed)**:
+    *   **Loại**: Fixed (khớp cố định, không chuyển động).
+    *   **Parent**: chassis.
+    *   **Child**: ${prefix}\_hip\_motor (động cơ hông).
+    *   **Vị trí**: xyz="${x} ${y} -0.005", với x, y phụ thuộc vào chân (ví dụ: x=0.15, y=0.10 cho left\_front).
+    *   **Mục đích**: Gắn động cơ hông vào chassis, không cho phép xoay.
+*   **Liên kết: ${prefix}\_hip\_motor**:
+    *   Hình trụ nhỏ (bán kính 0.012m, chiều dài 0.02m), đại diện cho động cơ hông.
+    *   Khối lượng: 0.03kg.
+*   **Khớp: ${prefix}\_hip\_joint (revolute)**:
+    *   **Loại**: Revolute (xoay quanh một trục).
+    *   **Parent**: ${prefix}\_hip\_motor.
+    *   **Child**: ${prefix}\_thigh (đùi).
+    *   **Trục xoay**: axis xyz="0 1 0" (xoay quanh trục y, trong mặt phẳng xz).
+    *   **Giới hạn góc**: lower="-1.57" upper="0" (-90° đến 0°, cho phép đùi xoay về phía trước).
+    *   **Mục đích**: Điều khiển góc đùi so với chassis, hỗ trợ chuyển động chân về phía trước.
+*   **Liên kết: ${prefix}\_thigh**:
+    *   Hình hộp (0.03 x 0.03 x 0.18m), đại diện cho đoạn đùi.
+    *   Khối lượng: 0.15kg.
+    *   Tâm khối lượng: xyz="0 0 -0.09" (giữa đùi).
+*   **Khớp: ${prefix}\_knee\_motor\_mount (fixed)**:
+    *   **Loại**: Fixed.
+    *   **Parent**: ${prefix}\_thigh.
+    *   **Child**: ${prefix}\_knee\_motor (động cơ đầu gối).
+    *   **Vị trí**: xyz="0 0 -0.18" rpy="0 -0.3 0" (đầu gối ở cuối đùi, nghiêng -17.2° để shank hướng về phía trước).
+    *   **Mục đích**: Gắn động cơ đầu gối vào đùi.
+*   **Liên kết: ${prefix}\_knee\_motor**:
+    *   Hình trụ nhỏ (bán kính 0.012m, chiều dài 0.02m).
+    *   Khối lượng: 0.03kg.
+*   **Khớp: ${prefix}\_knee\_joint (revolute)**:
+    *   **Loại**: Revolute.
+    *   **Parent**: ${prefix}\_knee\_motor.
+    *   **Child**: ${prefix}\_shank (cẳng chân).
+    *   **Trục xoay**: axis xyz="0 1 0".
+    *   **Giới hạn góc**: lower="-2.5" upper="0" (-143.2° đến 0°, cho phép shank gập về phía trước).
+    *   **Mục đích**: Điều khiển góc cẳng chân so với đùi, hỗ trợ gập chân.
+*   **Liên kết: ${prefix}\_shank**:
+    *   Hình hộp (0.02 x 0.02 x 0.18m), đại diện cho đoạn cẳng chân.
+    *   Khối lượng: 0.15kg.
+    *   Tâm khối lượng: xyz="0 0 -0.09".
+*   **Khớp: ${prefix}\_ankle\_motor\_mount (fixed)**:
+    *   **Loại**: Fixed.
+    *   **Parent**: ${prefix}\_shank.
+    *   **Child**: ${prefix}\_ankle\_motor (động cơ mắt cá).
+    *   **Vị trí**: xyz="0 0 -0.18" rpy="0 -0.3 0" (mắt cá ở cuối shank, nghiêng -17.2°).
+    *   **Mục đích**: Gắn động cơ mắt cá vào cẳng chân.
+*   **Liên kết: ${prefix}\_ankle\_motor**:
+    *   Hình trụ nhỏ (bán kính 0.012m, chiều dài 0.02m).
+    *   Khối lượng: 0.03kg.
+*   **Khớp: ${prefix}\_ankle\_joint (revolute)**:
+    *   **Loại**: Revolute.
+    *   **Parent**: ${prefix}\_ankle\_motor.
+    *   **Child**: ${prefix}\_foot (bàn chân).
+    *   **Trục xoay**: axis xyz="0 1 0".
+    *   **Giới hạn góc**: lower="-2.0" upper="2.0" (-114.6° đến +114.6°, cho phép điều chỉnh linh hoạt bàn chân).
+    *   **Mục đích**: Điều khiển góc bàn chân để tiếp xúc tốt với mặt đất.
+*   **Liên kết: ${prefix}\_foot**:
+    *   Hình cầu (bán kính 0.03m).
+    *   Khối lượng: 0.1kg.
+    *   Ma sát: mu1=1.2, mu2=1.2 (cho Gazebo).
+
+#### **Tóm tắt luồng khớp**:
+
+*   **Thứ tự**: chassis → hip\_motor\_mount (fixed) → hip\_motor → hip\_joint (revolute) → thigh → knee\_motor\_mount (fixed) → knee\_motor → knee\_joint (revolute) → shank → ankle\_motor\_mount (fixed) → ankle\_motor → ankle\_joint (revolute) → foot.
+*   **Khớp tự do (revolute)**: 3 khớp (hip\_joint, knee\_joint, ankle\_joint), đều xoay quanh trục y, cho phép chuyển động trong mặt phẳng xz.
+*   **Đặc điểm**: Chân gập về phía trước (hình ">") nhờ giới hạn góc âm (hip\_joint: -1.57 đến 0, knee\_joint: -2.5 đến 0) và rpy="-0.3" ở khớp knee và ankle.
+
+* * *
 
 ## Lỗi 
 

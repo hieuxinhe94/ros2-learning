@@ -7,22 +7,24 @@ controller_manager:
       ros__parameters:
         use_stamped_vel: true
 
-
 joint_group_effort_controller:
   ros__parameters:
     joints:
       - left_front_hip_joint
-      - left_front_upper_leg_joint
-      - left_front_lower_leg_joint
+      - left_front_knee_joint
+      - left_front_ankle_joint
+
       - right_front_hip_joint
-      - right_front_upper_leg_joint
-      - right_front_lower_leg_joint
+      - right_front_knee_joint
+      - right_front_ankle_joint
+
       - left_rear_hip_joint
-      - left_rear_upper_leg_joint
-      - left_rear_lower_leg_joint
+      - left_rear_knee_joint
+      - left_rear_ankle_joint
+
       - right_rear_hip_joint
-      - right_rear_upper_leg_joint
-      - right_rear_lower_leg_joint
+      - right_rear_knee_joint
+      - right_rear_ankle_joint
     command_interfaces:
       - position
     state_interfaces:
@@ -38,15 +40,18 @@ joint_group_effort_controller:
     hold_trajectory_duration: 0.0
     action_tolerance: 1.0
     gains:
-      left_front_hip_joint        : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      left_front_upper_leg_joint  : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      left_front_lower_leg_joint  : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_front_hip_joint       : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_front_upper_leg_joint : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_front_lower_leg_joint : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      left_rear_hip_joint         : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      left_rear_upper_leg_joint   : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      left_rear_lower_leg_joint   : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_rear_hip_joint        : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_rear_upper_leg_joint  : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
-      right_rear_lower_leg_joint  : {p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5}
+      left_front_hip_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      left_front_knee_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      left_front_ankle_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+
+      right_front_hip_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      right_front_knee_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      right_front_ankle_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+
+      left_rear_hip_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      left_rear_knee_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      left_rear_ankle_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+
+      right_rear_hip_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      right_rear_knee_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }
+      right_rear_ankle_joint: { p: 100.0, i: 0.2, d: 1.0, i_clamp: 2.5 }

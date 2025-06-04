@@ -52,9 +52,9 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(PROGRAMS
-  move/dog_gait_cycle.py move/gait_cycle_publisher.py
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(PROGRAMS
+#   move/dog_gait_cycle.py move/gait_cycle_publisher.py
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 
 ament_package()

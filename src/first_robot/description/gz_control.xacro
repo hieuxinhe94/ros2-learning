@@ -10,31 +10,31 @@
     <!-- Joint Definitions -->
     <xacro:macro name="define_joint_interfaces" params="joint_name">
       <joint name="${joint_name}">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
       </joint>
     </xacro:macro>
 
     <!-- Front Left Leg -->
-    <xacro:define_joint_interfaces joint_name="left_front_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_front_upper_leg_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_front_lower_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_front_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="left_front_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="left_front_ankle_joint" />
 
     <!-- Front Right Leg -->
-    <xacro:define_joint_interfaces joint_name="right_front_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_front_upper_leg_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_front_lower_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_front_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="right_front_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="right_front_ankle_joint" />
 
     <!-- Rear Left Leg -->
-    <xacro:define_joint_interfaces joint_name="left_rear_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_rear_upper_leg_joint"/>
-    <xacro:define_joint_interfaces joint_name="left_rear_lower_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="left_rear_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="left_rear_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="left_rear_ankle_joint" />
 
     <!-- Rear Right Leg -->
-    <xacro:define_joint_interfaces joint_name="right_rear_hip_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_rear_upper_leg_joint"/>
-    <xacro:define_joint_interfaces joint_name="right_rear_lower_leg_joint"/>
+    <xacro:define_joint_interfaces joint_name="right_rear_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="right_rear_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="right_rear_ankle_joint" />
 
   </ros2_control>
 
