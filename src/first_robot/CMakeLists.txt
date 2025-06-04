@@ -42,7 +42,7 @@ install(
 
 # actionable program
 install( 
-  DIRECTORY scripts move ai_models inteligent
+  DIRECTORY scripts  ai_models inteligent
   DESTINATION lib/${PROJECT_NAME}
 )
 

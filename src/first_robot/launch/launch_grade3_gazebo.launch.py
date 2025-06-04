@@ -126,12 +126,24 @@ def generate_launch_description():
             on_exit=[control_node],
         )
     )
-    # Load controller
-    load_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_group_effort_controller", "--controller-manager", "/controller_manager"],
-        output="screen",
+
+    joint_state_broadcaster_node = TimerAction(
+        period=3.0,  # delay 3 giây
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_state_broadcaster"],
+            ),
+            Node(
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                name="static_tf_pub_odom_base",
+                arguments=["0", "0", "0", "0", "0", "0", "odom", "base_link"],
+                output="screen",
+                parameters=[{"use_sim_time": use_sim_time}],
+            ),
+        ],
     )
 
     delay__trajectory_after_control_node = TimerAction(
@@ -140,10 +152,17 @@ def generate_launch_description():
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["joint_group_effort_controller", "--controller-manager", "/controller_manager" , '--ros-args', '--log-level', 'debug'],
-                output="screen"
+                arguments=[
+                    "joint_group_effort_controller",
+                    "--controller-manager",
+                    "/controller_manager",
+                    "--ros-args",
+                    "--log-level",
+                    "debug",
+                ],
+                output="screen",
             )
-        ]
+        ],
     )
 
     # RQt
@@ -325,7 +344,6 @@ def generate_launch_description():
     quadruped_controller_node = TimerAction(
         period=8.0,  # delay 5 giây
         actions=[
-         
             Node(
                 package="champ_base",
                 executable="quadruped_controller_node",
@@ -346,7 +364,7 @@ def generate_launch_description():
                     {"hardware_connected": False},
                     {"publish_foot_contacts": False},
                     {"close_loop_odom": True},
-                    {"gait": "trot"} # Chỉ định gait cụ thể
+                    {"gait": "trot"},  # Chỉ định gait cụ thể
                 ],
                 remappings=[("/cmd_vel/smooth", "/cmd_vel")],
             )
@@ -365,6 +383,26 @@ def generate_launch_description():
             links_config,
             gaits_config,
         ],
+        # arguments=["--ros-args", "--log-level", "debug"]
+    )
+
+    rviz_config_file = PathJoinSubstitution(
+        [FindPackageShare(package_name), "config", "view_bot.rviz"]
+    )
+
+    rviz_node = TimerAction(
+        period=8.0,  # delay 5 giây
+        actions=[
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                output="log",
+                arguments=["-d", rviz_config_file, "-f", fixed_frame_id],
+                condition=IfCondition(gui),
+                parameters=[{"use_sim_time": use_sim_time}],
+            )
+        ],
     )
 
     nodes = [
@@ -377,7 +415,8 @@ def generate_launch_description():
         robot_state_pub_node,
         #
         delay_control_node,
-        # load_controller,
+        joint_state_broadcaster_node,
+        
         #
         gz_spawn_entity,
         #
@@ -386,7 +425,8 @@ def generate_launch_description():
         # delay_slam_nav2_toolbox,
         # rqt,
         quadruped_controller_node,
-        state_estimator_node
+        state_estimator_node,
+        rviz_node,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

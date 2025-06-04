@@ -8,8 +8,7 @@
   <xacro:property name="motor_length" value="0.02" /> <!-- Length of motor cylinders m -->
   <xacro:property name="foot_radius" value="0.03" /> <!-- Radius of foot sphere m -->
 
-  <!--  INERTIAL MACRO  -->
-  <!-- Macro to calculate inertia for box-shaped links -->
+  <!-- INERTIAL MACRO -->
   <xacro:macro name="inertial_box_leg" params="mass box_size">
     <inertial>
       <mass value="${mass}" />
@@ -22,22 +21,33 @@
     </inertial>
   </xacro:macro>
 
-  <!--  LEG MACRO  -->
-  <!-- Macro to define a single leg with hip thigh knee shank ankle and foot -->
+  <!-- INERTIAL SPHERE MACRO -->
+  <xacro:macro name="inertial_sphere" params="mass radius">
+    <inertial>
+      <mass value="${mass}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia
+        ixx="${(2/5.0)*mass*pow(radius,2)}"
+        iyy="${(2/5.0)*mass*pow(radius,2)}"
+        izz="${(2/5.0)*mass*pow(radius,2)}"
+        ixy="0.0" ixz="0.0" iyz="0.0" />
+    </inertial>
+  </xacro:macro>
+
+  <!-- LEG MACRO -->
   <xacro:macro name="leg" params="prefix x y">
 
-    <!--  HIP SECTION  -->
-    <!-- Hip motor link  Small cylindrical motor attached to chassis -->
+    <!-- HIP SECTION -->
     <link name="${prefix}_hip_motor">
       <visual>
-        <origin xyz="0 0 0.005" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
-        <material name="grey" />
+        <material name="red" />
       </visual>
       <collision>
-        <origin xyz="0 0 0.005" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
@@ -48,26 +58,23 @@
       </inertial>
     </link>
 
-    <!-- Hip motor mount  Fixed joint attaching hip motor to chassis -->
     <joint name="${prefix}_hip_motor_mount" type="fixed">
       <parent link="chassis" />
       <child link="${prefix}_hip_motor" />
-      <origin xyz="${x} ${y} -0.005" />
+      <origin xyz="${x} ${y} -0.005" rpy="0 0 0" /> <!-- Attach under chassis belly -->
     </joint>
 
-    <!-- Hip joint  Revolute joint for thigh rotation, limited to forward motion -->
     <joint name="${prefix}_hip_joint" type="revolute">
       <parent link="${prefix}_hip_motor" />
       <child link="${prefix}_thigh" />
-      <origin xyz="0 0 0" />
-      <axis xyz="0 1 0" /> <!-- Rotation around y-axis -->
-      <limit effort="5" velocity="2.0" lower="-1.57" upper="0" /> <!-- Forward motion only -->
+      <origin xyz="0 0 0" rpy="0 0.385 0" /> <!-- -45° for thigh backward -->
+      <axis xyz="0 1 0" />
+      <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57" />
     </joint>
 
-    <!-- Thigh link  Box-shaped link connecting hip to knee -->
     <link name="${prefix}_thigh">
       <visual>
-        <origin xyz="0 0 -${thigh_length/2}" /> <!-- Center of thigh -->
+        <origin xyz="0 0 -${thigh_length/2}" />
         <geometry>
           <box size="0.03 0.03 ${thigh_length}" />
         </geometry>
@@ -82,18 +89,17 @@
       <xacro:inertial_box_leg mass="0.15" box_size="${[0.03, 0.03, thigh_length]}" />
     </link>
 
-    <!--  KNEE SECTION  -->
-    <!-- Knee motor link  Small cylindrical motor attached to thigh -->
+    <!-- KNEE SECTION -->
     <link name="${prefix}_knee_motor">
       <visual>
-        <origin xyz="0 0 -0.01" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
         <material name="grey" />
       </visual>
       <collision>
-        <origin xyz="0 0 -0.01" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
@@ -104,23 +110,20 @@
       </inertial>
     </link>
 
-    <!-- Knee motor mount  Fixed joint attaching knee motor to thigh -->
     <joint name="${prefix}_knee_motor_mount" type="fixed">
       <parent link="${prefix}_thigh" />
       <child link="${prefix}_knee_motor" />
-      <origin xyz="0 0 -${thigh_length}" rpy="0 -0.3 0" /> <!-- Tilt forward for natural posture -->
+      <origin xyz="0 0 -${thigh_length}" rpy="0 0 0" /> <!-- No rotation here -->
     </joint>
 
-    <!-- Knee joint  Revolute joint for shank rotation, limited to forward motion -->
     <joint name="${prefix}_knee_joint" type="revolute">
       <parent link="${prefix}_knee_motor" />
       <child link="${prefix}_shank" />
-      <origin xyz="0 0 0" />
-      <axis xyz="0 1 0" /> <!-- Rotation around y axis -->
-      <limit effort="5" velocity="2.0" lower="-2.8" upper="0" /> <!-- Forward motion only -->
+      <origin xyz="0 0 0" rpy="0 -0.385 0" /> <!-- +45° for shank forward -->
+      <axis xyz="0 1 0" />
+      <limit effort="5" velocity="2.0" lower="-2.8" upper="0" />
     </joint>
 
-    <!-- Shank link  Box-shaped link connecting knee to ankle -->
     <link name="${prefix}_shank">
       <visual>
         <origin xyz="0 0 -${shank_length/2}" />
@@ -138,18 +141,17 @@
       <xacro:inertial_box_leg mass="0.15" box_size="${[0.02, 0.02, shank_length]}" />
     </link>
 
-    <!--  ANKLE SECTION  -->
-    <!-- Ankle motor link  Small cylindrical motor attached to shank -->
+    <!-- ANKLE SECTION -->
     <link name="${prefix}_ankle_motor">
       <visual>
-        <origin xyz="0 0 -0.01" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
         <material name="grey" />
       </visual>
       <collision>
-        <origin xyz="0 0 -0.01" />
+        <origin xyz="0 0 0" />
         <geometry>
           <cylinder length="${motor_length}" radius="${motor_radius}" />
         </geometry>
@@ -160,23 +162,20 @@
       </inertial>
     </link>
 
-    <!-- Ankle motor mount  Fixed joint attaching ankle motor to shank -->
     <joint name="${prefix}_ankle_motor_mount" type="fixed">
       <parent link="${prefix}_shank" />
       <child link="${prefix}_ankle_motor" />
-      <origin xyz="0 0 -${shank_length}" rpy="0 -0.3 0" /> <!-- Tilt forward for natural posture -->
+      <origin xyz="0 0 -${shank_length}" rpy="0 0 0" /> <!-- No rotation here -->
     </joint>
 
-    <!-- Ankle joint  Revolute joint for foot rotation -->
     <joint name="${prefix}_ankle_joint" type="revolute">
       <parent link="${prefix}_ankle_motor" />
       <child link="${prefix}_foot" />
-      <origin xyz="0 0 0" />
-      <axis xyz="0 1 0" /> <!-- Rotation around y-axis -->
+      <origin xyz="0 0 -${motor_length/2}" rpy="0 0 0" /> <!-- No rotation to align foot -->
+      <axis xyz="0 1 0" />
       <limit effort="5" velocity="2.0" lower="-2.0" upper="2.0" />
     </joint>
 
-    <!-- Foot link  Spherical foot for ground contact -->
     <link name="${prefix}_foot">
       <visual>
         <geometry>
@@ -189,18 +188,16 @@
           <sphere radius="${foot_radius}" />
         </geometry>
       </collision>
-      <xacro:inertial_sphere mass="0.1" radius="${foot_radius}">
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </xacro:inertial_sphere>
+      <xacro:inertial_sphere mass="0.1" radius="${foot_radius}" />
     </link>
 
     <!-- Gazebo settings for foot friction -->
     <gazebo reference="${prefix}_foot">
-      <mu1>0.8</mu1> <!-- Giảm ma sát ngang -->
-      <mu2>0.8</mu2> <!-- Giảm ma sát dọc -->
+      <mu1>0.8</mu1>
+      <mu2>0.8</mu2>
     </gazebo>
 
-
+    <!-- Transmissions -->
     <transmission name="${prefix}_hip_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}_hip_joint" />
