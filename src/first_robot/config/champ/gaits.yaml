@@ -68,8 +68,8 @@
         duty_factor: 0.6 # Tỷ lệ thời gian chân tiếp xúc đất (60%)
         swing_phase: 0.4 # Tỷ lệ thời gian chân nâng lên
         initial_angles: # Góc ban đầu cho các khớp
-          left_front_hip_joint: -0.5 # -28.6° để đùi nghiêng về phía trước
-          left_front_knee_joint: -1.0 # -57.3° để shank gập về phía trước
+          left_front_hip_joint: -0.9 # -28.6° để đùi nghiêng về phía trước
+          left_front_knee_joint: -1.6 # -57.3° để shank gập về phía trước
           left_front_ankle_joint: 0.0 # Bàn chân song song mặt đất
           right_front_hip_joint: -0.5
           right_front_knee_joint: -1.0
@@ -85,8 +85,8 @@
           right_front: [0.15, -0.10, -0.36]
           left_rear: [-0.15, 0.10, -0.36]
           right_rear: [-0.15, -0.10, -0.36]
-        step_length: 0.1 # Độ dài bước (m)
-        step_height: 0.05 # Độ cao nâng chân (m)
+        step_length: 0.2 # Độ dài bước (m)
+        step_height: 0.15 # Độ cao nâng chân (m)
       
       gallop:
           cycle_time: 0.3          # Chu kỳ nhanh để phi nước đại

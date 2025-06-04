@@ -117,7 +117,7 @@
       <child link="${prefix}_shank" />
       <origin xyz="0 0 0" />
       <axis xyz="0 1 0" /> <!-- Rotation around y axis -->
-      <limit effort="5" velocity="2.0" lower="-2.5" upper="0" /> <!-- Forward motion only -->
+      <limit effort="5" velocity="2.0" lower="-2.8" upper="0" /> <!-- Forward motion only -->
     </joint>
 
     <!-- Shank link  Box-shaped link connecting knee to ankle -->

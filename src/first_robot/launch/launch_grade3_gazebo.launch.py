@@ -346,6 +346,7 @@ def generate_launch_description():
                     {"hardware_connected": False},
                     {"publish_foot_contacts": False},
                     {"close_loop_odom": True},
+                    {"gait": "trot"} # Chỉ định gait cụ thể
                 ],
                 remappings=[("/cmd_vel/smooth", "/cmd_vel")],
             )
