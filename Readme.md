@@ -155,3 +155,7 @@ sudo apt update
 sudo apt upgrade
 chmod +x move/dog_gait_cycle.py
     <!-- need to compose all to single file  run  xacro first_robot/description/robot.urdf.xacro > robot.urdf -->
+  <!-- Tâm link nằm giữa  origin là tại tâm hình học  nên Đầu A nằm ở  +L/2 theo trục Z Đầu B nằm ở  -L/2 theo trục Z -->
+  Ví dụ: link_parent là hình trụ dài 0.12 dọc trục Z
+→ Tâm: tại 0 0 0,
+→ Đầu B: tại 0 0 -0.06

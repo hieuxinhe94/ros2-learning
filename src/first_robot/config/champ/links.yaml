@@ -1,48 +1,47 @@
 /**:
   ros__parameters:
     base_link: base_link
-    chassis: chassis
     head: head
     feet:
-      - left_front_foot
-      - right_front_foot
-      - left_rear_foot
-      - right_rear_foot
+      - front_left_foot_link
+      - front_right_foot_link
+      - rear_left_foot_link
+      - rear_right_foot_link
     links_map:
       base: base_link
       left_front:
         [
-          "left_front_hip_motor",
-          "left_front_thigh",
-          "left_front_knee_motor",
-          "left_front_shank",
-          "left_front_ankle_motor",
-          "left_front_foot",
+          "front_left_hip_link",
+          "front_left_hip_motor_link",
+          "front_left_knee_link",
+          "front_left_knee_motor_link",
+          "front_left_ankle_link",
+          "front_left_foot_link",
         ]
       right_front:
         [
-          "right_front_hip_motor",
-          "right_front_thigh",
-          "right_front_knee_motor",
-          "right_front_shank",
-          "right_front_ankle_motor",
-          "right_front_foot",
+          "front_right_hip_link",
+          "front_right_hip_motor_link",
+          "front_right_knee_link",
+          "front_right_knee_motor_link",
+          "front_right_ankle_link",
+          "front_right_foot_link",
         ]
       left_hind:
         [
-          "left_rear_hip_motor",
-          "left_rear_thigh",
-          "left_rear_knee_motor",
-          "left_rear_shank",
-          "left_rear_ankle_motor",
-          "left_rear_foot",
+          "rear_left_hip_link",
+          "rear_left_hip_motor_link",
+          "rear_left_knee_link",
+          "rear_left_knee_motor_link",
+          "rear_left_ankle_link",
+          "rear_left_foot_link",
         ]
       right_hind:
         [
-          "right_rear_hip_motor",
-          "right_rear_thigh",
-          "right_rear_knee_motor",
-          "right_rear_shank",
-          "right_rear_ankle_motor",
-          "right_rear_foot",
+          "rear_right_hip_link",
+          "rear_right_hip_motor_link",
+          "rear_right_knee_link",
+          "rear_right_knee_motor_link",
+          "rear_right_ankle_link",
+          "rear_right_foot_link",
         ]

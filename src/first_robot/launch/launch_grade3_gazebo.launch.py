@@ -416,7 +416,6 @@ def generate_launch_description():
         #
         delay_control_node,
         joint_state_broadcaster_node,
-        
         #
         gz_spawn_entity,
         #
@@ -426,7 +425,7 @@ def generate_launch_description():
         # rqt,
         quadruped_controller_node,
         state_estimator_node,
-        rviz_node,
+        # rviz_node,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

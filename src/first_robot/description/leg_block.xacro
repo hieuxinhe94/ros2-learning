@@ -1,219 +1,255 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:property name="thigh_length" value="0.18" /> <!-- Length of thigh link m -->
-  <xacro:property name="shank_length" value="0.18" /> <!-- Length of shank link m -->
-  <xacro:property name="motor_mass" value="0.03" /> <!-- Mass of motor links kg -->
-  <xacro:property name="motor_radius" value="0.012" /> <!-- Radius of motor cylinders m -->
-  <xacro:property name="motor_length" value="0.02" /> <!-- Length of motor cylinders m -->
-  <xacro:property name="foot_radius" value="0.03" /> <!-- Radius of foot sphere m -->
+  <!-- Định nghĩa macro cho một chân -->
+  <xacro:macro name="leg" params="prefix pos side x y">
+    <!-- bắt đầu phần háng -->
+    <!-- Hip Link -->
 
-  <!-- INERTIAL MACRO -->
-  <xacro:macro name="inertial_box_leg" params="mass box_size">
-    <inertial>
-      <mass value="${mass}" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia
-        ixx="${(1/12.0)*mass*(pow(box_size[1],2)+pow(box_size[2],2))}"
-        iyy="${(1/12.0)*mass*(pow(box_size[0],2)+pow(box_size[2],2))}"
-        izz="${(1/12.0)*mass*(pow(box_size[0],2)+pow(box_size[1],2))}"
-        ixy="0.0" ixz="0.0" iyz="0.0" />
-    </inertial>
-  </xacro:macro>
 
-  <!-- INERTIAL SPHERE MACRO -->
-  <xacro:macro name="inertial_sphere" params="mass radius">
-    <inertial>
-      <mass value="${mass}" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia
-        ixx="${(2/5.0)*mass*pow(radius,2)}"
-        iyy="${(2/5.0)*mass*pow(radius,2)}"
-        izz="${(2/5.0)*mass*pow(radius,2)}"
-        ixy="0.0" ixz="0.0" iyz="0.0" />
-    </inertial>
-  </xacro:macro>
-
-  <!-- LEG MACRO -->
-  <xacro:macro name="leg" params="prefix x y">
-
-    <!-- HIP SECTION -->
-    <link name="${prefix}_hip_motor">
-      <visual>
-        <origin xyz="0 0 0" />
+    <link name="${prefix}_hip_link">
+      <visual name="${prefix}_hip_visual">
+        <xacro:if value="${(side == 'left')}">
+          <origin xyz="0 0.055 0" rpy="0 0 0"/>
+          <!-- vị trí đặt link - khớp háng so với body -->
+        </xacro:if>
+        <xacro:if value="${(side == 'right')}">
+          <origin xyz="0 -0.055 0" rpy="0 0 0"/>
+          <!-- vị trí đặt link - khớp háng so với body -->
+        </xacro:if>
         <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
+          <box size="0.03 0.03 0.02"/>
+          <!-- dài 2cm, cố định thân trên và các chân -->
         </geometry>
-        <material name="red" />
+        <material name="blue"/>
       </visual>
-      <collision>
-        <origin xyz="0 0 0" />
+      <collision name="${prefix}_hip_collision">
         <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
+          <box size="0.03 0.03 0.02"/>
+          <!-- dài 2cm, cố định thân trên và các chân -->
         </geometry>
       </collision>
       <inertial>
-        <mass value="${motor_mass}" />
-        <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+        <mass value="0.2"/>
+        <inertia ixx="0.000833" ixy="0.0" ixz="0.0" iyy="0.000833" iyz="0.0" izz="0.001666"/>
       </inertial>
     </link>
 
-    <joint name="${prefix}_hip_motor_mount" type="fixed">
-      <parent link="chassis" />
-      <child link="${prefix}_hip_motor" />
-      <origin xyz="${x} ${y} -0.005" rpy="0 0 0" /> <!-- Attach under chassis belly -->
+    <joint name="${prefix}_hip_joint" type="fixed">
+      <parent link="${pos}_body"/>
+      <child link="${prefix}_hip_link"/>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <!-- Vị trí gắn khớp háng vào body-->
     </joint>
 
-    <joint name="${prefix}_hip_joint" type="revolute">
-      <parent link="${prefix}_hip_motor" />
-      <child link="${prefix}_thigh" />
-      <origin xyz="0 0 0" rpy="0 0.385 0" /> <!-- -45° for thigh backward -->
-      <axis xyz="0 1 0" />
-      <limit effort="5" velocity="2.0" lower="-1.57" upper="1.57" />
-    </joint>
-
-    <link name="${prefix}_thigh">
-      <visual>
-        <origin xyz="0 0 -${thigh_length/2}" />
+    <!-- x1.1 Motor link vỏ motor mô phỏng, không quay -->
+    <link name="${prefix}_hip_motor_link">
+      <visual name="${prefix}_hip_motor_visual">
         <geometry>
-          <box size="0.03 0.03 ${thigh_length}" />
+          <cylinder radius="0.015" length="0.02"/>
         </geometry>
-        <material name="blue" />
+        <origin xyz="0.005 0 0" rpy="1.0 0 0"/>
+        <xacro:if value="${(side == 'left')}">
+          <origin xyz="0.005 0.055 0" rpy="1.5708 0 0"/>
+          <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+        </xacro:if>
+        <xacro:if value="${(side == 'right')}">
+          <origin xyz="0.005 -0.055 0" rpy="1.5708 0 0"/>
+          <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+        </xacro:if>
+        <material name="yellow"/>
       </visual>
-      <collision>
-        <origin xyz="0 0 -${thigh_length/2}" />
-        <geometry>
-          <box size="0.03 0.03 ${thigh_length}" />
-        </geometry>
-      </collision>
-      <xacro:inertial_box_leg mass="0.15" box_size="${[0.03, 0.03, thigh_length]}" />
+     <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+      </inertial>
     </link>
 
-    <!-- KNEE SECTION -->
-    <link name="${prefix}_knee_motor">
-      <visual>
-        <origin xyz="0 0 0" />
+    <!-- x1.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+    <joint name="${prefix}_hip_motor_fixed" type="fixed">
+      <parent link="${prefix}_hip_link"/>
+      <child link="${prefix}_hip_motor_link"/>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <!-- Vị trí gắn motor -->
+    </joint>
+
+    <!-- Kết thúc phần háng -->
+
+    <!-- *** Bắt đầu phần đùi chân *** -->
+
+    <!-- knee Link -->
+    <link name="${prefix}_knee_link">
+      <visual name="${prefix}_knee_visual">
+        <xacro:if value="${(side == 'left')}">
+          <origin xyz="0.005 0.055 -0.05" rpy="0 0 0"/>
+          <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+        </xacro:if>
+        <xacro:if value="${(side == 'right')}">
+          <origin xyz="0.005 -0.055 -0.05" rpy="0 0 0"/>
+          <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+        </xacro:if>
         <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
+          <cylinder radius="0.01" length="0.1"/>
         </geometry>
-        <material name="grey" />
+        <material name="green"/>
       </visual>
-      <collision>
-        <origin xyz="0 0 0" />
+      <collision name="${prefix}_knee_collision">
         <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
+          <cylinder radius="0.01" length="0.1"/>
         </geometry>
       </collision>
       <inertial>
-        <mass value="${motor_mass}" />
-        <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+        <mass value="0.5"/>
+        <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
       </inertial>
     </link>
 
-    <joint name="${prefix}_knee_motor_mount" type="fixed">
-      <parent link="${prefix}_thigh" />
-      <child link="${prefix}_knee_motor" />
-      <origin xyz="0 0 -${thigh_length}" rpy="0 0 0" /> <!-- No rotation here -->
-    </joint>
-
+    <!-- knee Joint (Đùi, quay về sau ) -->
     <joint name="${prefix}_knee_joint" type="revolute">
-      <parent link="${prefix}_knee_motor" />
-      <child link="${prefix}_shank" />
-      <origin xyz="0 0 0" rpy="0 -0.385 0" /> <!-- +45° for shank forward -->
-      <axis xyz="0 1 0" />
-      <limit effort="5" velocity="2.0" lower="-2.8" upper="0" />
+      <parent link="${prefix}_hip_motor_link"/>
+      <!-- Gắn vào motor háng mô phỏng -->
+      <child link="${prefix}_knee_link"/>
+      <origin xyz="0 0 0" rpy="0 0.5 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0"/>
     </joint>
 
-    <link name="${prefix}_shank">
-      <visual>
-        <origin xyz="0 0 -${shank_length/2}" />
+    <!-- x2.1 Motor link vỏ motor mô phỏng Đầu gối , không quay -->
+    <link name="${prefix}_knee_motor_link">
+      <visual name="${prefix}_knee_motor_visual">
         <geometry>
-          <box size="0.02 0.02 ${shank_length}" />
+          <cylinder radius="0.015" length="0.02"/>
         </geometry>
-        <material name="red" />
+        <xacro:if value="${(side == 'left')}">
+          <origin xyz="0.01 0.055 -0.085" rpy="1.0 0 0"/>
+          <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+        </xacro:if>
+        <xacro:if value="${(side == 'right')}">
+          <origin xyz="0.01 -0.055 -0.085" rpy="1.0 0 0"/>
+          <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+        </xacro:if>
+        <material name="red"/>
       </visual>
-      <collision>
-        <origin xyz="0 0 -${shank_length/2}" />
-        <geometry>
-          <box size="0.02 0.02 ${shank_length}" />
-        </geometry>
-      </collision>
-      <xacro:inertial_box_leg mass="0.15" box_size="${[0.02, 0.02, shank_length]}" />
-    </link>
-
-    <!-- ANKLE SECTION -->
-    <link name="${prefix}_ankle_motor">
-      <visual>
-        <origin xyz="0 0 0" />
-        <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
-        </geometry>
-        <material name="grey" />
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" />
-        <geometry>
-          <cylinder length="${motor_length}" radius="${motor_radius}" />
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="${motor_mass}" />
-        <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+     <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
       </inertial>
     </link>
 
-    <joint name="${prefix}_ankle_motor_mount" type="fixed">
-      <parent link="${prefix}_shank" />
-      <child link="${prefix}_ankle_motor" />
-      <origin xyz="0 0 -${shank_length}" rpy="0 0 0" /> <!-- No rotation here -->
+    <!-- x2.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+    <joint name="${prefix}_knee_motor_fixed" type="fixed">
+      <parent link="${prefix}_knee_link"/>
+      <child link="${prefix}_knee_motor_link"/>
+      <origin xyz="0 0 -0.01" rpy="0 0 0"/>
+      <!-- Vị trí gắn motor -->
     </joint>
 
-    <joint name="${prefix}_ankle_joint" type="revolute">
-      <parent link="${prefix}_ankle_motor" />
-      <child link="${prefix}_foot" />
-      <origin xyz="0 0 -${motor_length/2}" rpy="0 0 0" /> <!-- No rotation to align foot -->
-      <axis xyz="0 1 0" />
-      <limit effort="5" velocity="2.0" lower="-2.0" upper="2.0" />
-    </joint>
 
-    <link name="${prefix}_foot">
-      <visual>
+    <!-- *** Kết thúc phần đùi chân *** -->
+
+
+    <!-- *** Bắt đầu phần cẳng chân *** -->
+
+    <!-- ankle Link -->
+    <link name="${prefix}_ankle_link">
+      <visual name="${prefix}_ankle_visual">
         <geometry>
-          <sphere radius="${foot_radius}" />
+          <cylinder radius="0.01" length="0.1"/>
         </geometry>
-        <material name="black" />
+        <xacro:if value="${(side == 'left')}">
+          <origin xyz="0 0 -0.08" rpy="0 -1.0 0"/>
+          <!-- Dịch xuống 1/2 chiều dài -->
+          <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+        </xacro:if>
+        <xacro:if value="${(side == 'right')}">
+          <origin xyz="0 0 -0.08" rpy="0 -1.0 0"/>
+          <!-- Dịch xuống 1/2 chiều dài -->
+          <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+        </xacro:if>
+        <material name="purple"/>
       </visual>
-      <collision>
+      <collision name="${prefix}_ankle_collision">
+        <origin xyz="0 0 -0.08"/>
+        <!-- Khớp visual -->
         <geometry>
-          <sphere radius="${foot_radius}" />
+          <cylinder radius="0.01" length="0.1"/>
         </geometry>
       </collision>
-      <xacro:inertial_sphere mass="0.1" radius="${foot_radius}" />
+      <inertial>
+        <origin xyz="0 0 -0.08"/>
+        <!-- Dịch khối lượng xuống luôn -->
+        <mass value="0.2"/>
+        <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+      </inertial>
     </link>
 
-    <!-- Gazebo settings for foot friction -->
-    <gazebo reference="${prefix}_foot">
-      <mu1>0.8</mu1>
-      <mu2>0.8</mu2>
-    </gazebo>
+    <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+    <joint name="${prefix}_ankle_joint" type="fixed">
+      <parent link="${prefix}_knee_motor_link"/>
+      <child link="${prefix}_ankle_link"/>
+      <xacro:if value="${(side == 'left')}">
+        <origin xyz="0 0.055 0" rpy="0 -0.60 0"/>
+        <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      </xacro:if>
+      <xacro:if value="${(side == 'right')}">
+        <origin xyz="0 -0.055 0" rpy="0 -0.60 0"/>
+        <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      </xacro:if>
+      <!-- rút ngắn chiều dài -->
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0"/>
+    </joint>
 
-    <!-- Transmissions -->
-    <transmission name="${prefix}_hip_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${prefix}_hip_joint" />
-      <actuator name="${prefix}_hip_actuator" />
-    </transmission>
+
+
+    <!-- *** Kết thúc phần cẳng chân *** -->
+
+    <!-- Foot Link -->
+    <link name="${prefix}_foot_link">
+      <visual name="${prefix}_foot_visual">
+        <origin xyz="0.045 0 -0.055"/>
+        <geometry>
+          <sphere radius="0.02"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision name="${prefix}_foot_collision">
+        <origin xyz="0.045 0 -0.055"/>
+        <geometry>
+          <sphere radius="0.02"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.05"/>
+        <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+      </inertial>
+    </link>
+
+    <!-- Foot Joint -->
+    <joint name="${prefix}_foot_joint" type="fixed">
+      <parent link="${prefix}_ankle_link"/>
+      <child link="${prefix}_foot_link"/>
+      <origin xyz="0 0 -0.05" rpy="0 0 0"/>
+      <!-- rút gọn lại -->
+    </joint>
+
+
+    <!-- Transmission cho các joint -->
     <transmission name="${prefix}_knee_trans">
       <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${prefix}_knee_joint" />
-      <actuator name="${prefix}_knee_actuator" />
-    </transmission>
-    <transmission name="${prefix}_ankle_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${prefix}_ankle_joint" />
-      <actuator name="${prefix}_ankle_actuator" />
+      <joint name="${prefix}_knee_joint"/>
+      <actuator name="${prefix}_knee_motor">
+        <mechanical_reduction>1</mechanical_reduction>
+      </actuator>
     </transmission>
 
+    <transmission name="${prefix}_ankle_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_ankle_joint"/>
+      <actuator name="${prefix}_ankle_motor">
+        <mechanical_reduction>1</mechanical_reduction>
+      </actuator>
+    </transmission>
   </xacro:macro>
 
 </robot>

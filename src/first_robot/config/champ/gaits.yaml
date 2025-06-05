@@ -18,18 +18,18 @@
         duty_factor: 0.7
         swing_phase: 0.3
         initial_angles:
-          left_front_hip_joint: -0.7
-          left_front_knee_joint: -1.2
-          left_front_ankle_joint: 0.0
-          right_front_hip_joint: -0.7
-          right_front_knee_joint: -1.2
-          right_front_ankle_joint: 0.0
-          left_rear_hip_joint: -0.7
-          left_rear_knee_joint: -1.2
-          left_rear_ankle_joint: 0.0
-          right_rear_hip_joint: -0.7
-          right_rear_knee_joint: -1.2
-          right_rear_ankle_joint: 0.0
+          front_left_hip_joint: -0.7
+          front_left_knee_joint: -1.2
+          front_left_ankle_joint: 0.0
+          front_right_hip_joint: -0.7
+          front_right_knee_joint: -1.2
+          front_right_ankle_joint: 0.0
+          rear_left_hip_joint: -0.7
+          rear_left_knee_joint: -1.2
+          rear_left_ankle_joint: 0.0
+          rear_right_hip_joint: -0.7
+          rear_right_knee_joint: -1.2
+          rear_right_ankle_joint: 0.0
         foot_positions:
           left_front: [0.15, 0.10, -0.35]
           right_front: [0.15, -0.10, -0.35]
@@ -43,23 +43,23 @@
         duty_factor: 0.5
         swing_phase: 0.5
         initial_angles:
-          left_front_hip_joint: -0.7
-          left_front_knee_joint: -1.2
-          left_front_ankle_joint: 0.0
-          right_front_hip_joint: -0.7
-          right_front_knee_joint: -1.2
-          right_front_ankle_joint: 0.0
-          left_rear_hip_joint: -0.7
-          left_rear_knee_joint: -1.2
-          left_rear_ankle_joint: 0.0
-          right_rear_hip_joint: -0.7
-          right_rear_knee_joint: -1.2
-          right_rear_ankle_joint: 0.0
+          front_left_hip_joint: -0.7
+          front_left_knee_joint: -1.2
+          front_left_ankle_joint: 0.0
+          front_right_hip_joint: -0.7
+          front_right_knee_joint: -1.2
+          front_right_ankle_joint: 0.0
+          rear_left_hip_joint: -0.7
+          rear_left_knee_joint: -1.2
+          rear_left_ankle_joint: 0.0
+          rear_right_hip_joint: -0.7
+          rear_right_knee_joint: -1.2
+          rear_right_ankle_joint: 0.0
         foot_positions:
-          left_front: [0.15, 0.10, -0.35]
-          right_front: [0.15, -0.10, -0.35]
-          left_rear: [-0.15, 0.10, -0.35]
-          right_rear: [-0.15, -0.10, -0.35]
+          front_left: [0.15, 0.10, -0.35]
+          front_right: [0.15, -0.10, -0.35]
+          rear_left: [-0.15, 0.10, -0.35]
+          rear_right: [-0.15, -0.10, -0.35]
         step_length: 0.15
         step_height: 0.08
       
@@ -68,23 +68,23 @@
         duty_factor: 0.6 # Tỷ lệ thời gian chân tiếp xúc đất (60%)
         swing_phase: 0.4 # Tỷ lệ thời gian chân nâng lên
         initial_angles: # Góc ban đầu cho các khớp
-          left_front_hip_joint: -0.9 # -28.6° để đùi nghiêng về phía trước
-          left_front_knee_joint: -1.6 # -57.3° để shank gập về phía trước
-          left_front_ankle_joint: 0.0 # Bàn chân song song mặt đất
-          right_front_hip_joint: -0.5
-          right_front_knee_joint: -1.0
-          right_front_ankle_joint: 0.0
-          left_rear_hip_joint: -0.5
-          left_rear_knee_joint: -1.0
-          left_rear_ankle_joint: 0.0
-          right_rear_hip_joint: -0.5
-          right_rear_knee_joint: -1.0
-          right_rear_ankle_joint: 0.0
+          front_left_hip_joint: -0.9 # -28.6° để đùi nghiêng về phía trước
+          front_left_knee_joint: -1.6 # -57.3° để shank gập về phía trước
+          front_left_ankle_joint: 0.0 # Bàn chân song song mặt đất
+          front_right_hip_joint: -0.5
+          front_right_knee_joint: -1.0
+          front_right_ankle_joint: 0.0
+          rear_left_hip_joint: -0.5
+          rear_left_knee_joint: -1.0
+          rear_left_ankle_joint: 0.0
+          rear_right_hip_joint: -0.5
+          rear_right_knee_joint: -1.0
+          rear_right_ankle_joint: 0.0
         foot_positions: # Vị trí bàn chân mặc định (tọa độ x, y, z)
-          left_front: [0.15, 0.10, -0.36] # z = -(thigh_length + shank_length)
-          right_front: [0.15, -0.10, -0.36]
-          left_rear: [-0.15, 0.10, -0.36]
-          right_rear: [-0.15, -0.10, -0.36]
+          front_left: [0.15, 0.10, -0.36] # z = -(thigh_length + shank_length)
+          front_right: [0.15, -0.10, -0.36]
+          rear_left: [-0.15, 0.10, -0.36]
+          rear_right: [-0.15, -0.10, -0.36]
         step_length: 0.2 # Độ dài bước (m)
         step_height: 0.15 # Độ cao nâng chân (m)
       
@@ -93,43 +93,43 @@
           duty_factor: 0.4         # 40% tiếp xúc đất, tăng tốc độ
           swing_phase: 0.6         # 60% thời gian chân nâng
           initial_angles:
-            left_front_hip_joint: -0.8    # Vươn xa hơn
-            left_front_knee_joint: -1.4   # Gập sâu hơn
-            left_front_ankle_joint: 0.0
-            right_front_hip_joint: -0.8
-            right_front_knee_joint: -1.4
-            right_front_ankle_joint: 0.0
-            left_rear_hip_joint: -0.8
-            left_rear_knee_joint: -1.4
-            left_rear_ankle_joint: 0.0
-            right_rear_hip_joint: -0.8
-            right_rear_knee_joint: -1.4
-            right_rear_ankle_joint: 0.0
+            front_left_hip_joint: -0.8    # Vươn xa hơn
+            front_left_knee_joint: -1.4   # Gập sâu hơn
+            front_left_ankle_joint: 0.0
+            front_right_hip_joint: -0.8
+            front_right_knee_joint: -1.4
+            front_right_ankle_joint: 0.0
+            rear_left_hip_joint: -0.8
+            rear_left_knee_joint: -1.4
+            rear_left_ankle_joint: 0.0
+            rear_right_hip_joint: -0.8
+            rear_right_knee_joint: -1.4
+            rear_right_ankle_joint: 0.0
           foot_positions:
-            left_front: [0.15, 0.10, -0.35]
-            right_front: [0.15, -0.10, -0.35]
-            left_rear: [-0.15, 0.10, -0.35]
-            right_rear: [-0.15, -0.10, -0.35]
+            front_left: [0.15, 0.10, -0.35]
+            front_right: [0.15, -0.10, -0.35]
+            rear_left: [-0.15, 0.10, -0.35]
+            rear_right: [-0.15, -0.10, -0.35]
           step_length: 0.2         # Bước dài hơn
           step_height: 0.1         # Nâng chân cao hơn  
 
       leg_mapping:
         front_left:
-          hip: left_front_hip_joint
-          knee: left_front_knee_joint
-          ankle: left_front_ankle_joint
+          hip: front_left_hip_joint
+          knee: front_left_knee_joint
+          ankle: front_left_ankle_joint
         front_right:
-          hip: right_front_hip_joint
-          knee: right_front_knee_joint
-          ankle: right_front_ankle_joint
+          hip: front_right_hip_joint
+          knee: front_right_knee_joint
+          ankle: front_right_ankle_joint
         rear_left:
-          hip: left_rear_hip_joint
-          knee: left_rear_knee_joint
-          ankle: left_rear_ankle_joint
+          hip: rear_left_hip_joint
+          knee: rear_left_knee_joint
+          ankle: rear_left_ankle_joint
         rear_right:
-          hip: right_rear_hip_joint
-          knee: right_rear_knee_joint
-          ankle: right_rear_ankle_joint
+          hip: rear_right_hip_joint
+          knee: rear_right_knee_joint
+          ankle: rear_right_ankle_joint
       phase_offset:
         front_left: 0.0
         front_right: 0.5

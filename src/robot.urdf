@@ -4,8 +4,6 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="my_robot">
-  <!-- Specify some standard inertial calculations https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
-  <!-- These make use of xacro's mathematical functionality -->
   <material name="white">
     <color rgba="1 1 1 1"/>
   </material>
@@ -13,7 +11,22 @@
     <color rgba="1 0.3 0.1 1"/>
   </material>
   <material name="blue">
-    <color rgba="0.2 0.2 1 1"/>
+    <color rgba="0 0 1 1"/>
+  </material>
+  <material name="green">
+    <color rgba="0 1 0 1"/>
+  </material>
+  <material name="yellow">
+    <color rgba="1 1 0 1"/>
+  </material>
+  <material name="cyan">
+    <color rgba="0 1 1 1"/>
+  </material>
+  <material name="pink">
+    <color rgba="1 0.5 0.5 1"/>
+  </material>
+  <material name="purple">
+    <color rgba="0.5 0 0.5 1"/>
   </material>
   <material name="black">
     <color rgba="0 0 0 1"/>
@@ -24,917 +37,887 @@
   <material name="grey">
     <color rgba="0.5 0.5 0.5 1"/>
   </material>
+  <material name="silver">
+    <color rgba="0.75 0.75 0.75 1"/>
+  </material>
+  <!-- AAAAAAAAAAAAAAAAAAA -->
   <!-- BASE LINK -->
   <link name="base_link">
-    <inertial>
-      <mass value="0.5"/>
-      <!-- Giảm từ 2.0 -->
-      <origin xyz="0 0 0.1"/>
-      <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
-    </inertial>
-  </link>
-  <!-- CHASSIS LINK -->
-  <joint name="chassis_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="chassis"/>
-    <origin xyz="0 0 0"/>
-  </joint>
-  <link name="chassis">
-    <visual>
-      <origin xyz="0 0 0.075"/>
+    <visual name="base_link_visual">
+      <origin xyz="0 0 0.025"/>
       <geometry>
-        <box size="0.5 0.2 0.15"/>
+        <box size="0.5 0.2 0.1"/>
       </geometry>
       <material name="white"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0.075"/>
+    <collision name="base_link_collision">
+      <origin xyz="0 0 0.025"/>
       <!-- Sửa tâm va chạm -->
       <geometry>
-        <box size="0.5 0.2 0.15"/>
+        <box size="0.5 0.2 0.1"/>
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <origin rpy="0 0 0" xyz="0 0 0.025"/>
       <mass value="0.5"/>
-      <inertia ixx="0.0026041666666666665" ixy="0.0" ixz="0.0" iyy="0.011354166666666667" iyz="0.0" izz="0.012083333333333335"/>
+      <inertia ixx="0.0020833333333333337" ixy="0.0" ixz="0.0" iyy="0.010833333333333334" iyz="0.0" izz="0.012083333333333335"/>
     </inertial>
   </link>
-  <!-- === DESCRIPTION === -->
-  <!-- This file defines the leg macro for a quadruped robot, including hip, thigh, knee, shank,
-  ankle, and foot components. -->
-  <!-- Parameters are defined for modularity and ease of maintenance. -->
-  <!-- Radius of foot sphere (m) -->
-  <!-- === HIP SECTION === -->
-  <!-- Hip motor link: Small cylindrical motor attached to chassis -->
-  <link name="left_front_hip_motor">
-    <visual>
-      <origin xyz="0 0 0.005"/>
+  <!-- Front Body -->
+  <link name="front_body">
+    <visual name="front_body_visual">
       <geometry>
-        <cylinder length="0.02" radius="0.012"/>
+        <box size="0.05 0.1 0.05"/>
       </geometry>
-      <material name="grey"/>
+      <material name="pink"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0.005"/>
+    <collision name="front_body_collision">
       <geometry>
-        <cylinder length="0.02" radius="0.012"/>
+        <box size="0.05 0.1 0.025"/>
       </geometry>
     </collision>
     <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
     </inertial>
   </link>
-  <!-- Hip motor mount: Fixed joint attaching hip motor to chassis -->
-  <joint name="left_front_hip_motor_mount" type="fixed">
-    <parent link="chassis"/>
-    <child link="left_front_hip_motor"/>
-    <origin xyz="0.15 0.1 -0.005"/>
-  </joint>
-  <!-- Hip joint: Revolute joint for thigh rotation, limited to forward motion -->
-  <joint name="left_front_hip_joint" type="revolute">
-    <parent link="left_front_hip_motor"/>
-    <child link="left_front_thigh"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-1.57" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Thigh link: Box-shaped link connecting hip to knee -->
-  <link name="left_front_thigh">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <!-- Center of thigh -->
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-      <material name="blue"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0004162499999999999" ixy="0.0" ixz="0.0" iyy="0.0004162499999999999" iyz="0.0" izz="2.2499999999999998e-05"/>
-    </inertial>
-  </link>
-  <!-- === KNEE SECTION === -->
-  <!-- Knee motor link: Small cylindrical motor attached to thigh -->
-  <link name="left_front_knee_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Knee motor mount: Fixed joint attaching knee motor to thigh -->
-  <joint name="left_front_knee_motor_mount" type="fixed">
-    <parent link="left_front_thigh"/>
-    <child link="left_front_knee_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Knee joint: Revolute joint for shank rotation, limited to forward motion -->
-  <joint name="left_front_knee_joint" type="revolute">
-    <parent link="left_front_knee_motor"/>
-    <child link="left_front_shank"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.5" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Shank link: Box-shaped link connecting knee to ankle -->
-  <link name="left_front_shank">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.00040999999999999994" ixy="0.0" ixz="0.0" iyy="0.00040999999999999994" iyz="0.0" izz="9.999999999999999e-06"/>
-    </inertial>
-  </link>
-  <!-- === ANKLE SECTION === -->
-  <!-- Ankle motor link: Small cylindrical motor attached to shank -->
-  <link name="left_front_ankle_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Ankle motor mount: Fixed joint attaching ankle motor to shank -->
-  <joint name="left_front_ankle_motor_mount" type="fixed">
-    <parent link="left_front_shank"/>
-    <child link="left_front_ankle_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Ankle joint: Revolute joint for foot rotation -->
-  <joint name="left_front_ankle_joint" type="revolute">
-    <parent link="left_front_ankle_motor"/>
-    <child link="left_front_foot"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.0" upper="2.0" velocity="2.0"/>
-  </joint>
-  <!-- Foot link: Spherical foot for ground contact -->
-  <link name="left_front_foot">
-    <visual>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="3.600000000000001e-05" ixy="0.0" ixz="0.0" iyy="3.600000000000001e-05" iyz="0.0" izz="3.600000000000001e-05"/>
-    </inertial>
-  </link>
-  <!-- Gazebo settings for foot friction -->
-  <gazebo reference="left_front_foot">
-    <mu1>1.2</mu1>
-    <!-- Lateral friction -->
-    <mu2>1.2</mu2>
-    <!-- Longitudinal friction -->
-  </gazebo>
-  <transmission name="left_front_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_front_hip_joint"/>
-    <actuator name="left_front_hip_actuator"/>
-  </transmission>
-  <transmission name="left_front_knee_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_front_knee_joint"/>
-    <actuator name="left_front_knee_actuator"/>
-  </transmission>
-  <transmission name="left_front_ankle_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_front_ankle_joint"/>
-    <actuator name="left_front_ankle_actuator"/>
-  </transmission>
-  <!-- === HIP SECTION === -->
-  <!-- Hip motor link: Small cylindrical motor attached to chassis -->
-  <link name="right_front_hip_motor">
-    <visual>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Hip motor mount: Fixed joint attaching hip motor to chassis -->
-  <joint name="right_front_hip_motor_mount" type="fixed">
-    <parent link="chassis"/>
-    <child link="right_front_hip_motor"/>
-    <origin xyz="0.15 -0.1 -0.005"/>
-  </joint>
-  <!-- Hip joint: Revolute joint for thigh rotation, limited to forward motion -->
-  <joint name="right_front_hip_joint" type="revolute">
-    <parent link="right_front_hip_motor"/>
-    <child link="right_front_thigh"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-1.57" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Thigh link: Box-shaped link connecting hip to knee -->
-  <link name="right_front_thigh">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <!-- Center of thigh -->
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-      <material name="blue"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0004162499999999999" ixy="0.0" ixz="0.0" iyy="0.0004162499999999999" iyz="0.0" izz="2.2499999999999998e-05"/>
-    </inertial>
-  </link>
-  <!-- === KNEE SECTION === -->
-  <!-- Knee motor link: Small cylindrical motor attached to thigh -->
-  <link name="right_front_knee_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Knee motor mount: Fixed joint attaching knee motor to thigh -->
-  <joint name="right_front_knee_motor_mount" type="fixed">
-    <parent link="right_front_thigh"/>
-    <child link="right_front_knee_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Knee joint: Revolute joint for shank rotation, limited to forward motion -->
-  <joint name="right_front_knee_joint" type="revolute">
-    <parent link="right_front_knee_motor"/>
-    <child link="right_front_shank"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.5" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Shank link: Box-shaped link connecting knee to ankle -->
-  <link name="right_front_shank">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.00040999999999999994" ixy="0.0" ixz="0.0" iyy="0.00040999999999999994" iyz="0.0" izz="9.999999999999999e-06"/>
-    </inertial>
-  </link>
-  <!-- === ANKLE SECTION === -->
-  <!-- Ankle motor link: Small cylindrical motor attached to shank -->
-  <link name="right_front_ankle_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Ankle motor mount: Fixed joint attaching ankle motor to shank -->
-  <joint name="right_front_ankle_motor_mount" type="fixed">
-    <parent link="right_front_shank"/>
-    <child link="right_front_ankle_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Ankle joint: Revolute joint for foot rotation -->
-  <joint name="right_front_ankle_joint" type="revolute">
-    <parent link="right_front_ankle_motor"/>
-    <child link="right_front_foot"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.0" upper="2.0" velocity="2.0"/>
-  </joint>
-  <!-- Foot link: Spherical foot for ground contact -->
-  <link name="right_front_foot">
-    <visual>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="3.600000000000001e-05" ixy="0.0" ixz="0.0" iyy="3.600000000000001e-05" iyz="0.0" izz="3.600000000000001e-05"/>
-    </inertial>
-  </link>
-  <!-- Gazebo settings for foot friction -->
-  <gazebo reference="right_front_foot">
-    <mu1>1.2</mu1>
-    <!-- Lateral friction -->
-    <mu2>1.2</mu2>
-    <!-- Longitudinal friction -->
-  </gazebo>
-  <transmission name="right_front_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_front_hip_joint"/>
-    <actuator name="right_front_hip_actuator"/>
-  </transmission>
-  <transmission name="right_front_knee_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_front_knee_joint"/>
-    <actuator name="right_front_knee_actuator"/>
-  </transmission>
-  <transmission name="right_front_ankle_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_front_ankle_joint"/>
-    <actuator name="right_front_ankle_actuator"/>
-  </transmission>
-  <!-- === HIP SECTION === -->
-  <!-- Hip motor link: Small cylindrical motor attached to chassis -->
-  <link name="left_rear_hip_motor">
-    <visual>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Hip motor mount: Fixed joint attaching hip motor to chassis -->
-  <joint name="left_rear_hip_motor_mount" type="fixed">
-    <parent link="chassis"/>
-    <child link="left_rear_hip_motor"/>
-    <origin xyz="-0.15 0.1 -0.005"/>
-  </joint>
-  <!-- Hip joint: Revolute joint for thigh rotation, limited to forward motion -->
-  <joint name="left_rear_hip_joint" type="revolute">
-    <parent link="left_rear_hip_motor"/>
-    <child link="left_rear_thigh"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-1.57" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Thigh link: Box-shaped link connecting hip to knee -->
-  <link name="left_rear_thigh">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <!-- Center of thigh -->
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-      <material name="blue"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0004162499999999999" ixy="0.0" ixz="0.0" iyy="0.0004162499999999999" iyz="0.0" izz="2.2499999999999998e-05"/>
-    </inertial>
-  </link>
-  <!-- === KNEE SECTION === -->
-  <!-- Knee motor link: Small cylindrical motor attached to thigh -->
-  <link name="left_rear_knee_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Knee motor mount: Fixed joint attaching knee motor to thigh -->
-  <joint name="left_rear_knee_motor_mount" type="fixed">
-    <parent link="left_rear_thigh"/>
-    <child link="left_rear_knee_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Knee joint: Revolute joint for shank rotation, limited to forward motion -->
-  <joint name="left_rear_knee_joint" type="revolute">
-    <parent link="left_rear_knee_motor"/>
-    <child link="left_rear_shank"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.5" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Shank link: Box-shaped link connecting knee to ankle -->
-  <link name="left_rear_shank">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.00040999999999999994" ixy="0.0" ixz="0.0" iyy="0.00040999999999999994" iyz="0.0" izz="9.999999999999999e-06"/>
-    </inertial>
-  </link>
-  <!-- === ANKLE SECTION === -->
-  <!-- Ankle motor link: Small cylindrical motor attached to shank -->
-  <link name="left_rear_ankle_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Ankle motor mount: Fixed joint attaching ankle motor to shank -->
-  <joint name="left_rear_ankle_motor_mount" type="fixed">
-    <parent link="left_rear_shank"/>
-    <child link="left_rear_ankle_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Ankle joint: Revolute joint for foot rotation -->
-  <joint name="left_rear_ankle_joint" type="revolute">
-    <parent link="left_rear_ankle_motor"/>
-    <child link="left_rear_foot"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.0" upper="2.0" velocity="2.0"/>
-  </joint>
-  <!-- Foot link: Spherical foot for ground contact -->
-  <link name="left_rear_foot">
-    <visual>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="3.600000000000001e-05" ixy="0.0" ixz="0.0" iyy="3.600000000000001e-05" iyz="0.0" izz="3.600000000000001e-05"/>
-    </inertial>
-  </link>
-  <!-- Gazebo settings for foot friction -->
-  <gazebo reference="left_rear_foot">
-    <mu1>1.2</mu1>
-    <!-- Lateral friction -->
-    <mu2>1.2</mu2>
-    <!-- Longitudinal friction -->
-  </gazebo>
-  <transmission name="left_rear_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_rear_hip_joint"/>
-    <actuator name="left_rear_hip_actuator"/>
-  </transmission>
-  <transmission name="left_rear_knee_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_rear_knee_joint"/>
-    <actuator name="left_rear_knee_actuator"/>
-  </transmission>
-  <transmission name="left_rear_ankle_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="left_rear_ankle_joint"/>
-    <actuator name="left_rear_ankle_actuator"/>
-  </transmission>
-  <!-- === HIP SECTION === -->
-  <!-- Hip motor link: Small cylindrical motor attached to chassis -->
-  <link name="right_rear_hip_motor">
-    <visual>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0.005"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Hip motor mount: Fixed joint attaching hip motor to chassis -->
-  <joint name="right_rear_hip_motor_mount" type="fixed">
-    <parent link="chassis"/>
-    <child link="right_rear_hip_motor"/>
-    <origin xyz="-0.15 -0.1 -0.005"/>
-  </joint>
-  <!-- Hip joint: Revolute joint for thigh rotation, limited to forward motion -->
-  <joint name="right_rear_hip_joint" type="revolute">
-    <parent link="right_rear_hip_motor"/>
-    <child link="right_rear_thigh"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-1.57" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Thigh link: Box-shaped link connecting hip to knee -->
-  <link name="right_rear_thigh">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <!-- Center of thigh -->
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-      <material name="blue"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.03 0.03 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0004162499999999999" ixy="0.0" ixz="0.0" iyy="0.0004162499999999999" iyz="0.0" izz="2.2499999999999998e-05"/>
-    </inertial>
-  </link>
-  <!-- === KNEE SECTION === -->
-  <!-- Knee motor link: Small cylindrical motor attached to thigh -->
-  <link name="right_rear_knee_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Knee motor mount: Fixed joint attaching knee motor to thigh -->
-  <joint name="right_rear_knee_motor_mount" type="fixed">
-    <parent link="right_rear_thigh"/>
-    <child link="right_rear_knee_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Knee joint: Revolute joint for shank rotation, limited to forward motion -->
-  <joint name="right_rear_knee_joint" type="revolute">
-    <parent link="right_rear_knee_motor"/>
-    <child link="right_rear_shank"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.5" upper="0" velocity="2.0"/>
-    <!-- Forward motion only -->
-  </joint>
-  <!-- Shank link: Box-shaped link connecting knee to ankle -->
-  <link name="right_rear_shank">
-    <visual>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.09"/>
-      <geometry>
-        <box size="0.02 0.02 0.18"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.15"/>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.00040999999999999994" ixy="0.0" ixz="0.0" iyy="0.00040999999999999994" iyz="0.0" izz="9.999999999999999e-06"/>
-    </inertial>
-  </link>
-  <!-- === ANKLE SECTION === -->
-  <!-- Ankle motor link: Small cylindrical motor attached to shank -->
-  <link name="right_rear_ankle_motor">
-    <visual>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 -0.01"/>
-      <geometry>
-        <cylinder length="0.02" radius="0.012"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.03"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-  </link>
-  <!-- Ankle motor mount: Fixed joint attaching ankle motor to shank -->
-  <joint name="right_rear_ankle_motor_mount" type="fixed">
-    <parent link="right_rear_shank"/>
-    <child link="right_rear_ankle_motor"/>
-    <origin rpy="0 -0.3 0" xyz="0 0 -0.18"/>
-    <!-- Tilt forward for natural posture -->
-  </joint>
-  <!-- Ankle joint: Revolute joint for foot rotation -->
-  <joint name="right_rear_ankle_joint" type="revolute">
-    <parent link="right_rear_ankle_motor"/>
-    <child link="right_rear_foot"/>
-    <origin xyz="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <!-- Rotation around y-axis -->
-    <limit effort="5" lower="-2.0" upper="2.0" velocity="2.0"/>
-  </joint>
-  <!-- Foot link: Spherical foot for ground contact -->
-  <link name="right_rear_foot">
-    <visual>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.03"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="3.600000000000001e-05" ixy="0.0" ixz="0.0" iyy="3.600000000000001e-05" iyz="0.0" izz="3.600000000000001e-05"/>
-    </inertial>
-  </link>
-  <!-- Gazebo settings for foot friction -->
-  <gazebo reference="right_rear_foot">
-    <mu1>1.2</mu1>
-    <!-- Lateral friction -->
-    <mu2>1.2</mu2>
-    <!-- Longitudinal friction -->
-  </gazebo>
-  <transmission name="right_rear_hip_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_rear_hip_joint"/>
-    <actuator name="right_rear_hip_actuator"/>
-  </transmission>
-  <transmission name="right_rear_knee_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_rear_knee_joint"/>
-    <actuator name="right_rear_knee_actuator"/>
-  </transmission>
-  <transmission name="right_rear_ankle_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="right_rear_ankle_joint"/>
-    <actuator name="right_rear_ankle_actuator"/>
-  </transmission>
-  <!-- HEAD LINK -->
-  <joint name="head_joint" type="fixed">
+  <!-- Joint nối base_link và front_body -->
+  <joint name="front_body_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="head"/>
-    <origin xyz="0 0 0.15"/>
+    <child link="front_body"/>
+    <origin rpy="0 0 0" xyz="0.25 0 0"/>
+    <!-- Đẩy về trước cho cân đối -->
   </joint>
-  <link name="head">
-    <visual>
-      <origin xyz="0 0 0.05"/>
+  <!-- Rear Body -->
+  <link name="rear_body">
+    <visual name="rear_body_visual">
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.02 0.02 0.1"/>
       </geometry>
-      <material name="orange"/>
+      <material name="purple"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0.05"/>
+    <collision name="rear_body_collision">
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.02 0.02 0.1"/>
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0.05"/>
-      <mass value="0.2"/>
-      <inertia ixx="0.0003333333333333334" ixy="0.0" ixz="0.0" iyy="0.0003333333333333334" iyz="0.0" izz="0.0003333333333333334"/>
+      <mass value="2.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
     </inertial>
   </link>
+  <!-- Joint nối base_link và rear_body -->
+  <joint name="rear_body_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_body"/>
+    <origin rpy="0 0 0" xyz="-0.25 0 0"/>
+    <!-- Đẩy về sau cho cân đối -->
+  </joint>
+  <!-- Chân trước trái FL -->
+  <joint name="front_left_body_hip_joint" type="fixed">
+    <parent link="front_body"/>
+    <child link="front_left_hip_link"/>
+    <origin rpy="0 0 0" xyz="0.1 0.1 -0.025"/>
+    <!-- Ngang 0.1, rộng 0.1, hạ thấp hơn -->
+  </joint>
+  <!-- Chân trước phải FR -->
+  <joint name="front_right_body_hip_joint" type="fixed">
+    <parent link="front_body"/>
+    <child link="front_right_hip_link"/>
+    <origin rpy="0 0 0" xyz="0.1 -0.1 -0.025"/>
+  </joint>
+  <!-- Chân sau trái RL -->
+  <joint name="rear_left_body_hip_joint" type="fixed">
+    <parent link="rear_body"/>
+    <child link="rear_left_hip_link"/>
+    <origin rpy="0 0 0" xyz="-0.1 0.1 -0.025"/>
+  </joint>
+  <!-- Chân sau phải RR -->
+  <joint name="rear_right_body_hip_joint" type="fixed">
+    <parent link="rear_body"/>
+    <child link="rear_right_hip_link"/>
+    <origin rpy="0 0 0" xyz="-0.1 -0.1 -0.025"/>
+  </joint>
+  <!-- bắt đầu phần háng -->
+  <!-- Hip Link -->
+  <link name="front_left_hip_link">
+    <visual name="front_left_hip_visual">
+      <origin rpy="0 0 0" xyz="0 0.055 0"/>
+      <!-- vị trí đặt link - khớp háng so với body -->
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision name="front_left_hip_collision">
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.000833" ixy="0.0" ixz="0.0" iyy="0.000833" iyz="0.0" izz="0.001666"/>
+    </inertial>
+  </link>
+  <joint name="front_left_hip_joint" type="fixed">
+    <parent link="front_body"/>
+    <child link="front_left_hip_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn khớp háng vào body-->
+  </joint>
+  <!-- x1.1 Motor link vỏ motor mô phỏng, không quay -->
+  <link name="front_left_hip_motor_link">
+    <visual name="front_left_hip_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.005 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0.005 0.055 0"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="yellow"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x1.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="front_left_hip_motor_fixed" type="fixed">
+    <parent link="front_left_hip_link"/>
+    <child link="front_left_hip_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- Kết thúc phần háng -->
+  <!-- *** Bắt đầu phần đùi chân *** -->
+  <!-- knee Link -->
+  <link name="front_left_knee_link">
+    <visual name="front_left_knee_visual">
+      <origin rpy="0 0 0" xyz="0.005 0.055 -0.05"/>
+      <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <collision name="front_left_knee_collision">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- knee Joint (Đùi, quay về sau ) -->
+  <joint name="front_left_knee_joint" type="revolute">
+    <parent link="front_left_hip_motor_link"/>
+    <!-- Gắn vào motor háng mô phỏng -->
+    <child link="front_left_knee_link"/>
+    <origin rpy="0 0.5 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- x2.1 Motor link vỏ motor mô phỏng Đầu gối , không quay -->
+  <link name="front_left_knee_motor_link">
+    <visual name="front_left_knee_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.01 0.055 -0.085"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="red"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x2.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="front_left_knee_motor_fixed" type="fixed">
+    <parent link="front_left_knee_link"/>
+    <child link="front_left_knee_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.01"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- *** Kết thúc phần đùi chân *** -->
+  <!-- *** Bắt đầu phần cẳng chân *** -->
+  <!-- ankle Link -->
+  <link name="front_left_ankle_link">
+    <visual name="front_left_ankle_visual">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 -1.0 0" xyz="0 0 -0.08"/>
+      <!-- Dịch xuống 1/2 chiều dài -->
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="purple"/>
+    </visual>
+    <collision name="front_left_ankle_collision">
+      <origin xyz="0 0 -0.08"/>
+      <!-- Khớp visual -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 -0.08"/>
+      <!-- Dịch khối lượng xuống luôn -->
+      <mass value="0.2"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+  <joint name="front_left_ankle_joint" type="fixed">
+    <parent link="front_left_knee_motor_link"/>
+    <child link="front_left_ankle_link"/>
+    <origin rpy="0 -0.60 0" xyz="0 0.055 0"/>
+    <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+    <!-- rút ngắn chiều dài -->
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- *** Kết thúc phần cẳng chân *** -->
+  <!-- Foot Link -->
+  <link name="front_left_foot_link">
+    <visual name="front_left_foot_visual">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision name="front_left_foot_collision">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- Foot Joint -->
+  <joint name="front_left_foot_joint" type="fixed">
+    <parent link="front_left_ankle_link"/>
+    <child link="front_left_foot_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.05"/>
+    <!-- rút gọn lại -->
+  </joint>
+  <!-- Transmission cho các joint -->
+  <transmission name="front_left_knee_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="front_left_knee_joint"/>
+    <actuator name="front_left_knee_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <transmission name="front_left_ankle_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="front_left_ankle_joint"/>
+    <actuator name="front_left_ankle_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <!-- bắt đầu phần háng -->
+  <!-- Hip Link -->
+  <link name="front_right_hip_link">
+    <visual name="front_right_hip_visual">
+      <origin rpy="0 0 0" xyz="0 -0.055 0"/>
+      <!-- vị trí đặt link - khớp háng so với body -->
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision name="front_right_hip_collision">
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.000833" ixy="0.0" ixz="0.0" iyy="0.000833" iyz="0.0" izz="0.001666"/>
+    </inertial>
+  </link>
+  <joint name="front_right_hip_joint" type="fixed">
+    <parent link="front_body"/>
+    <child link="front_right_hip_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn khớp háng vào body-->
+  </joint>
+  <!-- x1.1 Motor link vỏ motor mô phỏng, không quay -->
+  <link name="front_right_hip_motor_link">
+    <visual name="front_right_hip_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.005 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0.005 -0.055 0"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="yellow"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x1.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="front_right_hip_motor_fixed" type="fixed">
+    <parent link="front_right_hip_link"/>
+    <child link="front_right_hip_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- Kết thúc phần háng -->
+  <!-- *** Bắt đầu phần đùi chân *** -->
+  <!-- knee Link -->
+  <link name="front_right_knee_link">
+    <visual name="front_right_knee_visual">
+      <origin rpy="0 0 0" xyz="0.005 -0.055 -0.05"/>
+      <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <collision name="front_right_knee_collision">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- knee Joint (Đùi, quay về sau ) -->
+  <joint name="front_right_knee_joint" type="revolute">
+    <parent link="front_right_hip_motor_link"/>
+    <!-- Gắn vào motor háng mô phỏng -->
+    <child link="front_right_knee_link"/>
+    <origin rpy="0 0.5 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- x2.1 Motor link vỏ motor mô phỏng Đầu gối , không quay -->
+  <link name="front_right_knee_motor_link">
+    <visual name="front_right_knee_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.01 -0.055 -0.085"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="red"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x2.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="front_right_knee_motor_fixed" type="fixed">
+    <parent link="front_right_knee_link"/>
+    <child link="front_right_knee_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.01"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- *** Kết thúc phần đùi chân *** -->
+  <!-- *** Bắt đầu phần cẳng chân *** -->
+  <!-- ankle Link -->
+  <link name="front_right_ankle_link">
+    <visual name="front_right_ankle_visual">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 -1.0 0" xyz="0 0 -0.08"/>
+      <!-- Dịch xuống 1/2 chiều dài -->
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="purple"/>
+    </visual>
+    <collision name="front_right_ankle_collision">
+      <origin xyz="0 0 -0.08"/>
+      <!-- Khớp visual -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 -0.08"/>
+      <!-- Dịch khối lượng xuống luôn -->
+      <mass value="0.2"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+  <joint name="front_right_ankle_joint" type="fixed">
+    <parent link="front_right_knee_motor_link"/>
+    <child link="front_right_ankle_link"/>
+    <origin rpy="0 -0.60 0" xyz="0 -0.055 0"/>
+    <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+    <!-- rút ngắn chiều dài -->
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- *** Kết thúc phần cẳng chân *** -->
+  <!-- Foot Link -->
+  <link name="front_right_foot_link">
+    <visual name="front_right_foot_visual">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision name="front_right_foot_collision">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- Foot Joint -->
+  <joint name="front_right_foot_joint" type="fixed">
+    <parent link="front_right_ankle_link"/>
+    <child link="front_right_foot_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.05"/>
+    <!-- rút gọn lại -->
+  </joint>
+  <!-- Transmission cho các joint -->
+  <transmission name="front_right_knee_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="front_right_knee_joint"/>
+    <actuator name="front_right_knee_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <transmission name="front_right_ankle_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="front_right_ankle_joint"/>
+    <actuator name="front_right_ankle_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <!-- bắt đầu phần háng -->
+  <!-- Hip Link -->
+  <link name="rear_left_hip_link">
+    <visual name="rear_left_hip_visual">
+      <origin rpy="0 0 0" xyz="0 0.055 0"/>
+      <!-- vị trí đặt link - khớp háng so với body -->
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision name="rear_left_hip_collision">
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.000833" ixy="0.0" ixz="0.0" iyy="0.000833" iyz="0.0" izz="0.001666"/>
+    </inertial>
+  </link>
+  <joint name="rear_left_hip_joint" type="fixed">
+    <parent link="rear_body"/>
+    <child link="rear_left_hip_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn khớp háng vào body-->
+  </joint>
+  <!-- x1.1 Motor link vỏ motor mô phỏng, không quay -->
+  <link name="rear_left_hip_motor_link">
+    <visual name="rear_left_hip_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.005 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0.005 0.055 0"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="yellow"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x1.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="rear_left_hip_motor_fixed" type="fixed">
+    <parent link="rear_left_hip_link"/>
+    <child link="rear_left_hip_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- Kết thúc phần háng -->
+  <!-- *** Bắt đầu phần đùi chân *** -->
+  <!-- knee Link -->
+  <link name="rear_left_knee_link">
+    <visual name="rear_left_knee_visual">
+      <origin rpy="0 0 0" xyz="0.005 0.055 -0.05"/>
+      <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <collision name="rear_left_knee_collision">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- knee Joint (Đùi, quay về sau ) -->
+  <joint name="rear_left_knee_joint" type="revolute">
+    <parent link="rear_left_hip_motor_link"/>
+    <!-- Gắn vào motor háng mô phỏng -->
+    <child link="rear_left_knee_link"/>
+    <origin rpy="0 0.5 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- x2.1 Motor link vỏ motor mô phỏng Đầu gối , không quay -->
+  <link name="rear_left_knee_motor_link">
+    <visual name="rear_left_knee_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.01 0.055 -0.085"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="red"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x2.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="rear_left_knee_motor_fixed" type="fixed">
+    <parent link="rear_left_knee_link"/>
+    <child link="rear_left_knee_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.01"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- *** Kết thúc phần đùi chân *** -->
+  <!-- *** Bắt đầu phần cẳng chân *** -->
+  <!-- ankle Link -->
+  <link name="rear_left_ankle_link">
+    <visual name="rear_left_ankle_visual">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 -1.0 0" xyz="0 0 -0.08"/>
+      <!-- Dịch xuống 1/2 chiều dài -->
+      <!-- vị trí đặt link mô phỏng motor khớp háng- trái -->
+      <material name="purple"/>
+    </visual>
+    <collision name="rear_left_ankle_collision">
+      <origin xyz="0 0 -0.08"/>
+      <!-- Khớp visual -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 -0.08"/>
+      <!-- Dịch khối lượng xuống luôn -->
+      <mass value="0.2"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+  <joint name="rear_left_ankle_joint" type="fixed">
+    <parent link="rear_left_knee_motor_link"/>
+    <child link="rear_left_ankle_link"/>
+    <origin rpy="0 -0.60 0" xyz="0 0.055 0"/>
+    <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+    <!-- rút ngắn chiều dài -->
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- *** Kết thúc phần cẳng chân *** -->
+  <!-- Foot Link -->
+  <link name="rear_left_foot_link">
+    <visual name="rear_left_foot_visual">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision name="rear_left_foot_collision">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- Foot Joint -->
+  <joint name="rear_left_foot_joint" type="fixed">
+    <parent link="rear_left_ankle_link"/>
+    <child link="rear_left_foot_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.05"/>
+    <!-- rút gọn lại -->
+  </joint>
+  <!-- Transmission cho các joint -->
+  <transmission name="rear_left_knee_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rear_left_knee_joint"/>
+    <actuator name="rear_left_knee_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <transmission name="rear_left_ankle_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rear_left_ankle_joint"/>
+    <actuator name="rear_left_ankle_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <!-- bắt đầu phần háng -->
+  <!-- Hip Link -->
+  <link name="rear_right_hip_link">
+    <visual name="rear_right_hip_visual">
+      <origin rpy="0 0 0" xyz="0 -0.055 0"/>
+      <!-- vị trí đặt link - khớp háng so với body -->
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision name="rear_right_hip_collision">
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+        <!-- dài 2cm, cố định thân trên và các chân -->
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.000833" ixy="0.0" ixz="0.0" iyy="0.000833" iyz="0.0" izz="0.001666"/>
+    </inertial>
+  </link>
+  <joint name="rear_right_hip_joint" type="fixed">
+    <parent link="rear_body"/>
+    <child link="rear_right_hip_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn khớp háng vào body-->
+  </joint>
+  <!-- x1.1 Motor link vỏ motor mô phỏng, không quay -->
+  <link name="rear_right_hip_motor_link">
+    <visual name="rear_right_hip_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.005 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0.005 -0.055 0"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="yellow"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x1.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="rear_right_hip_motor_fixed" type="fixed">
+    <parent link="rear_right_hip_link"/>
+    <child link="rear_right_hip_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- Kết thúc phần háng -->
+  <!-- *** Bắt đầu phần đùi chân *** -->
+  <!-- knee Link -->
+  <link name="rear_right_knee_link">
+    <visual name="rear_right_knee_visual">
+      <origin rpy="0 0 0" xyz="0.005 -0.055 -0.05"/>
+      <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <collision name="rear_right_knee_collision">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- knee Joint (Đùi, quay về sau ) -->
+  <joint name="rear_right_knee_joint" type="revolute">
+    <parent link="rear_right_hip_motor_link"/>
+    <!-- Gắn vào motor háng mô phỏng -->
+    <child link="rear_right_knee_link"/>
+    <origin rpy="0 0.5 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- x2.1 Motor link vỏ motor mô phỏng Đầu gối , không quay -->
+  <link name="rear_right_knee_motor_link">
+    <visual name="rear_right_knee_motor_visual">
+      <geometry>
+        <cylinder length="0.02" radius="0.015"/>
+      </geometry>
+      <origin rpy="1.0 0 0" xyz="0.01 -0.055 -0.085"/>
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="red"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- x2.2 Gắn motor link mô phỏng vào body bằng joint cố định -->
+  <joint name="rear_right_knee_motor_fixed" type="fixed">
+    <parent link="rear_right_knee_link"/>
+    <child link="rear_right_knee_motor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.01"/>
+    <!-- Vị trí gắn motor -->
+  </joint>
+  <!-- *** Kết thúc phần đùi chân *** -->
+  <!-- *** Bắt đầu phần cẳng chân *** -->
+  <!-- ankle Link -->
+  <link name="rear_right_ankle_link">
+    <visual name="rear_right_ankle_visual">
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 -1.0 0" xyz="0 0 -0.08"/>
+      <!-- Dịch xuống 1/2 chiều dài -->
+      <!-- vị trí đặt link mô phỏng motor khớp háng- phải -->
+      <material name="purple"/>
+    </visual>
+    <collision name="rear_right_ankle_collision">
+      <origin xyz="0 0 -0.08"/>
+      <!-- Khớp visual -->
+      <geometry>
+        <cylinder length="0.1" radius="0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 -0.08"/>
+      <!-- Dịch khối lượng xuống luôn -->
+      <mass value="0.2"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+  <joint name="rear_right_ankle_joint" type="fixed">
+    <parent link="rear_right_knee_motor_link"/>
+    <child link="rear_right_ankle_link"/>
+    <origin rpy="0 -0.60 0" xyz="0 -0.055 0"/>
+    <!-- Vị trí đặt link đùi -  so với motor háng mô phỏng -->
+    <!-- rút ngắn chiều dài -->
+    <axis xyz="0 1 0"/>
+    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+  </joint>
+  <!-- *** Kết thúc phần cẳng chân *** -->
+  <!-- Foot Link -->
+  <link name="rear_right_foot_link">
+    <visual name="rear_right_foot_visual">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision name="rear_right_foot_collision">
+      <origin xyz="0.045 0 -0.055"/>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.000417" ixy="0.0" ixz="0.0" iyy="0.000417" iyz="0.0" izz="0.000833"/>
+    </inertial>
+  </link>
+  <!-- Foot Joint -->
+  <joint name="rear_right_foot_joint" type="fixed">
+    <parent link="rear_right_ankle_link"/>
+    <child link="rear_right_foot_link"/>
+    <origin rpy="0 0 0" xyz="0 0 -0.05"/>
+    <!-- rút gọn lại -->
+  </joint>
+  <!-- Transmission cho các joint -->
+  <transmission name="rear_right_knee_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rear_right_knee_joint"/>
+    <actuator name="rear_right_knee_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
+  <transmission name="rear_right_ankle_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rear_right_ankle_joint"/>
+    <actuator name="rear_right_ankle_motor">
+      <mechanical_reduction>1</mechanical_reduction>
+    </actuator>
+  </transmission>
   <ros2_control name="FirstRobot" type="system">
     <hardware>
       <plugin>gz_ros2_control/GazeboSimSystem</plugin>
     </hardware>
-    <joint name="left_front_hip_joint">
+    <joint name="front_left_knee_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="left_front_knee_joint">
+    <joint name="front_left_ankle_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="left_front_ankle_joint">
+    <joint name="front_right_knee_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="right_front_hip_joint">
+    <joint name="front_right_ankle_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="right_front_knee_joint">
+    <joint name="rear_left_knee_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="right_front_ankle_joint">
+    <joint name="rear_left_ankle_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="left_rear_hip_joint">
+    <joint name="rear_right_knee_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
-    <joint name="left_rear_knee_joint">
-      <command_interface name="position"/>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="left_rear_ankle_joint">
-      <command_interface name="position"/>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_rear_hip_joint">
-      <command_interface name="position"/>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_rear_knee_joint">
-      <command_interface name="position"/>
-      <state_interface name="position"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_rear_ankle_joint">
+    <joint name="rear_right_ankle_joint">
       <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
@@ -948,7 +931,7 @@
   <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
     <child link="lidar_link"/>
-    <origin rpy="0 0 0" xyz="0.1 0 0.175"/>
+    <origin rpy="0 0 0" xyz="0.1 0 0.075"/>
   </joint>
   <link name="lidar_link">
     <visual>
@@ -1008,9 +991,9 @@
     </sensor>
   </gazebo>
   <joint name="camera_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="base_link"/>
     <child link="camera_link"/>
-    <origin rpy="0 0 0" xyz="0.25 0 0.08"/>
+    <origin rpy="0 0 0" xyz="0.25 0 0.04"/>
   </joint>
   <joint name="camera_optical_joint" type="fixed">
     <parent link="camera_link"/>
@@ -1021,7 +1004,7 @@
   <link name="camera_link">
     <visual>
       <geometry>
-        <box size="0.010 0.03 0.03"/>
+        <box size="0.010 0.03 0.015"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -1056,7 +1039,7 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 0.1"/>
+    <origin xyz="0 0 0.05"/>
     <!-- Đặt IMU gần trọng tâm -->
   </joint>
   <gazebo reference="imu_link">
