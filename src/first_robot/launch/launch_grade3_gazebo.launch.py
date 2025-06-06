@@ -110,8 +110,8 @@ def generate_launch_description():
         # arguments=['--ros-args', '--log-level', 'debug'],
         arguments=[
             "--controller-manager-timeout",
-            "60",  # Longer timeout
-            "joint_trajectory_controller",  # No --inactive flag to ensure full activation
+            "60",  
+            "joint_trajectory_controller",  
         ],
         parameters=[
             {"use_sim_time": use_sim_time},
@@ -225,7 +225,7 @@ def generate_launch_description():
             "-y",
             "0",
             "-z",
-            "0.5",  # 👈 nâng z lên chút
+            "0.25",  # 👈 nâng z lên chút
             "-allow_renaming",
             "true",
         ],
@@ -425,7 +425,7 @@ def generate_launch_description():
         # rqt,
         quadruped_controller_node,
         state_estimator_node,
-        # rviz_node,
+        rviz_node,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

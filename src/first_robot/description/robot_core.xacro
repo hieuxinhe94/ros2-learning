@@ -2,13 +2,13 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <!-- IMPORT MATERIAL -->
     <xacro:include filename="$(find first_robot)/description/constants.xacro"/>
-    <!-- AAAAAAAAAAAAAAAAAAA -->
+    
     <!-- BASE LINK -->
     <link name="base_link">
         <visual name="base_link_visual">
-            <origin xyz="0 0 0.025" />
+            <origin xyz="0 0 0.0125" />
             <geometry>
-                <box size="0.5 0.2 0.1" />
+                <box size="0.2 0.15 0.05" />
             </geometry>
             <material name="white" />
         </visual>
@@ -16,10 +16,10 @@
             <origin xyz="0 0 0.025" />
             <!-- Sửa tâm va chạm -->
             <geometry>
-                <box size="0.5 0.2 0.1" />
+                <box size="0.2 0.15 0.05" />
             </geometry>
         </collision>
-        <xacro:inertial_box mass="0.5" x="0.5" y="0.2" z="0.1">
+        <xacro:inertial_box mass="0.5" x="0.2" y="0.15" z="0.05">
             <origin xyz="0 0 0.025" rpy="0 0 0" />
         </xacro:inertial_box>
     </link>
@@ -47,7 +47,7 @@
     <joint name="front_body_joint" type="fixed">
       <parent link="base_link"/>
       <child link="front_body"/>
-      <origin xyz="0.25 0 0" rpy="0 0 0"/> <!-- Đẩy về trước cho cân đối -->
+      <origin xyz="0.1 0 0" rpy="0 0 0"/> <!-- Đẩy về trước cho cân đối -->
     </joint>
 
     <!-- Rear Body -->
@@ -73,45 +73,19 @@
     <joint name="rear_body_joint" type="fixed">
       <parent link="base_link"/>
       <child link="rear_body"/>
-       <origin xyz="-0.25 0 0" rpy="0 0 0"/> <!-- Đẩy về sau cho cân đối -->
+       <origin xyz="-0.1 0 0" rpy="0 0 0"/> <!-- Đẩy về sau cho cân đối -->
     </joint>
 
-    <!-- Chân trước trái FL -->
-    <joint name="front_left_body_hip_joint" type="fixed">
-      <parent link="front_body"/>
-      <child link="front_left_hip_link"/>
-       <origin xyz="0.1 0.1 -0.025" rpy="0 0 0"/> <!-- Ngang 0.1, rộng 0.1, hạ thấp hơn -->
-    </joint>
-
-    <!-- Chân trước phải FR -->
-    <joint name="front_right_body_hip_joint" type="fixed">
-      <parent link="front_body"/>
-      <child link="front_right_hip_link"/>
-       <origin xyz="0.1 -0.1 -0.025" rpy="0 0 0"/>
-    </joint>
-
-    <!-- Chân sau trái RL -->
-    <joint name="rear_left_body_hip_joint" type="fixed">
-      <parent link="rear_body"/>
-      <child link="rear_left_hip_link"/>
-      <origin xyz="-0.1 0.1 -0.025" rpy="0 0 0"/>
-    </joint>
-
-    <!-- Chân sau phải RR -->
-    <joint name="rear_right_body_hip_joint" type="fixed">
-      <parent link="rear_body"/>
-      <child link="rear_right_hip_link"/>
-      <origin xyz="-0.1 -0.1 -0.025" rpy="0 0 0"/>
-    </joint>
+   
 
     <!-- IMPORT LEG PATTERN -->
     <xacro:include filename="$(find first_robot)/description/leg_block.xacro"/>
 
     <!-- Gọi macro leg cho từng chân -->
-    <xacro:leg prefix="front_left" pos="front" side="left" x=" 0.15" y=" 0.10" />
-    <xacro:leg prefix="front_right" pos="front" side="right" x=" 0.15" y="-0.10" />
-    <xacro:leg prefix="rear_left" pos="rear" side="left" x="-0.15" y=" 0.10" />
-    <xacro:leg prefix="rear_right" pos="rear" side="right" x="-0.15" y="-0.10" />
+    <xacro:leg prefix="front_left" pos="front" side="left" x=" 0.075" y=" 0.05" />
+    <xacro:leg prefix="front_right" pos="front" side="right" x=" 0.075" y="-0.05" />
+    <xacro:leg prefix="rear_left" pos="rear" side="left" x="-0.075" y=" 0.05" />
+    <xacro:leg prefix="rear_right" pos="rear" side="right" x="-0.075" y="-0.05" />
 
 
 </robot>
