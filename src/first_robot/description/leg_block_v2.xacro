@@ -2,36 +2,36 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Định nghĩa macro cho một chân -->
-  <!-- prefix: Tên của chân lf: front_left, rf: front_right, lh: rear_left, rh: rear_right     -->
-  <!-- side: Chân đối xứng với chân này 1: bên phải, -1: bên trái. Dùng để nhân chia với tọa độ -->
-  <!-- use_dae: Sử dụng mesh hay không True: sử dụng, False: không sử dụng -->
-  <!-- pos: Chân trước hay chân sau (1: chân trước, -1: chân sau) -->
+  <!-- prefix  Tên của chân lf  front left  rf  front right  lh  rear left  rh  rear right     -->
+  <!-- side  Chân đối xứng với chân này 1 bên phải  âm 1  bên trái  Dùng để nhân chia với tọa độ -->
+  <!-- use dae  Sử dụng mesh hay không True  sử dụng  False  không sử dụng -->
+  <!-- pos  Chân trước hay chân sau  1  chân trước  âm 1  chân sau-->
 
   <xacro:macro name="leg" params="prefix side pos use_dae">
     <!-- bắt đầu phần háng -->
     <!-- Hip Link -->
     <link name="${prefix}_hip_link">
       <visual name="${prefix}_hip_visual">
-        <!-- Chân trái và phía trước -->
+        <!-- Chân phải và phía trước -->
         <xacro:if value="${(side == 1) and (pos == 1)}">
-          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
         </xacro:if>
         <!-- Chân trái và phía sau -->
         <xacro:if value="${(side == 1) and (pos == -1)}">
-          <origin rpy="${PI} 0 0" xyz="0 0 0"/>
+          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
         </xacro:if>
-        <!-- Chân phải và phía trước -->
+        <!-- Chân trái và phía trước -->
         <xacro:if value="${(side == -1) and (pos == 1)}">
-          <origin rpy="0 ${PI} 0" xyz="0 0 0"/>
+          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
         </xacro:if>
         <!-- Chân phải và phía sau -->
         <xacro:if value="${(side == -1) and (pos == -1)}">
-          <origin rpy="${PI} ${PI} 0" xyz="0 0 0"/>
+          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
         </xacro:if>
 
         <geometry>
           <cylinder length="${hip_length}" radius="${hip_radius}"/>
-          <!-- dài 2cm, cố định thân trên và các chân -->
+          <!-- dài 2cm  cố định thân trên và các chân -->
         </geometry>
         <material name="blue"/>
       </visual>
@@ -101,7 +101,7 @@
       </inertial>
     </link>
 
-    <!-- knee Joint (Đùi, quay về sau ) -->
+    <!-- knee Joint  Đùi  quay về sau  -->
     <joint name="${prefix}_knee_joint" description="Knee joint side ${side} and pos ${pos}" type="revolute">
       <origin rpy="0 0 0" xyz="0 ${knee_offset*-side} 0"/>
       <parent link="${prefix}_hip_link"/>
@@ -132,13 +132,13 @@
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="00.785 0" xyz="${ankle_com_x} ${ankle_com_y} ${ankle_com_z}"/>
+        <origin rpy="0 0.785 0" xyz="${ankle_com_x} ${ankle_com_y} ${ankle_com_z}"/>
         <mass value="${ankle_mass}"/>
         <inertia ixx="${ankle_ixx}" ixy="${ankle_ixy}" ixz="${ankle_ixz}" iyy="${ankle_iyy}" iyz="${ankle_iyz}" izz="${ankle_izz}"/>
       </inertial>
     </link>
 
-    <!-- ankle Joint (Cẳng chân, quay về trước 45°) -->
+    <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
     <joint name="${prefix}_ankle_joint" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 ${-ankle_length}"/>
       <parent link="${prefix}_knee_link"/>
@@ -156,7 +156,7 @@
       <visual name="${prefix}_foot_visual">
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <sphere radius="${foot_radius-0.01}"/>
+          <sphere radius="${foot_radius}"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -174,34 +174,13 @@
 
     <!-- Foot Joint -->
     <joint name="${prefix}_foot_joint" type="fixed">
-       <origin rpy="0 0 0" xyz="${ankle_length/2*sin(0.785)} 0 ${-ankle_length*cos(0.785)}"/>
+       <origin rpy="0 0 0" xyz="${(ankle_length)/2*sin(0.785) } 0 ${-(ankle_length)*cos(0.785) - 0.02}"/>
       <parent link="${prefix}_ankle_link"/>
       <child link="${prefix}_foot_link"/>
     </joint>
 
- <!-- *** Kết thúc phần bàn chân *** -->
-    <ros2_control name="${prefix}" type="system">
-      <hardware>
-        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-      </hardware>
-      <joint name="${prefix}_hip_joint">
-        <command_interface name="effort"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
 
-      <joint name="${prefix}_knee_joint">
-        <command_interface name="effort"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-
-      <joint name="${prefix}_ankle_joint">
-        <command_interface name="effort"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-    </ros2_control>
+     
 
 
     <!-- Transmission cho các joint -->

@@ -60,7 +60,7 @@
     <xacro:property name="knee_height" value="0.034"/>
     <xacro:property name="ankle_width" value="0.016"/>
     <xacro:property name="ankle_height" value="0.016"/>
-    <xacro:property name="foot_radius" value="0.02"/>
+    <xacro:property name="foot_radius" value="0.03"/>
     <xacro:property name="stick_radius" value="0.01"/>
     <xacro:property name="stick_length" value="0.2"/>
 

@@ -110,8 +110,8 @@ def generate_launch_description():
         # arguments=['--ros-args', '--log-level', 'debug'],
         arguments=[
             "--controller-manager-timeout",
-            "60",  
-            "joint_trajectory_controller",  
+            "60",
+            "joint_trajectory_controller",
         ],
         parameters=[
             {"use_sim_time": use_sim_time},
@@ -128,7 +128,7 @@ def generate_launch_description():
     )
 
     joint_state_broadcaster_node = TimerAction(
-        period=3.0,  # delay 3 giây
+        period=2.0,  # delay 3 giây
         actions=[
             Node(
                 package="controller_manager",
@@ -158,7 +158,7 @@ def generate_launch_description():
                     "/controller_manager",
                     "--ros-args",
                     "--log-level",
-                    "debug",
+                    "info",
                 ],
                 output="screen",
             )
@@ -210,24 +210,29 @@ def generate_launch_description():
         output="screen",
     )
 
-    gz_spawn_entity = Node(
-        package="ros_gz_sim",
-        executable="create",
-        output="screen",
-        name="gz_spawn_entity",
-        arguments=[
-            "-topic",
-            "/robot_description",
-            "-name",
-            "my_robot",
-            "-x",
-            "0",
-            "-y",
-            "0",
-            "-z",
-            "0.25",  # 👈 nâng z lên chút
-            "-allow_renaming",
-            "true",
+    gz_spawn_entity = TimerAction(
+        period=4.0,  # chờ 4 giây
+        actions=[
+            Node(
+                package="ros_gz_sim",
+                executable="create",
+                output="screen",
+                name="gz_spawn_entity",
+                arguments=[
+                    "-topic",
+                    "/robot_description",
+                    "-name",
+                    "my_robot",
+                    "-x",
+                    "0",
+                    "-y",
+                    "0",
+                    "-z",
+                    "0.6",  # 👈 nâng z lên chút
+                    "-allow_renaming",
+                    "true",
+                ],
+            )
         ],
     )
 
@@ -415,6 +420,7 @@ def generate_launch_description():
         robot_state_pub_node,
         #
         delay_control_node,
+        #
         joint_state_broadcaster_node,
         #
         gz_spawn_entity,
@@ -424,7 +430,9 @@ def generate_launch_description():
         # delay_slam_nav2_toolbox,
         # rqt,
         quadruped_controller_node,
+        #
         state_estimator_node,
+        #
         rviz_node,
     ]
 

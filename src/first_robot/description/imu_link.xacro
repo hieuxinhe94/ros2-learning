@@ -3,29 +3,30 @@
 
     <link name="imu_link">
         <inertial>
-            <mass value="0.001"/>
-            <origin rpy="0 0 0" xyz="0 0 0"/>
-            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+            <mass value="0.001" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
         </inertial>
         <visual>
-            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <origin rpy="0 0 0" xyz="0 0 0" />
             <geometry>
-                <box size="0.001 0.001 0.001"/>
+                <box size="0.001 0.001 0.01" />
             </geometry>
+            <material name="yellow" />
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <origin rpy="0 0 0" xyz="0 0 0" />
             <geometry>
-                <box size=".001 .001 .001"/>
+                <box size=".001 .001 .01" />
             </geometry>
         </collision>
     </link>
 
 
     <joint name="imu_joint" type="fixed">
-        <parent link="trunk"/>
-        <child link="imu_link"/>
-        <origin xyz="0 0 0.05" rpy="0 0 0" />
+        <parent link="trunk" />
+        <child link="imu_link" />
+        <origin xyz="0 0 0.1" rpy="0 0 0" />
         <!-- Đặt IMU gần trọng tâm -->
     </joint>
 

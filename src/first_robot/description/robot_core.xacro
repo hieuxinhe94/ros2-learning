@@ -9,7 +9,7 @@
       </geometry>
       <material name="white" />
     </visual>
-    <!-- collision & inertial -->
+  
   </link>
 
   <joint name="floating_base" type="fixed">
@@ -18,7 +18,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
-  <!-- Trunk : Thân robot -->
+  <!-- Trunk  Thân robot -->
   <link name="trunk">
     <visual name="trunk_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -39,63 +39,6 @@
       <inertia ixx="${trunk_ixx}" ixy="${trunk_ixy}" ixz="${trunk_ixz}" iyy="${trunk_iyy}" iyz="${trunk_iyz}" izz="${trunk_izz}"/>
     </inertial>
     </link>
-
-
-    <!-- Front Body -->
-    <link name="front_body">
-      <visual name="front_body_visual">
-        <geometry>
-          <box size="0.05 0.1 0.05"/>
-        </geometry>
-        <material name="pink"/>
-      </visual>
-      <collision name="front_body_collision">
-        <geometry>
-          <box size="0.05 0.1 0.025"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="1.0"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
-      </inertial>
-    </link>
-
-    <!-- Joint nối base_link và front_body -->
-    <joint name="front_body_joint" type="fixed">
-      <parent link="base_link"/>
-      <child link="front_body"/>
-      <origin xyz="0.1 0 0" rpy="0 0 0"/>
-      <!-- Đẩy về trước cho cân đối -->
-    </joint>
-
-    <!-- Rear Body -->
-    <link name="rear_body">
-      <visual name="rear_body_visual">
-        <geometry>
-          <box size="0.02 0.02 0.1"/>
-        </geometry>
-        <material name="purple"/>
-      </visual>
-      <collision name="rear_body_collision">
-        <geometry>
-          <box size="0.02 0.02 0.1"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="2.0"/>
-        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
-      </inertial>
-    </link>
-
-    <!-- Joint nối base_link và rear_body -->
-    <joint name="rear_body_joint" type="fixed">
-      <parent link="base_link"/>
-      <child link="rear_body"/>
-      <origin xyz="-0.1 0 0" rpy="0 0 0"/>
-      <!-- Đẩy về sau cho cân đối -->
-    </joint>
-
-
 
     <!-- IMPORT LEG PATTERN -->
     <xacro:include filename="$(find first_robot)/description/leg_block_v2.xacro"/>

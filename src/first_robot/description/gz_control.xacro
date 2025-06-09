@@ -6,7 +6,6 @@
     <hardware>
       <plugin>gz_ros2_control/GazeboSimSystem</plugin>
     </hardware>
-
     <!-- Joint Definitions -->
     <xacro:macro name="define_joint_interfaces" params="joint_name">
       <joint name="${joint_name}">
@@ -15,7 +14,27 @@
         <state_interface name="velocity" />
       </joint>
     </xacro:macro>
-  
+
+    <!-- Front Left Leg -->
+    <xacro:define_joint_interfaces joint_name="front_left_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="front_left_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="front_left_ankle_joint" />
+
+    <!-- Front Right Leg -->
+    <xacro:define_joint_interfaces joint_name="front_right_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="front_right_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="front_right_ankle_joint" />
+
+    <!-- Rear Left Leg -->
+    <xacro:define_joint_interfaces joint_name="rear_left_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_left_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_left_ankle_joint" />
+
+    <!-- Rear Right Leg -->
+    <xacro:define_joint_interfaces joint_name="rear_right_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_right_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_right_ankle_joint" />
+
   </ros2_control>
 
   <gazebo>

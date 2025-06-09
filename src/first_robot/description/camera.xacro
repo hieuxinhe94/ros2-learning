@@ -4,31 +4,25 @@
     <joint name="camera_joint" type="fixed">
         <parent link="base_link" />
         <child link="camera_link" />
-        <origin xyz="0.326 0 0.043"  rpy="0 0 0"/>
+        <origin xyz="0.190 0 0.043"  rpy="0 0 0"/>
     </joint>
-    <joint name="camera_optical_joint" type="fixed">
-        <parent link="camera_link" />
-        <child link="camera_link_optical" />
-        <origin xyz="0.05 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
-    </joint>
-    <link name="camera_link_optical"></link>
 
     <link name="camera_link">
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.001"/>
+                <sphere radius="0.005"/>
             </geometry>
-            <material name="cyan" />
+            <material name="red" />
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <sphere radius="0.001"/>
+                <sphere radius="0.005"/>
             </geometry>
         </collision>
         <inertial>
-            <mass value="0.001"/>
+            <mass value="0.005"/>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
         </inertial>
