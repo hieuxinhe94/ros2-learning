@@ -23,7 +23,8 @@
     <visual name="trunk_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="${trunk_length} ${trunk_width} ${trunk_height}"/>
+          <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
+          <mesh filename="file://$(find first_robot)/meshes/trunk.dae" scale="1 1 1"/>
       </geometry>
       <material name="silver"/>
     </visual>
@@ -41,7 +42,7 @@
     </link>
 
     <!-- IMPORT LEG PATTERN -->
-    <xacro:include filename="$(find first_robot)/description/leg_block_v2.xacro"/>
+    <xacro:include filename="$(find first_robot)/description/leg_block_v3.xacro"/>
 
     <!-- Gọi macro leg cho từng chân -->
     <xacro:leg prefix="front_left" side="-1" use_dae="False" pos="1" />

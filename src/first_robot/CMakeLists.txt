@@ -36,22 +36,21 @@ endif()
 
 # main program
 install(
-  DIRECTORY config description launch mesh worlds ai_models inteligent
+  DIRECTORY config description launch meshes worlds 
   DESTINATION share/${PROJECT_NAME}
 )
 
 # actionable program
 install( 
-  DIRECTORY scripts  ai_models inteligent
+  DIRECTORY scripts ai_models inteligent
   DESTINATION lib/${PROJECT_NAME}
 )
-
 
 install(PROGRAMS
   scripts/twist_to_twiststamped.py
   DESTINATION lib/${PROJECT_NAME}
 )
-
+ 
 # install(PROGRAMS
 #   move/dog_gait_cycle.py move/gait_cycle_publisher.py
 #   DESTINATION lib/${PROJECT_NAME}
