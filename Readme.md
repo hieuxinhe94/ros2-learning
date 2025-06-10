@@ -1,3 +1,25 @@
+### Mục lục
+Lớp 1: Robot 2 bánh xe tự di chuyển 
+![Design]()
+![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
+Link: 
+
+Lớp 2: Robot 4 bánh xe tự di chuyển + SLAM + NAV2 (camera + laser ) + AI (Mobile SSD)
+![Design]()
+[Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+Link: 
+
+Lớp 3: Robot chó 4 chân với khung cơ bản  + SLAM + NAV2  + CHAMP (camera + laser ) + AI (Mobile SSD)
+![Design](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
+[Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+Link: 
+
+Lớp 4: Robot chó 4 chân: Sản xuất vật lý và ghép nối các thiết bị + SLAM + NAV2  + CHAMP (camera + laser)  + AI (Mobile SSD)
+![Design]()
+[Rviz]()
+Link: 
+
+
 ## Mục tiêu
 > Dựa trên cơ sở:
 - Xây dựng robot có khả năng di chuyển tự động, sử dụng các tool gazebo (mô phỏng vật lý) + rviz (mô phỏng dữ liệu).
@@ -61,16 +83,11 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 Bắt đầu chạy code
 
     ros2 launch first_robot launch_grade2_gazebo.launch.py
+    
+    
+* * *
+![Preview-Design](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
 
-### Kết quả
-![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
-
-video demo:
-
-![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
-
-
-Dưới đây là bản mô tả tổng hợp 4 chân robot chó, ngắn gọn và súc tích:
 
 * * *
 
@@ -118,8 +135,7 @@ CopyEdit
 *   Tất cả các khớp đều hoạt động trong mặt phẳng xz để tạo dáng di chuyển kiểu ">"
     
 *   Thiết kế modular, cấu trúc giống nhau, chỉ khác `prefix`, `x/y position`.
-    
-
+ 
 * * *
 
  
