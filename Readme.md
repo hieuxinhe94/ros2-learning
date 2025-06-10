@@ -83,14 +83,10 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 Bắt đầu chạy code
 
     ros2 launch first_robot launch_grade2_gazebo.launch.py
-
-### Kết quả
- 
- 
-Dưới đây là bản mô tả tổng hợp 4 chân robot chó, ngắn gọn và súc tích:
+    
+    
+* * *
 ![Preview-Design](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
-
-
 
 
 * * *
@@ -139,8 +135,7 @@ CopyEdit
 *   Tất cả các khớp đều hoạt động trong mặt phẳng xz để tạo dáng di chuyển kiểu ">"
     
 *   Thiết kế modular, cấu trúc giống nhau, chỉ khác `prefix`, `x/y position`.
-    
-
+ 
 * * *
 
  
