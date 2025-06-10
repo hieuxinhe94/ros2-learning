@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <link name="imu_link">
+        <inertial>
+            <mass value="0.001" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <geometry>
+                <box size="0.001 0.001 0.01" />
+            </geometry>
+            <material name="yellow" />
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <geometry>
+                <box size=".001 .001 .01" />
+            </geometry>
+        </collision>
+    </link>
+
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="trunk" />
+        <child link="imu_link" />
+        <origin xyz="0 0 0.1" rpy="0 0 0" />
+        <!-- Đặt IMU gần trọng tâm -->
+    </joint>
+
+
+    <gazebo reference="imu_link">
+        <sensor name="imu_sensor" type="imu">
+            <always_on>true</always_on>
+            <update_rate>200</update_rate>
+            <topic>imu/data</topic>
+            <plugin name="gz::sim::systems::Imu" filename="gz-sim-imu-system">
+                <ros>
+                    <namespace>/</namespace>
+                </ros>
+            </plugin>
+            <imu>
+                <noise type="gaussian">
+                    <rate>
+                        <mean>0.0</mean>
+                        <stddev>0.005</stddev> <!-- Giảm nhiễu -->
+                    </rate>
+                    <accel>
+                        <mean>0.0</mean>
+                        <stddev>0.005</stddev>
+                    </accel>
+                </noise>
+            </imu>
+        </sensor>
+    </gazebo>
+
+</robot>

@@ -1,58 +1,45 @@
-<?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="use_mock_hardware" default="true" />
+  <xacro:arg name="use_gazebo" default="true" />
 
   <ros2_control name="FirstRobot" type="system">
-   
     <hardware>
-      <xacro:if value="true">
-        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-      </xacro:if>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
     </hardware>
+    <!-- Joint Definitions -->
+    <xacro:macro name="define_joint_interfaces" params="joint_name">
+      <joint name="${joint_name}">
+        <command_interface name="position" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </xacro:macro>
 
-    <joint name="left_wheel_joint">
-      <command_interface name="position">
-        <param name="min">-1</param>
-        <param name="max">1</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <command_interface name="velocity"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_wheel_joint">
-      <command_interface name="position">
-        <param name="min">-1</param>
-        <param name="max">1</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <command_interface name="velocity"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="left_rear_wheel_joint">
-      <command_interface name="position">
-        <param name="min">-1</param>
-        <param name="max">1</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <command_interface name="velocity"/>
-      <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_rear_wheel_joint">
-      <command_interface name="position">
-        <param name="min">-1</param>
-        <param name="max">1</param>
-      </command_interface>
-      <state_interface name="position"/>
-      <command_interface name="velocity"/>
-      <state_interface name="velocity"/>
-    </joint>
+    <!-- Front Left Leg -->
+    <xacro:define_joint_interfaces joint_name="front_left_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="front_left_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="front_left_ankle_joint" />
 
+    <!-- Front Right Leg -->
+    <xacro:define_joint_interfaces joint_name="front_right_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="front_right_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="front_right_ankle_joint" />
+
+    <!-- Rear Left Leg -->
+    <xacro:define_joint_interfaces joint_name="rear_left_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_left_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_left_ankle_joint" />
+
+    <!-- Rear Right Leg -->
+    <xacro:define_joint_interfaces joint_name="rear_right_hip_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_right_knee_joint" />
+    <xacro:define_joint_interfaces joint_name="rear_right_ankle_joint" />
 
   </ros2_control>
 
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find first_robot)/config/controller_simple.yaml</parameters>
+      <parameters>$(find first_robot)/config/ros_control.yaml</parameters>
     </plugin>
   </gazebo>
 </robot>

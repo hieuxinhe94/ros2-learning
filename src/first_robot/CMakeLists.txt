@@ -42,7 +42,7 @@ install(
 
 # actionable program
 install( 
-  DIRECTORY scripts move ai_models inteligent
+  DIRECTORY scripts  ai_models inteligent
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -52,9 +52,9 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(PROGRAMS
-  move/random_mover.py move/patrol_mover.py  inteligent/obstacle_avoid_node_by_camera.py inteligent/obstacle_avoid_node_by_depth_camera.py  inteligent/semantic_explorer.py  inteligent/action_scheduler.py
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(PROGRAMS
+#   move/dog_gait_cycle.py move/gait_cycle_publisher.py
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 
 ament_package()

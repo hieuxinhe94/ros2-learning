@@ -1,0 +1,37 @@
+/**:
+  ros__parameters:
+    gait:
+      knee_orientation: ">>"
+      pantograph_leg: false
+      odom_scaler: 0.9
+      max_linear_velocity_x: 0.3
+      max_linear_velocity_y: 0.25
+      max_angular_velocity_z: 0.5
+      com_x_translation: 0.0
+      swing_height: 0.04
+      stance_depth: 0.01
+      stance_duration: 0.25
+      nominal_height: 0.225
+
+      leg_mapping:
+        front_left:
+          hip: front_left_hip_joint
+          knee: front_left_knee_joint
+          ankle: front_left_ankle_joint
+        front_right:
+          hip: front_right_hip_joint
+          knee: front_right_knee_joint
+          ankle: front_right_ankle_joint
+        rear_left:
+          hip: rear_left_hip_joint
+          knee: rear_left_knee_joint
+          ankle: rear_left_ankle_joint
+        rear_right:
+          hip: rear_right_hip_joint
+          knee: rear_right_knee_joint
+          ankle: rear_right_ankle_joint
+      phase_offset:
+        front_left: 0.0
+        front_right: 0.5
+        rear_left: 0.5
+        rear_right: 0.0

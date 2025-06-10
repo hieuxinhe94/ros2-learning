@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     ros-jazzy-gz-ros2-control   \ 
     ros-jazzy-navigation2 \
     ros-jazzy-nav2-bringup \
+    ros-jazzy-tf-transformations \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y ros-jazzy-ros-gz 

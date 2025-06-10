@@ -1,0 +1,47 @@
+/**:
+  ros__parameters:
+    base_link: base_link
+    head: head
+    feet:
+      - front_left_foot_link
+      - front_right_foot_link
+      - rear_left_foot_link
+      - rear_right_foot_link
+    links_map:
+      base: base_link
+      left_front:
+        [
+          "front_left_hip_link",
+       
+          "front_left_knee_link",
+       
+          "front_left_ankle_link",
+          "front_left_foot_link",
+        ]
+      right_front:
+        [
+          "front_right_hip_link",
+    
+          "front_right_knee_link",
+        
+          "front_right_ankle_link",
+          "front_right_foot_link",
+        ]
+      left_hind:
+        [
+          "rear_left_hip_link",
+      
+          "rear_left_knee_link",
+   
+          "rear_left_ankle_link",
+          "rear_left_foot_link",
+        ]
+      right_hind:
+        [
+          "rear_right_hip_link",
+      
+          "rear_right_knee_link",
+       
+          "rear_right_ankle_link",
+          "rear_right_foot_link",
+        ]
