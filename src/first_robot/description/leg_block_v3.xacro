@@ -51,7 +51,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_hip_joint" description="Hip joint side ${side} and pos ${pos}"
+    <joint name="${prefix}_hip_joint" initial_position="0.0" description="Hip joint side ${side} and pos ${pos}"
       type="revolute">
       <parent link="trunk" />
       <child link="${prefix}_hip_link" />
@@ -117,7 +117,7 @@
     </link>
 
     <!-- knee Joint  Đùi  quay về sau  -->
-    <joint name="${prefix}_knee_joint" description="Knee joint side ${side} and pos ${pos}"
+    <joint name="${prefix}_knee_joint" initial_position="0.5" description="Knee joint side ${side} and pos ${pos}"
       type="revolute">
       <origin rpy="0 0.45 0" xyz="0 ${knee_offset*-side} 0" />
       <parent link="${prefix}_hip_link" />
@@ -125,7 +125,7 @@
       <child link="${prefix}_knee_link" />
       <axis xyz="0 1 0" />
       <dynamics damping="${damping}" friction="${friction}" />
-      <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" />
+      <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
       <limit effort="${knee_torque_max}" velocity="${knee_velocity_max}"
         lower="${knee_position_min}" upper="${knee_position_max}" />
     </joint>
@@ -158,8 +158,8 @@
     </link>
 
     <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
-    <joint name="${prefix}_ankle_joint" type="revolute">
-      <origin rpy="0 -0.8 0" xyz="0 0 ${-ankle_length}" />
+    <joint name="${prefix}_ankle_joint" initial_position="-1.0" type="revolute">
+      <origin rpy="0 -0.90 0" xyz="0 0 ${-ankle_length}" />
       <parent link="${prefix}_knee_link" />
       <child link="${prefix}_ankle_link" />
       <axis xyz="0 1 0" />

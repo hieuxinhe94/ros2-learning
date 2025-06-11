@@ -9,6 +9,7 @@
     <!-- Joint Definitions -->
     <xacro:macro name="define_joint_interfaces" params="joint_name">
       <joint name="${joint_name}">
+        <command_interface name="effort" />
         <command_interface name="position" />
         <state_interface name="position" />
         <state_interface name="velocity" />

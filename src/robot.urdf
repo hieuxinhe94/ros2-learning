@@ -78,7 +78,7 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="0.021112 0.0 -0.005366"/>
-      <mass value="4.921"/>
+      <mass value="2.2"/>
       <inertia ixx="0.02448" ixy="0.00012166" ixz="0.0014849" iyy="0.098077" iyz="-3.12e-05" izz="0.107"/>
     </inertial>
   </link>
@@ -116,8 +116,8 @@
     <child link="front_left_hip_link"/>
     <origin rpy="0 0 0" xyz="0.1934 0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-1.0472" upper="1.0472" velocity="30.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
   <!-- *** Bắt đầu phần đùi chân *** -->
@@ -150,8 +150,8 @@
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="front_left_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
   <!-- *** Kết thúc phần đùi chân *** -->
@@ -181,12 +181,12 @@
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
   <joint name="front_left_ankle_joint" type="revolute">
-    <origin rpy="0 -1.57 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
     <parent link="front_left_knee_link"/>
     <child link="front_left_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="35.55" lower="-1.0" upper="1.0" velocity="20.06"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -261,8 +261,8 @@
     <child link="front_right_hip_link"/>
     <origin rpy="0 0 0" xyz="0.1934 -0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-1.0472" upper="1.0472" velocity="30.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
   <!-- *** Bắt đầu phần đùi chân *** -->
@@ -295,8 +295,8 @@
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="front_right_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
   <!-- *** Kết thúc phần đùi chân *** -->
@@ -326,12 +326,12 @@
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
   <joint name="front_right_ankle_joint" type="revolute">
-    <origin rpy="0 -1.57 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
     <parent link="front_right_knee_link"/>
     <child link="front_right_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="35.55" lower="-1.0" upper="1.0" velocity="20.06"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -406,8 +406,8 @@
     <child link="rear_left_hip_link"/>
     <origin rpy="0 0 0" xyz="-0.1934 0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-1.0472" upper="1.0472" velocity="30.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
   <!-- *** Bắt đầu phần đùi chân *** -->
@@ -440,8 +440,8 @@
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="rear_left_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
   <!-- *** Kết thúc phần đùi chân *** -->
@@ -471,12 +471,12 @@
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
   <joint name="rear_left_ankle_joint" type="revolute">
-    <origin rpy="0 -1.57 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
     <parent link="rear_left_knee_link"/>
     <child link="rear_left_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="35.55" lower="-1.0" upper="1.0" velocity="20.06"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -551,8 +551,8 @@
     <child link="rear_right_hip_link"/>
     <origin rpy="0 0 0" xyz="-0.1934 -0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-1.0472" upper="1.0472" velocity="30.1"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
   <!-- *** Bắt đầu phần đùi chân *** -->
@@ -585,8 +585,8 @@
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="rear_right_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="30" lower="-1.57" upper="1.57" velocity="7.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
   <!-- *** Kết thúc phần đùi chân *** -->
@@ -616,12 +616,12 @@
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
   <joint name="rear_right_ankle_joint" type="revolute">
-    <origin rpy="0 -1.57 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
     <parent link="rear_right_knee_link"/>
     <child link="rear_right_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="35.55" lower="-1.0" upper="1.0" velocity="20.06"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->

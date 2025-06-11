@@ -29,6 +29,7 @@ joint_group_effort_controller:
       - rear_right_knee_joint
       - rear_right_ankle_joint
     command_interfaces:
+      - effort
       - position
     state_interfaces:
       - position
