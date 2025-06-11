@@ -3,52 +3,57 @@
   <!-- Base -->
   <link name="base_link">
     <visual name="base_link_visual">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <box size="0.001 0.001 0.001"/>
+        <box size="0.001 0.001 0.001" />
       </geometry>
       <material name="white" />
     </visual>
-  
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.1" />
+      <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0" />
+    </inertial>
   </link>
 
   <joint name="floating_base" type="fixed">
-    <parent link="base_link"/>
-    <child link="trunk"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link" />
+    <child link="trunk" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
   </joint>
 
   <!-- Trunk  Thân robot -->
   <link name="trunk">
     <visual name="trunk_visual">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-          <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
-          <mesh filename="file://$(find first_robot)/meshes/trunk.dae" scale="1 1 1"/>
+        <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
+        <mesh filename="file://$(find first_robot)/meshes/trunk.dae" scale="1 1 1" />
       </geometry>
-      <material name="silver"/>
+      <material name="silver" />
     </visual>
     <collision name="trunk_collision">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <box size="${trunk_length} ${trunk_width} ${trunk_height}"/>
+        <box size="${trunk_length} ${trunk_width} ${trunk_height}" />
       </geometry>
     </collision>
     <inertial>
-      <origin rpy="0 0 0" xyz="${trunk_com_x} ${trunk_com_y} ${trunk_com_z}"/>
-      <mass value="${trunk_mass}"/>
-      <inertia ixx="${trunk_ixx}" ixy="${trunk_ixy}" ixz="${trunk_ixz}" iyy="${trunk_iyy}" iyz="${trunk_iyz}" izz="${trunk_izz}"/>
+      <origin rpy="0 0 0" xyz="${trunk_com_x} ${trunk_com_y} ${trunk_com_z}" />
+      <mass value="${trunk_mass}" />
+      <inertia ixx="${trunk_ixx}" ixy="${trunk_ixy}" ixz="${trunk_ixz}" iyy="${trunk_iyy}"
+        iyz="${trunk_iyz}" izz="${trunk_izz}" />
     </inertial>
-    </link>
+  </link>
 
-    <!-- IMPORT LEG PATTERN -->
-    <xacro:include filename="$(find first_robot)/description/leg_block_v3.xacro"/>
+  <!-- IMPORT LEG PATTERN -->
+  <xacro:include filename="$(find first_robot)/description/leg_block_v3.xacro" />
 
-    <!-- Gọi macro leg cho từng chân -->
-    <xacro:leg prefix="front_left" side="-1" use_dae="False" pos="1" />
-    <xacro:leg prefix="front_right" side="1" use_dae="False" pos="1"/>
-    <xacro:leg prefix="rear_left" side="-1" use_dae="False" pos="-1" />
-    <xacro:leg prefix="rear_right" side="1" use_dae="False" pos="-1" />
+  <!-- Gọi macro leg cho từng chân -->
+  <xacro:leg prefix="front_left" side="-1" use_dae="False" pos="1" />
+  <xacro:leg prefix="front_right" side="1" use_dae="False" pos="1" />
+  <xacro:leg prefix="rear_left" side="-1" use_dae="False" pos="-1" />
+  <xacro:leg prefix="rear_right" side="1" use_dae="False" pos="-1" />
 
 
-  </robot>
+</robot>

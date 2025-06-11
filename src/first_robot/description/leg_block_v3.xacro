@@ -14,69 +14,73 @@
       <visual name="${prefix}_hip_visual">
         <!-- Chân phải và phía trước -->
         <xacro:if value="${(side == 1) and (pos == 1)}">
-          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
+          <origin rpy="${PI} 0 0" xyz="0 0 0" />
         </xacro:if>
         <!-- Chân trái và phía sau -->
         <xacro:if value="${(side == 1) and (pos == -1)}">
-          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
+          <origin rpy="${PI} ${PI} 0" xyz="0 0 0" />
         </xacro:if>
         <!-- Chân trái và phía trước -->
         <xacro:if value="${(side == -1) and (pos == 1)}">
-          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
+          <origin rpy="0 0 0" xyz="0 0 0" />
         </xacro:if>
         <!-- Chân phải và phía sau -->
         <xacro:if value="${(side == -1) and (pos == -1)}">
-          <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/>
+          <origin rpy="0 ${PI} 0" xyz="0 0 0" />
         </xacro:if>
 
         <geometry>
           <!-- <cylinder length="${hip_length}" radius="${hip_radius}"/> -->
 
-          <mesh filename="file://$(find first_robot)/meshes/hip.dae" scale="1 1 1"/>
+          <mesh filename="file://$(find first_robot)/meshes/hip.dae" scale="1 1 1" />
           <!-- dài 2cm  cố định thân trên và các chân -->
         </geometry>
-        <material name="blue"/>
+        <material name="blue" />
       </visual>
       <collision name="${prefix}_hip_collision">
-        <origin rpy="${PI/2.0} 2.0 0" xyz="0 ${hip_offset*side} 0"/>
+        <origin rpy="0 0 0" xyz="0 ${hip_offset*side} 0" />
         <geometry>
-          <cylinder length="${hip_length + 0.01}" radius="${hip_radius + 0.01}"/>
+          <cylinder length="${hip_length + 0.01}" radius="${hip_radius + 0.01}" />
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0 0 0" xyz="${hip_com_x*pos} ${hip_com_y*side} ${hip_com_z}"/>
-        <mass value="${hip_mass}"/>
-        <inertia ixx="${hip_ixx}" ixy="${hip_ixy*side*pos}" ixz="${hip_ixz*pos}" iyy="${hip_iyy}" iyz="${hip_iyz*side}" izz="${hip_izz}"/>
+        <origin rpy="0 0 0" xyz="${hip_com_x*pos} ${hip_com_y*side} ${hip_com_z}" />
+        <mass value="${hip_mass}" />
+        <inertia ixx="${hip_ixx}" ixy="${hip_ixy*side*pos}" ixz="${hip_ixz*pos}" iyy="${hip_iyy}"
+          iyz="${hip_iyz*side}" izz="${hip_izz}" />
       </inertial>
     </link>
 
-    <joint name="${prefix}_hip_joint" description="Hip joint side ${side} and pos ${pos}" type="revolute">
-      <parent link="trunk"/>
-      <child link="${prefix}_hip_link"/>
+    <joint name="${prefix}_hip_joint" description="Hip joint side ${side} and pos ${pos}"
+      type="revolute">
+      <parent link="trunk" />
+      <child link="${prefix}_hip_link" />
 
       <!-- Chân trái và phía trước -->
       <xacro:if value="${(side == 1) and (pos == 1)}">
-        <origin rpy="0 0 0" xyz="${leg_offset_x} ${-leg_offset_y} 0"/>
+        <origin rpy="0 0 0" xyz="${leg_offset_x} ${-leg_offset_y} 0" />
       </xacro:if>
       <!-- Chân trái và phía sau -->
       <xacro:if value="${(side == 1) and (pos == -1)}">
-        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${-leg_offset_y} 0"/>
+        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${-leg_offset_y} 0" />
       </xacro:if>
       <!-- Chân phải và phía trước -->
       <xacro:if value="${(side == -1) and (pos == 1)}">
-        <origin rpy="0 0 0" xyz="${leg_offset_x} ${leg_offset_y} 0"/>
+        <origin rpy="0 0 0" xyz="${leg_offset_x} ${leg_offset_y} 0" />
 
       </xacro:if>
       <!-- Chân phải và phía sau -->
       <xacro:if value="${(side == -1) and (pos == -1)}">
-        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${leg_offset_y} 0"/>
+        <origin rpy="0 0 0" xyz="${-leg_offset_x} ${leg_offset_y} 0" />
       </xacro:if>
 
 
-      <axis xyz="1 0 0"/>
+      <axis xyz="1 0 0" />
 
-      <dynamics damping="${damping}" friction="${friction}"/>
-      <limit effort="${hip_torque_max}" velocity="${hip_velocity_max}" lower="${hip_position_min}" upper="${hip_position_max}"/>
+      <dynamics damping="${damping}" friction="${friction}" />
+      <limit effort="${hip_torque_max}" velocity="${hip_velocity_max}" lower="${hip_position_min}"
+        upper="${hip_position_max}" />
+
       <!-- Vị trí gắn khớp háng vào body-->
     </joint>
 
@@ -84,43 +88,46 @@
     <!-- knee Link -->
     <link name="${prefix}_knee_link">
       <visual name="${prefix}_knee_visual">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
           <!-- <box size="${knee_length} ${knee_width} ${knee_height}"/> -->
           <xacro:if value="${(side == 1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee_mirror.dae" scale="1 1 1"/>
+            <mesh filename="file://$(find first_robot)/meshes/knee_mirror.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
           <xacro:if value="${(side == -1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee.dae" scale="1 1 1"/>
+            <mesh filename="file://$(find first_robot)/meshes/knee.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
         </geometry>
-        <material name="green"/>
+        <material name="green" />
       </visual>
       <collision name="${prefix}_knee_collision">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
-          <box size="${knee_length + 0.01} ${knee_width + 0.01} ${knee_height + 0.01}"/>
+          <box size="${knee_length + 0.01} ${knee_width + 0.01} ${knee_height + 0.01}" />
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0 0 0" xyz="${knee_com_x} ${knee_com_y*-side} ${knee_com_z}"/>
-        <mass value="${knee_mass}"/>
-        <inertia ixx="${knee_ixx}" ixy="${knee_ixy*-side}" ixz="${knee_ixz}" iyy="${knee_iyy}" iyz="${knee_iyz*-side}" izz="${knee_izz}"/>
+        <origin rpy="0 0 0" xyz="${knee_com_x} ${knee_com_y*-side} ${knee_com_z}" />
+        <mass value="${knee_mass}" />
+        <inertia ixx="${knee_ixx}" ixy="${knee_ixy*-side}" ixz="${knee_ixz}" iyy="${knee_iyy}"
+          iyz="${knee_iyz*-side}" izz="${knee_izz}" />
       </inertial>
     </link>
 
     <!-- knee Joint  Đùi  quay về sau  -->
-    <joint name="${prefix}_knee_joint" description="Knee joint side ${side} and pos ${pos}" type="revolute">
-      <origin rpy="0 0.45 0" xyz="0 ${knee_offset*-side} 0"/>
-      <parent link="${prefix}_hip_link"/>
+    <joint name="${prefix}_knee_joint" description="Knee joint side ${side} and pos ${pos}"
+      type="revolute">
+      <origin rpy="0 0.45 0" xyz="0 ${knee_offset*-side} 0" />
+      <parent link="${prefix}_hip_link" />
       <!-- Gắn vào motor háng mô phỏng -->
-      <child link="${prefix}_knee_link"/>
-      <axis xyz="0 1 0"/>
-      <dynamics damping="${damping}" friction="${friction}"/>
-      <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0"/>
-      <limit effort="${knee_torque_max}" velocity="${knee_velocity_max}" lower="${knee_position_min}" upper="${knee_position_max}"/>
+      <child link="${prefix}_knee_link" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="${damping}" friction="${friction}" />
+      <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" />
+      <limit effort="${knee_torque_max}" velocity="${knee_velocity_max}"
+        lower="${knee_position_min}" upper="${knee_position_max}" />
     </joint>
     <!-- *** Kết thúc phần đùi chân *** -->
 
@@ -128,35 +135,37 @@
     <!-- ankle Link -->
     <link name="${prefix}_ankle_link">
       <visual name="${prefix}_ankle_visual">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
           <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-          <mesh filename="file://$(find first_robot)/meshes/ankle.dae" scale="1 1 1"/>
+          <mesh filename="file://$(find first_robot)/meshes/ankle.dae" scale="1 1 1" />
         </geometry>
         <!-- Màu tím -->
-        <material name="purple"/>
+        <material name="purple" />
       </visual>
       <collision name="${prefix}_ankle_collision">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
-          <box size="${ankle_length + 0.01} ${ankle_width + 0.01} ${ankle_height + 0.01}"/>
+          <box size="${ankle_length + 0.01} ${ankle_width + 0.01} ${ankle_height + 0.01}" />
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0 0 0" xyz="${ankle_com_x} ${ankle_com_y} ${ankle_com_z}"/>
-        <mass value="${ankle_mass}"/>
-        <inertia ixx="${ankle_ixx}" ixy="${ankle_ixy}" ixz="${ankle_ixz}" iyy="${ankle_iyy}" iyz="${ankle_iyz}" izz="${ankle_izz}"/>
+        <origin rpy="0 0 0" xyz="${ankle_com_x} ${ankle_com_y} ${ankle_com_z}" />
+        <mass value="${ankle_mass}" />
+        <inertia ixx="${ankle_ixx}" ixy="${ankle_ixy}" ixz="${ankle_ixz}" iyy="${ankle_iyy}"
+          iyz="${ankle_iyz}" izz="${ankle_izz}" />
       </inertial>
     </link>
 
     <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
     <joint name="${prefix}_ankle_joint" type="revolute">
-      <origin rpy="0 -0.45 0" xyz="0 0 ${-ankle_length}"/>
-      <parent link="${prefix}_knee_link"/>
-      <child link="${prefix}_ankle_link"/>
-      <axis xyz="0 1 0"/>
-      <dynamics damping="${damping}" friction="${friction}"/>
-      <limit effort="${ankle_torque_max}" velocity="${ankle_velocity_max}" lower="${ankle_position_min}" upper="${ankle_position_max}"/>
+      <origin rpy="0 -0.8 0" xyz="0 0 ${-ankle_length}" />
+      <parent link="${prefix}_knee_link" />
+      <child link="${prefix}_ankle_link" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="${damping}" friction="${friction}" />
+      <limit effort="${ankle_torque_max}" velocity="${ankle_velocity_max}"
+        lower="${ankle_position_min}" upper="${ankle_position_max}" />
     </joint>
 
     <!-- *** Kết thúc phần cẳng chân *** -->
@@ -165,40 +174,39 @@
     <!-- Foot Link -->
     <link name="${prefix}_foot_link">
       <visual name="${prefix}_foot_visual">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
-          <mesh filename="file://$(find first_robot)/meshes/foot.dae" scale="1 1 1"/>
+          <mesh filename="file://$(find first_robot)/meshes/foot.dae" scale="1 1 1" />
           <!-- <sphere radius="${foot_radius}"/> -->
         </geometry>
-        <material name="black"/>
+        <material name="black" />
       </visual>
       <collision name="${prefix}_foot_collision">
-        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
-          <sphere radius="${foot_radius}"/>
+          <sphere radius="${foot_radius}" />
         </geometry>
       </collision>
       <inertial>
-        <mass value="${foot_mass}"/>
-        <inertia ixx="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" ixy="0.0" ixz="0.0" iyy="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" iyz="0.0" izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}"/>
+        <mass value="${foot_mass}" />
+        <inertia ixx="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" ixy="0.0" ixz="0.0"
+          iyy="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" iyz="0.0"
+          izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" />
       </inertial>
     </link>
 
     <!-- Foot Joint -->
     <joint name="${prefix}_foot_joint" type="fixed">
-      <origin rpy="0 0 0" xyz="0 0 -0.213"/>
-      <parent link="${prefix}_ankle_link"/>
-      <child link="${prefix}_foot_link"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.213" />
+      <parent link="${prefix}_ankle_link" />
+      <child link="${prefix}_foot_link" />
     </joint>
-
-
-
 
 
     <!-- Transmission cho các joint -->
     <transmission name="${prefix}_knee_trans">
       <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${prefix}_knee_joint"/>
+      <joint name="${prefix}_knee_joint" />
       <actuator name="${prefix}_knee_motor">
         <mechanical_reduction>1</mechanical_reduction>
       </actuator>
@@ -206,7 +214,7 @@
 
     <transmission name="${prefix}_ankle_trans">
       <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${prefix}_ankle_joint"/>
+      <joint name="${prefix}_ankle_joint" />
       <actuator name="${prefix}_ankle_motor">
         <mechanical_reduction>1</mechanical_reduction>
       </actuator>

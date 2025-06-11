@@ -47,7 +47,7 @@ install(
 )
 
 install(PROGRAMS
-  scripts/twist_to_twiststamped.py
+  scripts/twist_to_twiststamped.py 
   DESTINATION lib/${PROJECT_NAME}
 )
  
@@ -55,5 +55,5 @@ install(PROGRAMS
 #   move/dog_gait_cycle.py move/gait_cycle_publisher.py
 #   DESTINATION lib/${PROJECT_NAME}
 # )
-
+ 
 ament_package()
