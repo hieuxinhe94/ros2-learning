@@ -415,9 +415,9 @@ def generate_launch_description():
         #
         # delay_slam_nav2_toolbox,
         # rqt,
-        quadruped_controller_node,
+        # quadruped_controller_node,
         #  
-        state_estimator_node,
+        # state_estimator_node,
         #
         # rviz_node,
         publish_to_foxglove

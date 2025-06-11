@@ -159,7 +159,7 @@
 
     <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
     <joint name="${prefix}_ankle_joint" initial_position="-1.0" type="revolute">
-      <origin rpy="0 -0.90 0" xyz="0 0 ${-ankle_length}" />
+      <origin rpy="0 -0.6 0" xyz="0 0 ${-ankle_length}" />
       <parent link="${prefix}_knee_link" />
       <child link="${prefix}_ankle_link" />
       <axis xyz="0 1 0" />

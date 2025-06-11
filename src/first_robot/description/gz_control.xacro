@@ -1,6 +1,18 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="use_mock_hardware" default="true" />
   <xacro:arg name="use_gazebo" default="true" />
+  <gazebo>
+    <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+      <publish_link_pose>true</publish_link_pose>
+      <publish_sensor_pose>true</publish_sensor_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+      <static_publisher>true</static_publisher>
+      <static_update_frequency>100</static_update_frequency>
+    </plugin>
+  </gazebo>
 
   <ros2_control name="FirstRobot" type="system">
     <hardware>
@@ -10,7 +22,6 @@
     <xacro:macro name="define_joint_interfaces" params="joint_name">
       <joint name="${joint_name}">
         <command_interface name="effort" />
-        <command_interface name="position" />
         <state_interface name="position" />
         <state_interface name="velocity" />
       </joint>
@@ -41,6 +52,115 @@
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>$(find first_robot)/config/ros_control.yaml</parameters>
+       <robot_param_node>robot_state_publisher</robot_param_node>
     </plugin>
+  </gazebo>
+
+
+   <gazebo reference="trunk">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <!-- FL leg -->
+  <gazebo reference="front_left_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="front_left_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="front_left_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="front_left_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <!-- FR leg -->
+  <gazebo reference="front_right_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="front_right_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="front_right_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="front_right_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <!-- RL leg -->
+  <gazebo reference="rear_left_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="rear_left_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="rear_left_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="rear_left_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <!-- RR leg -->
+  <gazebo reference="rear_right_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="rear_right_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="rear_right_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="rear_right_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
   </gazebo>
 </robot>
