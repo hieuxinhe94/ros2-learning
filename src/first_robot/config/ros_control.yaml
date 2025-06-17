@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 100
+    update_rate: 250
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -45,22 +45,29 @@ joint_group_effort_controller:
       goal_time: 0.0
       
     # Default settings that can help with stability
-    hold_trajectory_duration: 0.0
+    hold_trajectory_duration: 2.0
     action_tolerance: 1.0
+   
+   
+    #     Tham số	Gợi ý
+    # p	100–300  tăng dần nếu chân không đủ lực 
+    # d	5–10  cao hơn để giữ vững khớp khi có trọng lực
+    # i	0.0–0.1 chỉ cần nếu robot bị lệch liên tục
+    # i_clamp	0.5–1.0 tránh tích lũy lực quá lớn 
     
     gains:
-      front_left_hip_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      front_left_knee_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      front_left_ankle_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
+      front_left_hip_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      front_left_knee_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      front_left_ankle_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
 
-      front_right_hip_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      front_right_knee_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      front_right_ankle_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
+      front_right_hip_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      front_right_knee_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      front_right_ankle_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
 
-      rear_left_hip_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      rear_left_knee_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      rear_left_ankle_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
+      rear_left_hip_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      rear_left_knee_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      rear_left_ankle_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
 
-      rear_right_hip_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      rear_right_knee_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
-      rear_right_ankle_joint: { p: 100.0, i: 0.2, d: 10.0, i_clamp: 2.5 }
+      rear_right_hip_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      rear_right_knee_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }
+      rear_right_ankle_joint: { p: 200.0, i: 0.2, d: 2.0, i_clamp: 2.5 }

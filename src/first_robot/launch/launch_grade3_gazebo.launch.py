@@ -211,7 +211,7 @@ def generate_launch_description():
     )
 
     gz_spawn_entity = TimerAction(
-        period=4.0,  # chờ 4 giây
+        period=1.0,  # chờ 4 giây
         actions=[
             Node(
                 package="ros_gz_sim",
@@ -415,7 +415,7 @@ def generate_launch_description():
         #
         # delay_slam_nav2_toolbox,
         # rqt,
-        # quadruped_controller_node,
+        quadruped_controller_node,
         #  
         # state_estimator_node,
         #
