@@ -8,11 +8,12 @@
       max_linear_velocity_y: 0.25
       max_angular_velocity_z: 0.5
       com_x_translation: 0.0
-      swing_height: 0.1
+      swing_height: 0.05
       step_height: 0.1
+      step_length: 0.1
       stance_depth: 0.01
       stance_duration: 0.25
-      nominal_height: 0.225
+      nominal_height: 0.30
 
       leg_mapping:
         front_left:
