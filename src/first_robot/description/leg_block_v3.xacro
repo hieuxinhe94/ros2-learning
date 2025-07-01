@@ -46,14 +46,11 @@
       <inertial>
         <origin rpy="0 0 0" xyz="${hip_com_x*pos} ${hip_com_y*side} ${hip_com_z}" />
         <mass value="${hip_mass}" />
-        <inertia ixx="${hip_ixx}" ixy="${hip_ixy*side*pos}" ixz="${hip_ixz*pos}" iyy="${hip_iyy}"
-          iyz="${hip_iyz*side}" izz="${hip_izz}" />
+        <inertia ixx="${hip_ixx}" ixy="${hip_ixy*side*pos}" ixz="${hip_ixz*pos}" iyy="${hip_iyy}" iyz="${hip_iyz*side}" izz="${hip_izz}" />
       </inertial>
     </link>
 
-    <joint name="${prefix}_hip_joint" initial_position="0.0"
-      description="Hip joint side ${side} and pos ${pos}"
-      type="revolute">
+    <joint name="${prefix}_hip_joint" initial_position="0.0" description="Hip joint side ${side} and pos ${pos}" type="revolute">
       <parent link="trunk" />
       <child link="${prefix}_hip_link" />
 
@@ -79,8 +76,7 @@
       <axis xyz="1 0 0" />
 
       <dynamics damping="${damping}" friction="${friction}" />
-      <limit effort="${hip_torque_max}" velocity="${hip_velocity_max}" lower="${hip_position_min}"
-        upper="${hip_position_max}" />
+      <limit effort="${hip_torque_max}" velocity="${hip_velocity_max}" lower="${hip_position_min}" upper="${hip_position_max}" />
 
       <!-- Vị trí gắn khớp háng vào body-->
     </joint>
@@ -93,11 +89,11 @@
         <geometry>
           <!-- <box size="${knee_length} ${knee_width} ${knee_height}"/> -->
           <xacro:if value="${(side == 1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee_mirror.dae" scale="1 1 1" />
+            <mesh filename="file://$(find first_robot)/meshes/knee_mirror_new.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
           <xacro:if value="${(side == -1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee.dae" scale="1 1 1" />
+            <mesh filename="file://$(find first_robot)/meshes/knee_new.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
         </geometry>
@@ -112,15 +108,12 @@
       <inertial>
         <origin rpy="0 0 0" xyz="${knee_com_x} ${knee_com_y*-side} ${knee_com_z}" />
         <mass value="${knee_mass}" />
-        <inertia ixx="${knee_ixx}" ixy="${knee_ixy*-side}" ixz="${knee_ixz}" iyy="${knee_iyy}"
-          iyz="${knee_iyz*-side}" izz="${knee_izz}" />
+        <inertia ixx="${knee_ixx}" ixy="${knee_ixy*-side}" ixz="${knee_ixz}" iyy="${knee_iyy}" iyz="${knee_iyz*-side}" izz="${knee_izz}" />
       </inertial>
     </link>
 
     <!-- knee Joint  Đùi  quay về sau  -->
-    <joint name="${prefix}_knee_joint" initial_position="0.0"
-      description="Knee joint side ${side} and pos ${pos}"
-      type="revolute">
+    <joint name="${prefix}_knee_joint" initial_position="0.0" description="Knee joint side ${side} and pos ${pos}" type="revolute">
       <origin rpy="0 0 0" xyz="0 ${knee_offset*-side} 0" />
       <parent link="${prefix}_hip_link" />
       <!-- Gắn vào motor háng mô phỏng -->
@@ -128,8 +121,7 @@
       <axis xyz="0 1 0" />
       <dynamics damping="${damping}" friction="${friction}" />
       <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
-      <limit effort="${knee_torque_max}" velocity="${knee_velocity_max}"
-        lower="${knee_position_min}" upper="${knee_position_max}" />
+      <limit effort="${knee_torque_max}" velocity="${knee_velocity_max}" lower="${knee_position_min}" upper="${knee_position_max}" />
     </joint>
     <!-- *** Kết thúc phần đùi chân *** -->
 
@@ -140,7 +132,15 @@
         <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
           <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-          <mesh filename="file://$(find first_robot)/meshes/ankle.dae" scale="1 1 1" />
+          <mesh filename="file://$(find first_robot)/meshes/ankle_new.dae" scale="1 1 1" />
+          <xacro:if value="${(side == 1) }">
+            <mesh filename="file://$(find first_robot)/meshes/ankle_new.dae" scale="1 1 1" />
+            <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
+          </xacro:if>
+          <xacro:if value="${(side == -1) }">
+            <mesh filename="file://$(find first_robot)/meshes/ankle_mirror_new.dae" scale="1 1 1" />
+            <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
+          </xacro:if>
         </geometry>
         <!-- Màu tím -->
         <material name="purple" />
@@ -154,8 +154,7 @@
       <inertial>
         <origin rpy="0 0 0" xyz="${ankle_com_x} ${ankle_com_y} ${ankle_com_z}" />
         <mass value="${ankle_mass}" />
-        <inertia ixx="${ankle_ixx}" ixy="${ankle_ixy}" ixz="${ankle_ixz}" iyy="${ankle_iyy}"
-          iyz="${ankle_iyz}" izz="${ankle_izz}" />
+        <inertia ixx="${ankle_ixx}" ixy="${ankle_ixy}" ixz="${ankle_ixz}" iyy="${ankle_iyy}" iyz="${ankle_iyz}" izz="${ankle_izz}" />
       </inertial>
     </link>
 
@@ -166,8 +165,7 @@
       <child link="${prefix}_ankle_link" />
       <axis xyz="0 1 0" />
       <dynamics damping="${damping}" friction="${friction}" />
-      <limit effort="${ankle_torque_max}" velocity="${ankle_velocity_max}"
-        lower="${ankle_position_min}" upper="${ankle_position_max}" />
+      <limit effort="${ankle_torque_max}" velocity="${ankle_velocity_max}" lower="${ankle_position_min}" upper="${ankle_position_max}" />
       <gazebo>
         <plugin name="${prefix}_ankle_controller" filename="libgazebo_ros_joint_position_controller.so">
           <robotNamespace>/first_robot</robotNamespace>
@@ -213,9 +211,7 @@
       </collision>
       <inertial>
         <mass value="${foot_mass}" />
-        <inertia ixx="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" ixy="0.0" ixz="0.0"
-          iyy="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" iyz="0.0"
-          izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" />
+        <inertia ixx="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" ixy="0.0" ixz="0.0" iyy="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" iyz="0.0" izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" />
       </inertial>
     </link>
 

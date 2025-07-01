@@ -5,7 +5,7 @@
     <visual name="base_link_visual">
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <box size="0.3762 0.0935 0.114" />
+        <box size="0.3762 0.02 0.05" />
       </geometry>
       <material name="white" />
     </visual>
@@ -28,7 +28,7 @@
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
         <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
-        <mesh filename="file://$(find first_robot)/meshes/trunk.dae" scale="1 1 1" />
+        <mesh filename="file://$(find first_robot)/meshes/trunk_new.dae" scale="1 1 1" />
       </geometry>
       <material name="silver" />
     </visual>
