@@ -45,20 +45,20 @@
     <visual name="base_link_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.001 0.001 0.001"/>
+        <box size="0.3762 0.02 0.05"/>
       </geometry>
       <material name="white"/>
     </visual>
     <inertial>
       <origin xyz="0 0 0"/>
-      <mass value="0.1"/>
+      <mass value="2.2"/>
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
     </inertial>
   </link>
   <joint name="floating_base" type="fixed">
     <parent link="base_link"/>
     <child link="trunk"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.021112 0 0"/>
   </joint>
   <!-- Trunk  Thân robot -->
   <link name="trunk">
@@ -66,9 +66,9 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/trunk.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/trunk_new.dae" scale="1 1 1"/>
       </geometry>
-      <material name="silver"/>
+      <!-- <material name="silver" /> -->
     </visual>
     <collision name="trunk_collision">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -78,7 +78,7 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="0.021112 0.0 -0.005366"/>
-      <mass value="2.2"/>
+      <mass value="4.2"/>
       <inertia ixx="0.02448" ixy="0.00012166" ixz="0.0014849" iyy="0.098077" iyz="-3.12e-05" izz="0.107"/>
     </inertial>
   </link>
@@ -97,7 +97,7 @@
         <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/hip.dae" scale="1 1 1"/>
         <!-- dài 2cm  cố định thân trên và các chân -->
       </geometry>
-      <material name="blue"/>
+      <!-- <material name="blue" /> -->
     </visual>
     <collision name="front_left_hip_collision">
       <origin rpy="0 0 0" xyz="0 -0.0955 0"/>
@@ -107,16 +107,16 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.0054 -0.00194 -0.000105"/>
-      <mass value="0.678"/>
+      <mass value="0.478"/>
       <inertia ixx="0.00048" ixy="3.01e-06" ixz="1.11e-06" iyy="0.000884" iyz="1.42e-06" izz="0.000596"/>
     </inertial>
   </link>
-  <joint description="Hip joint side -1 and pos 1" name="front_left_hip_joint" type="revolute">
+  <joint description="Hip joint side -1 and pos 1" initial_position="0.0" name="front_left_hip_joint" type="revolute">
     <parent link="trunk"/>
     <child link="front_left_hip_link"/>
     <origin rpy="0 0 0" xyz="0.1934 0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
@@ -126,7 +126,7 @@
     <visual name="front_left_knee_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_right.dae" scale="1 1 1"/>
         <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <material name="green"/>
@@ -139,18 +139,18 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.00374 -0.0223 -0.0327"/>
-      <mass value="0.135862"/>
+      <mass value="0.435862"/>
       <inertia ixx="0.00584" ixy="8.72e-05" ixz="-0.000289" iyy="0.0058" iyz="0.000808" izz="0.00103"/>
     </inertial>
   </link>
   <!-- knee Joint  Đùi  quay về sau  -->
-  <joint description="Knee joint side -1 and pos 1" name="front_left_knee_joint" type="revolute">
-    <origin rpy="0 0.45 0" xyz="0 0.0955 0"/>
+  <joint description="Knee joint side -1 and pos 1" initial_position="0.0" name="front_left_knee_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0.0955 0"/>
     <parent link="front_left_hip_link"/>
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="front_left_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
@@ -162,10 +162,10 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle_right.dae" scale="1 1 1"/>
       </geometry>
       <!-- Màu tím -->
-      <material name="purple"/>
+      <!-- <material name="purple" /> -->
     </visual>
     <collision name="front_left_ankle_collision">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -180,13 +180,35 @@
     </inertial>
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
-  <joint name="front_left_ankle_joint" type="revolute">
-    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
+  <joint initial_position="0.0" name="front_left_ankle_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
     <parent link="front_left_knee_link"/>
     <child link="front_left_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
+    <gazebo>
+      <plugin filename="libgazebo_ros_joint_position_controller.so" name="front_left_ankle_controller">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>front_left_ankle_joint</jointName>
+        <commandTopic>/front_left_ankle_controller/command</commandTopic>
+        <updateRate>30</updateRate>
+        <pid>
+          <p>100.0</p>
+          <i>0.0</i>
+          <d>10.0</d>
+        </pid>
+      </plugin>
+      <!-- Plugin cảm biến lực mô phỏng -->
+      <plugin filename="libgazebo_ros_force_torque_sensor.so" name="front_left_force_torque_sensor">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>front_left_ankle_joint</jointName>
+        <topicName>/front_left_force_torque_sensor</topicName>
+      </plugin>
+    </gazebo>
+    <sensor name="front_left_force_torque" type="force_torque">
+      <update_rate>30</update_rate>
+    </sensor>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -242,7 +264,7 @@
         <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/hip.dae" scale="1 1 1"/>
         <!-- dài 2cm  cố định thân trên và các chân -->
       </geometry>
-      <material name="blue"/>
+      <!-- <material name="blue" /> -->
     </visual>
     <collision name="front_right_hip_collision">
       <origin rpy="0 0 0" xyz="0 0.0955 0"/>
@@ -252,16 +274,16 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.0054 0.00194 -0.000105"/>
-      <mass value="0.678"/>
+      <mass value="0.478"/>
       <inertia ixx="0.00048" ixy="-3.01e-06" ixz="1.11e-06" iyy="0.000884" iyz="-1.42e-06" izz="0.000596"/>
     </inertial>
   </link>
-  <joint description="Hip joint side 1 and pos 1" name="front_right_hip_joint" type="revolute">
+  <joint description="Hip joint side 1 and pos 1" initial_position="0.0" name="front_right_hip_joint" type="revolute">
     <parent link="trunk"/>
     <child link="front_right_hip_link"/>
     <origin rpy="0 0 0" xyz="0.1934 -0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
@@ -271,7 +293,7 @@
     <visual name="front_right_knee_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_mirror.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_left.dae" scale="1 1 1"/>
         <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <material name="green"/>
@@ -284,18 +306,18 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.00374 0.0223 -0.0327"/>
-      <mass value="0.135862"/>
+      <mass value="0.435862"/>
       <inertia ixx="0.00584" ixy="-8.72e-05" ixz="-0.000289" iyy="0.0058" iyz="-0.000808" izz="0.00103"/>
     </inertial>
   </link>
   <!-- knee Joint  Đùi  quay về sau  -->
-  <joint description="Knee joint side 1 and pos 1" name="front_right_knee_joint" type="revolute">
-    <origin rpy="0 0.45 0" xyz="0 -0.0955 0"/>
+  <joint description="Knee joint side 1 and pos 1" initial_position="0.0" name="front_right_knee_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 -0.0955 0"/>
     <parent link="front_right_hip_link"/>
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="front_right_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
@@ -307,10 +329,11 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle_left.dae" scale="1 1 1"/>
+        <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <!-- Màu tím -->
-      <material name="purple"/>
+      <!-- <material name="purple" /> -->
     </visual>
     <collision name="front_right_ankle_collision">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -325,13 +348,35 @@
     </inertial>
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
-  <joint name="front_right_ankle_joint" type="revolute">
-    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
+  <joint initial_position="0.0" name="front_right_ankle_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
     <parent link="front_right_knee_link"/>
     <child link="front_right_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
+    <gazebo>
+      <plugin filename="libgazebo_ros_joint_position_controller.so" name="front_right_ankle_controller">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>front_right_ankle_joint</jointName>
+        <commandTopic>/front_right_ankle_controller/command</commandTopic>
+        <updateRate>30</updateRate>
+        <pid>
+          <p>100.0</p>
+          <i>0.0</i>
+          <d>10.0</d>
+        </pid>
+      </plugin>
+      <!-- Plugin cảm biến lực mô phỏng -->
+      <plugin filename="libgazebo_ros_force_torque_sensor.so" name="front_right_force_torque_sensor">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>front_right_ankle_joint</jointName>
+        <topicName>/front_right_force_torque_sensor</topicName>
+      </plugin>
+    </gazebo>
+    <sensor name="front_right_force_torque" type="force_torque">
+      <update_rate>30</update_rate>
+    </sensor>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -387,7 +432,7 @@
         <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/hip.dae" scale="1 1 1"/>
         <!-- dài 2cm  cố định thân trên và các chân -->
       </geometry>
-      <material name="blue"/>
+      <!-- <material name="blue" /> -->
     </visual>
     <collision name="rear_left_hip_collision">
       <origin rpy="0 0 0" xyz="0 -0.0955 0"/>
@@ -397,16 +442,16 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="0.0054 -0.00194 -0.000105"/>
-      <mass value="0.678"/>
+      <mass value="0.478"/>
       <inertia ixx="0.00048" ixy="-3.01e-06" ixz="-1.11e-06" iyy="0.000884" iyz="1.42e-06" izz="0.000596"/>
     </inertial>
   </link>
-  <joint description="Hip joint side -1 and pos -1" name="rear_left_hip_joint" type="revolute">
+  <joint description="Hip joint side -1 and pos -1" initial_position="0.0" name="rear_left_hip_joint" type="revolute">
     <parent link="trunk"/>
     <child link="rear_left_hip_link"/>
     <origin rpy="0 0 0" xyz="-0.1934 0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
@@ -416,7 +461,7 @@
     <visual name="rear_left_knee_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_right.dae" scale="1 1 1"/>
         <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <material name="green"/>
@@ -429,18 +474,18 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.00374 -0.0223 -0.0327"/>
-      <mass value="0.135862"/>
+      <mass value="0.435862"/>
       <inertia ixx="0.00584" ixy="8.72e-05" ixz="-0.000289" iyy="0.0058" iyz="0.000808" izz="0.00103"/>
     </inertial>
   </link>
   <!-- knee Joint  Đùi  quay về sau  -->
-  <joint description="Knee joint side -1 and pos -1" name="rear_left_knee_joint" type="revolute">
-    <origin rpy="0 0.45 0" xyz="0 0.0955 0"/>
+  <joint description="Knee joint side -1 and pos -1" initial_position="0.0" name="rear_left_knee_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0.0955 0"/>
     <parent link="rear_left_hip_link"/>
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="rear_left_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
@@ -452,10 +497,10 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle_right.dae" scale="1 1 1"/>
       </geometry>
       <!-- Màu tím -->
-      <material name="purple"/>
+      <!-- <material name="purple" /> -->
     </visual>
     <collision name="rear_left_ankle_collision">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -470,13 +515,35 @@
     </inertial>
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
-  <joint name="rear_left_ankle_joint" type="revolute">
-    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
+  <joint initial_position="0.0" name="rear_left_ankle_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
     <parent link="rear_left_knee_link"/>
     <child link="rear_left_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
+    <gazebo>
+      <plugin filename="libgazebo_ros_joint_position_controller.so" name="rear_left_ankle_controller">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>rear_left_ankle_joint</jointName>
+        <commandTopic>/rear_left_ankle_controller/command</commandTopic>
+        <updateRate>30</updateRate>
+        <pid>
+          <p>100.0</p>
+          <i>0.0</i>
+          <d>10.0</d>
+        </pid>
+      </plugin>
+      <!-- Plugin cảm biến lực mô phỏng -->
+      <plugin filename="libgazebo_ros_force_torque_sensor.so" name="rear_left_force_torque_sensor">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>rear_left_ankle_joint</jointName>
+        <topicName>/rear_left_force_torque_sensor</topicName>
+      </plugin>
+    </gazebo>
+    <sensor name="rear_left_force_torque" type="force_torque">
+      <update_rate>30</update_rate>
+    </sensor>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -532,7 +599,7 @@
         <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/hip.dae" scale="1 1 1"/>
         <!-- dài 2cm  cố định thân trên và các chân -->
       </geometry>
-      <material name="blue"/>
+      <!-- <material name="blue" /> -->
     </visual>
     <collision name="rear_right_hip_collision">
       <origin rpy="0 0 0" xyz="0 0.0955 0"/>
@@ -542,16 +609,16 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="0.0054 0.00194 -0.000105"/>
-      <mass value="0.678"/>
+      <mass value="0.478"/>
       <inertia ixx="0.00048" ixy="3.01e-06" ixz="-1.11e-06" iyy="0.000884" iyz="-1.42e-06" izz="0.000596"/>
     </inertial>
   </link>
-  <joint description="Hip joint side 1 and pos -1" name="rear_right_hip_joint" type="revolute">
+  <joint description="Hip joint side 1 and pos -1" initial_position="0.0" name="rear_right_hip_joint" type="revolute">
     <parent link="trunk"/>
     <child link="rear_right_hip_link"/>
     <origin rpy="0 0 0" xyz="-0.1934 -0.0465 0"/>
     <axis xyz="1 0 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="23.7" lower="-0.686" upper="0.863" velocity="30.1"/>
     <!-- Vị trí gắn khớp háng vào body-->
   </joint>
@@ -561,7 +628,7 @@
     <visual name="rear_right_knee_visual">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_mirror.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/knee_left.dae" scale="1 1 1"/>
         <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <material name="green"/>
@@ -574,18 +641,18 @@
     </collision>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.00374 0.0223 -0.0327"/>
-      <mass value="0.135862"/>
+      <mass value="0.435862"/>
       <inertia ixx="0.00584" ixy="-8.72e-05" ixz="-0.000289" iyy="0.0058" iyz="-0.000808" izz="0.00103"/>
     </inertial>
   </link>
   <!-- knee Joint  Đùi  quay về sau  -->
-  <joint description="Knee joint side 1 and pos -1" name="rear_right_knee_joint" type="revolute">
-    <origin rpy="0 0.45 0" xyz="0 -0.0955 0"/>
+  <joint description="Knee joint side 1 and pos -1" initial_position="0.0" name="rear_right_knee_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 -0.0955 0"/>
     <parent link="rear_right_hip_link"/>
     <!-- Gắn vào motor háng mô phỏng -->
     <child link="rear_right_knee_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <!-- <limit lower="-1.57" upper="1.57" effort="30" velocity="7.0" /> -->
     <limit effort="23.7" lower="-1.5708" upper="3.4907" velocity="30.1"/>
   </joint>
@@ -597,10 +664,11 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle.dae" scale="1 1 1"/>
+        <mesh filename="file:///home/phieu/ros2-learning/src/install/first_robot/share/first_robot/meshes/ankle_left.dae" scale="1 1 1"/>
+        <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
       </geometry>
       <!-- Màu tím -->
-      <material name="purple"/>
+      <!-- <material name="purple" /> -->
     </visual>
     <collision name="rear_right_ankle_collision">
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -615,13 +683,35 @@
     </inertial>
   </link>
   <!-- ankle Joint  Cẳng chân  quay về trước 45  -->
-  <joint name="rear_right_ankle_joint" type="revolute">
-    <origin rpy="0 -0.90 0" xyz="0 0 -0.213"/>
+  <joint initial_position="0.0" name="rear_right_ankle_joint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
     <parent link="rear_right_knee_link"/>
     <child link="rear_right_ankle_link"/>
     <axis xyz="0 1 0"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
     <limit effort="35.55" lower="-2.818" upper="-0.888" velocity="20.06"/>
+    <gazebo>
+      <plugin filename="libgazebo_ros_joint_position_controller.so" name="rear_right_ankle_controller">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>rear_right_ankle_joint</jointName>
+        <commandTopic>/rear_right_ankle_controller/command</commandTopic>
+        <updateRate>30</updateRate>
+        <pid>
+          <p>100.0</p>
+          <i>0.0</i>
+          <d>10.0</d>
+        </pid>
+      </plugin>
+      <!-- Plugin cảm biến lực mô phỏng -->
+      <plugin filename="libgazebo_ros_force_torque_sensor.so" name="rear_right_force_torque_sensor">
+        <robotNamespace>/first_robot</robotNamespace>
+        <jointName>rear_right_ankle_joint</jointName>
+        <topicName>/rear_right_force_torque_sensor</topicName>
+      </plugin>
+    </gazebo>
+    <sensor name="rear_right_force_torque" type="force_torque">
+      <update_rate>30</update_rate>
+    </sensor>
   </joint>
   <!-- *** Kết thúc phần cẳng chân *** -->
   <!-- *** Bắt đầu phần bàn chân *** -->
@@ -667,67 +757,79 @@
       <mechanical_reduction>1</mechanical_reduction>
     </actuator>
   </transmission>
+  <gazebo>
+    <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+      <publish_link_pose>true</publish_link_pose>
+      <publish_sensor_pose>true</publish_sensor_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+      <static_publisher>true</static_publisher>
+      <static_update_frequency>100</static_update_frequency>
+    </plugin>
+  </gazebo>
   <ros2_control name="FirstRobot" type="system">
     <hardware>
       <plugin>gz_ros2_control/GazeboSimSystem</plugin>
     </hardware>
     <joint name="front_left_hip_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="front_left_knee_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="front_left_ankle_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="front_right_hip_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="front_right_knee_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="front_right_ankle_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_left_hip_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_left_knee_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_left_ankle_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_right_hip_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_right_knee_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
     <joint name="rear_right_ankle_joint">
-      <command_interface name="position"/>
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -735,7 +837,110 @@
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>/home/phieu/ros2-learning/src/install/first_robot/share/first_robot/config/ros_control.yaml</parameters>
+      <robot_param_node>robot_state_publisher</robot_param_node>
     </plugin>
+  </gazebo>
+  <gazebo reference="trunk">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <!-- FL leg -->
+  <gazebo reference="front_left_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="front_left_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="front_left_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="front_left_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <!-- FR leg -->
+  <gazebo reference="front_right_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="front_right_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="front_right_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="front_right_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <!-- RL leg -->
+  <gazebo reference="rear_left_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="rear_left_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="rear_left_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="rear_left_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <!-- RR leg -->
+  <gazebo reference="rear_right_hip_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+  <gazebo reference="rear_right_knee_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="rear_right_ankle_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <self_collide>1</self_collide>
+  </gazebo>
+  <gazebo reference="rear_right_foot_link">
+    <mu1>0.6</mu1>
+    <mu2>0.6</mu2>
+    <self_collide>1</self_collide>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
   </gazebo>
   <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
