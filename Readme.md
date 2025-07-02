@@ -16,13 +16,13 @@ Lớp 3: Robot chó 4 chân với khung cơ bản  + SLAM + NAV2  + CHAMP (camer
 ![Gazebo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v3_preview_level_1.gif?raw=true)
 [Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
 Source code: branch grade_3_snipdog_with_slam_nav2_3dlaser_gazebo
-
 Link: 
 
 Lớp 4: Robot chó 4 chân: Sản xuất vật lý và ghép nối các thiết bị + SLAM + NAV2  + CHAMP (camera + laser)  + AI (Mobile SSD)
 ![Design](TODO)
 [Rviz](TODO)
 Link: 
+ 
 
 
 ## Mục tiêu
