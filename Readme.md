@@ -2,26 +2,27 @@
 Lớp 1: Robot 2 bánh xe tự di chuyển 
 ![Design]()
 ![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/first_robot_two_wheel_gazebo_rviz.gif?raw=true)
-
--> Docs: 
+Source code: branch grade_1_two_wheel_robot_auto_run_gazebo_rviz
+Link: 
 
 Lớp 2: Robot 4 bánh xe tự di chuyển + SLAM + NAV2 (camera + laser ) + AI (Mobile SSD)
 ![Design]()
-![Gazebo demo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
-
--> Link: 
+[Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+Source code: branch grade_2_two_wheel_with_AI_robot_laser_map_gazebo_rviz
+Link: 
 
 Lớp 3: Robot chó 4 chân với khung cơ bản  + SLAM + NAV2  + CHAMP (camera + laser ) + AI (Mobile SSD)
-![Design](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
-![Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
-
--> Link: 
+![Prototype](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
+![Gazebo](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v3_preview_level_1.gif?raw=true)
+[Rviz](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/simple_robot_running_2.gif?raw=true)
+Source code: branch grade_3_snipdog_with_slam_nav2_3dlaser_gazebo
+Link: 
 
 Lớp 4: Robot chó 4 chân: Sản xuất vật lý và ghép nối các thiết bị + SLAM + NAV2  + CHAMP (camera + laser)  + AI (Mobile SSD)
-![Design]()
-[Rviz]()
-
--> Link: 
+![Design](TODO)
+[Rviz](TODO)
+Link: 
+ 
 
 
 ## Mục tiêu
@@ -63,7 +64,7 @@ Cài đặt các gói cần thiết:
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_grade2_gazebo.launch.py
+    ros2 launch first_robot launch_grade3_gazebo.launch.py
     ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/cmd_vel
 
 ### Docker
@@ -86,62 +87,51 @@ Sau khi build hoàn thành, cần source thư mục code vừa build
 
 Bắt đầu chạy code
 
-    ros2 launch first_robot launch_grade2_gazebo.launch.py
+    ros2 launch first_robot launch_grade3_gazebo.launch.py
     
     
 * * *
-![Preview-Design](https://github.com/hieuxinhe94/ros2-learning/blob/main/docs/dog_v2_preview_design.gif?raw=true)
+Robot sử dụng cấu trúc 4 chân (quadruped), mỗi chân gồm 3 khớp chủ động (revolute), tổng cộng 12 bậc tự do (DOF). Thiết kế này tương thích với bộ điều khiển CHAMP và mô phỏng vật lý trong Gazebo.
 
+#### **Bảng thông số các khớp chân robot**
 
-* * *
+| Tên khớp      | Loại khớp   | Trục quay      | Giới hạn (rad)           | Vị trí gắn | Ghi chú                |
+|---------------|-------------|----------------|--------------------------|------------|------------------------|
+| Hip           | Revolute    | X (1 0 0)      | -0.686 ~ 0.863           | Thân robot | Khớp háng, quay ngang  |
+| Knee          | Revolute    | Y (0 1 0)      | -1.5708 ~ 3.4907         | Đùi        | Khớp gối, quay dọc     |
+| Ankle         | Revolute    | Y (0 1 0)      | -2.818 ~ -0.888          | Cẳng chân  | Khớp cổ chân           |
+| Foot          | Fixed       | -              | -                        | Bàn chân   | Không chủ động         |
 
-### 1\. Chi tiết cấu hình
+- **Mỗi chân gồm 3 khớp chủ động (hip, knee, ankle) và 1 khớp cố định (foot).**
+- **Tổng cộng 12 bậc tự do (DOF) cho 4 chân.**
+- **Các giới hạn và trục quay phải đồng bộ giữa URDF/xacro và file cấu hình CHAMP.**
 
-#### **Cấu trúc luồng khớp (áp dụng cho cả 4 chân: FL, FR, RL, RR)**
+---
 
-*   **Chassis** (`base_link`): liên kết gốc, gắn 4 chân.
-    
-*   **Khớp: `${prefix}_hip_joint` (revolute)**
-    
-    *   Parent: `base_link`, Child: `${prefix}_hip_link`
-        
-    *   Trục: z (0 0 1), Giới hạn: ±0.785 rad
-        
-    *   Vị trí: xác định bởi `x_pos`, `y_pos` theo từng chân
-        
-*   **Khớp: `${prefix}_upper_leg_joint` (revolute)**
-    
-    *   Parent: `${prefix}_hip_link`, Child: `${prefix}_upper_leg_link`
-        
-    *   Trục: y (0 1 0), Giới hạn: -1.57 → 0 rad
-        
-*   **Khớp: `${prefix}_lower_leg_joint` (revolute)**
-    
-    *   Parent: `${prefix}_upper_leg_link`, Child: `${prefix}_lower_leg_link`
-        
-    *   Trục: y (0 1 0), Giới hạn: -2.5 → 0 rad, RPY="-0.3 0 0"
-        
-*   **Liên kết foot** (nếu có): Gắn cuối chân dưới, không có khớp riêng.
-    
+3. Thông số hình học và vị trí lắp đặt
+- Hip Joint:
+Gắn vào trunk tại vị trí xyz riêng cho từng chân (ví dụ: 0.1934 0.0465 0 cho chân trước trái).
+Trục quay X (1 0 0).
+- Knee Joint:
+Gắn vào hip_link, offset theo trục Y (ví dụ: 0 0.0955 0).
+Trục quay Y (0 1 0).
+- Ankle Joint:
+Gắn vào knee_link, offset theo trục Z (ví dụ: 0 0 -0.213).
+Trục quay Y (0 1 0).
+- Foot Link:
+Gắn cố định vào ankle_link, offset theo trục Z.
 
 * * *
+ base_link
+   └── hip_joint (revolute, trục X)
+         └── hip_link
+               └── knee_joint (revolute, trục Y)
+                     └── knee_link
+                           └── ankle_joint (revolute, trục Y)
+                                 └── ankle_link
+                                       └── foot_link (fixed)
 
-#### **Tóm tắt luồng khớp**
-
-scss
-
-CopyEdit
-
-`base_link  → hip_joint (z)    → hip_link      → upper_leg_joint (y)        → upper_leg_link          → lower_leg_joint (y, rpy -0.3)            → lower_leg_link              → foot`
-
-*   Tổng: 3 khớp chủ động (revolute) mỗi chân × 4 chân = **12 DOF**
-    
-*   Tất cả các khớp đều hoạt động trong mặt phẳng xz để tạo dáng di chuyển kiểu ">"
-    
-*   Thiết kế modular, cấu trúc giống nhau, chỉ khác `prefix`, `x/y position`.
- 
-* * *
-
+... continue update 
  
 ## Lỗi 
 
@@ -152,9 +142,5 @@ bash
 Copy
 sudo apt update
 sudo apt upgrade
-chmod +x move/dog_gait_cycle.py
-    <!-- need to compose all to single file  run  xacro first_robot/description/robot.urdf.xacro > robot.urdf -->
-  <!-- Tâm link nằm giữa  origin là tại tâm hình học  nên Đầu A nằm ở  +L/2 theo trục Z Đầu B nằm ở  -L/2 theo trục Z -->
-  Ví dụ: link_parent là hình trụ dài 0.12 dọc trục Z
-→ Tâm: tại 0 0 0,
-→ Đầu B: tại 0 0 -0.06
+<!-- need to compose all to single file  run  xacro first_robot/description/robot.urdf.xacro > robot.urdf -->
+

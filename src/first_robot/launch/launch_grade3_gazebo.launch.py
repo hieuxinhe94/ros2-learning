@@ -211,7 +211,7 @@ def generate_launch_description():
     )
 
     gz_spawn_entity = TimerAction(
-        period=4.0,  # chờ 4 giây
+        period=1.0,  # chờ 4 giây
         actions=[
             Node(
                 package="ros_gz_sim",
@@ -228,7 +228,7 @@ def generate_launch_description():
                     "-y",
                     "0",
                     "-z",
-                    "0.6",  # 👈 nâng z lên chút
+                    "0.55",  # 👈 nâng z lên chút
                     "-allow_renaming",
                     "true",
                 ],
@@ -305,16 +305,16 @@ def generate_launch_description():
         ]
     )
 
-    # delay_imu_node =  TimerAction(
-    #         period=8.0,  # delay 8 giây
-    #         actions=[Node(
-    #         package="tf2_ros",
-    #         executable="static_transform_publisher",
-    #         arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
-    #         output='screen'
-    #         )
-    #     ],
-    # )
+    delay_imu_node =  TimerAction(
+            period=8.0,  # delay 8 giây
+            actions=[Node(
+            package="tf2_ros",
+            executable="static_transform_publisher",
+            arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
+            output='screen'
+            )
+        ],
+    )
 
     this_package = launch_ros.substitutions.FindPackageShare(package=package_name).find(
         package_name
@@ -323,28 +323,8 @@ def generate_launch_description():
     links_config = os.path.join(this_package, "config/champ/links.yaml")
     joints_config = os.path.join(this_package, "config/champ/joints.yaml")
     urdf_config = os.path.join(this_package, "description/robot.urdf.xacro")
-
-    TimerAction(
-        period=10.0,  # delay 8 giây
-        actions=[
-            Node(
-                package="tf2_ros",
-                executable="static_transform_publisher",
-                arguments=[
-                    "0",
-                    "0",
-                    "0.1",
-                    "0",
-                    "0",
-                    "0",
-                    "1",
-                    "base_link",
-                    "imu_link",
-                ],
-                output="screen",
-            )
-        ],
-    )
+ 
+ 
     # CHAMP controller nodes
     quadruped_controller_node = TimerAction(
         period=8.0,  # delay 5 giây
@@ -409,6 +389,12 @@ def generate_launch_description():
             )
         ],
     )
+    
+
+    # ros2 launch foxglove_bridge foxglove_bridge_launch.xml
+    publish_to_foxglove = ExecuteProcess(
+        cmd=["ros2", "launch", "foxglove_bridge", "foxglove_bridge_launch.xml"], output="screen"
+    )
 
     nodes = [
         gazebo,
@@ -430,10 +416,11 @@ def generate_launch_description():
         # delay_slam_nav2_toolbox,
         # rqt,
         quadruped_controller_node,
-        #
+        #  
         state_estimator_node,
         #
-        rviz_node,
+        # rviz_node,
+        publish_to_foxglove
     ]
 
     return LaunchDescription(declared_arguments + nodes)
