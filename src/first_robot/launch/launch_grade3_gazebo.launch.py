@@ -417,7 +417,7 @@ def generate_launch_description():
         # rqt,
         quadruped_controller_node,
         #  
-        # state_estimator_node,
+        state_estimator_node,
         #
         # rviz_node,
         publish_to_foxglove
