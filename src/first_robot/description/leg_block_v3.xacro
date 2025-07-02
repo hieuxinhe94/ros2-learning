@@ -35,7 +35,7 @@
           <mesh filename="file://$(find first_robot)/meshes/hip.dae" scale="1 1 1" />
           <!-- dài 2cm  cố định thân trên và các chân -->
         </geometry>
-        <material name="blue" />
+        <!-- <material name="blue" /> -->
       </visual>
       <collision name="${prefix}_hip_collision">
         <origin rpy="0 0 0" xyz="0 ${hip_offset*side} 0" />
@@ -89,11 +89,11 @@
         <geometry>
           <!-- <box size="${knee_length} ${knee_width} ${knee_height}"/> -->
           <xacro:if value="${(side == 1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee_mirror_new.dae" scale="1 1 1" />
+            <mesh filename="file://$(find first_robot)/meshes/knee_left.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
           <xacro:if value="${(side == -1) }">
-            <mesh filename="file://$(find first_robot)/meshes/knee_new.dae" scale="1 1 1" />
+            <mesh filename="file://$(find first_robot)/meshes/knee_right.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
         </geometry>
@@ -132,18 +132,18 @@
         <origin rpy="0 0 0" xyz="0 0 0" />
         <geometry>
           <!-- <box size="${ankle_length} ${ankle_width} ${ankle_height}"/> -->
-          <mesh filename="file://$(find first_robot)/meshes/ankle_new.dae" scale="1 1 1" />
+         
           <xacro:if value="${(side == 1) }">
-            <mesh filename="file://$(find first_robot)/meshes/ankle_new.dae" scale="1 1 1" />
+            <mesh  filename="file://$(find first_robot)/meshes/ankle_left.dae" scale="1 1 1" />
             <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
           </xacro:if>
           <xacro:if value="${(side == -1) }">
-            <mesh filename="file://$(find first_robot)/meshes/ankle_mirror_new.dae" scale="1 1 1" />
-            <!-- <origin rpy="${PI/2.0} 2.0 0" xyz="0 0 0"/> -->
+            <mesh filename="file://$(find first_robot)/meshes/ankle_right.dae" scale="1 1 1" />
+           
           </xacro:if>
         </geometry>
         <!-- Màu tím -->
-        <material name="purple" />
+        <!-- <material name="purple" /> -->
       </visual>
       <collision name="${prefix}_ankle_collision">
         <origin rpy="0 0 0" xyz="0 0 0" />

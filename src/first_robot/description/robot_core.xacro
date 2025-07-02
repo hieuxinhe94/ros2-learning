@@ -30,7 +30,7 @@
         <!-- <box size="${trunk_length} ${trunk_width} ${trunk_height}"/> -->
         <mesh filename="file://$(find first_robot)/meshes/trunk_new.dae" scale="1 1 1" />
       </geometry>
-      <material name="silver" />
+      <!-- <material name="silver" /> -->
     </visual>
     <collision name="trunk_collision">
       <origin rpy="0 0 0" xyz="0 0 0" />
