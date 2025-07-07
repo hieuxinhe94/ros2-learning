@@ -1,0 +1,8 @@
+planner_configs:
+  RRTConnectkConfigDefault:
+    type: geometric::RRTConnect
+    range: 0.1
+
+manipulator:
+  planner_configs:
+    - RRTConnectkConfigDefault

@@ -1,0 +1,36 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="use_mock_hardware" default="true" />
+  <xacro:arg name="use_gazebo" default="true" />
+  <gazebo>
+    
+  </gazebo>
+
+  <ros2_control name="SecondRobot" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <!-- Joint Definitions -->
+    <xacro:macro name="define_joint_interfaces" params="joint_name">
+      <joint name="${joint_name}">
+        <command_interface name="effort" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </xacro:macro>
+
+    <!-- Khai báo các joint cần control -->
+    <xacro:define_joint_interfaces joint_name="shoulder_joint"/>
+    <xacro:define_joint_interfaces joint_name="elbow_joint"/>
+    <xacro:define_joint_interfaces joint_name="wrist_joint"/>
+
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find second_robot)/config/ros_control.yaml</parameters>
+       <robot_param_node>robot_state_publisher</robot_param_node>
+    </plugin>
+  </gazebo>
+
+ 
+</robot>

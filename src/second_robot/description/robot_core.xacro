@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <visual name="base_link_visual">
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <box size="0.3762 0.02 0.05" />
+      </geometry>
+      <material name="white" />
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="2.2" />
+      <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <collision name="base_collision">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.3762 0.02 0.05" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Base to Shoulder Joint -->
+  <joint name="base_to_shoulder_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="shoulder_link" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+
+  <!-- Shoulder Link -->
+  <link name="shoulder_link">
+    <visual>
+      <geometry>
+        <sphere radius="0.025" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <material name="gray" />
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.2" />
+      <inertia ixx="0.00005" iyy="0.00005" izz="0.00005" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+  </link>
+
+  <!-- Shoulder Joint -->
+  <joint name="shoulder_joint" type="revolute">
+    <parent link="shoulder_link" />
+    <child link="upper_arm_link" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
+  </joint>
+
+  <link name="upper_arm_link">
+    <visual>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <material name="blue">
+        <color rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <inertial>
+      <origin xyz="${link_length/2} 0 0" />
+      <mass value="0.15" />
+      <inertia ixx="0.00012" iyy="0.00012" izz="0.00002" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+  </link>
+
+  <!-- Elbow Joint -->
+  <joint name="elbow_joint" type="revolute">
+    <parent link="upper_arm_link" />
+    <child link="forearm_link" />
+    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
+  </joint>
+
+  <link name="forearm_link">
+    <visual>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <material name="green">
+        <color rgba="0 1 0 1" />
+      </material>
+    </visual>
+    <inertial>
+      <origin xyz="${link_length/2} 0 0" />
+      <mass value="0.12" />
+      <inertia ixx="0.00010" iyy="0.00010" izz="0.000015" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+  </link>
+
+  <!-- Wrist Joint -->
+  <joint name="wrist_joint" type="revolute">
+    <parent link="forearm_link" />
+    <child link="wrist_link" />
+    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
+  </joint>
+
+  <link name="wrist_link">
+    <visual>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <material name="red">
+        <color rgba="1 0 0 1" />
+      </material>
+    </visual>
+    <inertial>
+      <origin xyz="${link_length/2} 0 0" />
+      <mass value="0.08" />
+      <inertia ixx="0.00007" iyy="0.00007" izz="0.00001" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+  </link>
+
+  <!-- End Effector -->
+  <link name="end_effector_link">
+    <visual>
+      <geometry>
+        <sphere radius="0.015" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <material name="yellow">
+        <color rgba="1 1 0 1" />
+      </material>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.02" />
+      <inertia ixx="0.00001" iyy="0.00001" izz="0.00001" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+  </link>
+
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="wrist_link" />
+    <child link="end_effector_link" />
+    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+  </joint>
+
+
+
+
+</robot>
