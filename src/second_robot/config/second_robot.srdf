@@ -1,0 +1,11 @@
+<robot name="second_robot">
+  <virtual_joint name="world_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+
+  <group name="manipulator">
+    <joint name="shoulder_joint"/>
+    <joint name="elbow_joint"/>
+    <joint name="wrist_joint"/>
+  </group>
+
+  <end_effector name="ee" parent_link="end_effector_link" group="manipulator"/>
+</robot>

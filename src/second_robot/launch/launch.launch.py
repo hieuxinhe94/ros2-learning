@@ -83,7 +83,7 @@ def generate_launch_description():
     robot_description_dict = {"robot_description": robot_description_content}
     robot_description_semantic = PathJoinSubstitution([
         FindPackageShare(package_name),
-        "srdf",
+        "config",
         "second_robot.srdf"
     ])
     robot_description_semantic_config = Command([
