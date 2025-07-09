@@ -7,8 +7,8 @@
 
   <ros2_control name="SecondRobot" type="system">
     <hardware>
-      <!-- <plugin>gz_ros2_control/GazeboSimSystem</plugin> -->
-      <plugin>mock_components/GenericSystem</plugin>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      <!-- <plugin>mock_components/GenericSystem</plugin> -->
     </hardware>
     <!-- Joint Definitions -->
     <xacro:macro name="define_joint_interfaces" params="joint_name">

@@ -14,6 +14,12 @@
         <joint name="elbow_joint"/>
         <joint name="wrist_joint"/>
     </group>
+
+    <group_state name="ready" group="manipulator">
+        <joint name="shoulder_joint" value="-1.0"/>
+        <joint name="elbow_joint" value="1.5"/>
+        <joint name="wrist_joint" value="0.5"/>
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="ee" parent_link="base_link" group="manipulator"/>
 </robot>

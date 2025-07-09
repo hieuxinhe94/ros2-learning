@@ -259,7 +259,7 @@ def generate_launch_description():
         #
         delay_control_node,
         #
-        move_group_node,
+        # move_group_node,
         #
         gz_spawn_entity,
      
