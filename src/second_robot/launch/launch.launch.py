@@ -16,7 +16,13 @@ from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit, OnProcessStart
 import launch_ros
+import yaml
 
+def load_yaml(package_name, file_path):
+    pkg_path = get_package_share_directory(package_name)
+    abs_path = os.path.join(pkg_path, file_path)
+    with open(abs_path, 'r') as file:
+        return yaml.safe_load(file)
 
 def generate_launch_description():
 
@@ -90,17 +96,12 @@ def generate_launch_description():
         "cat ", robot_description_semantic
     ])
     robot_description_semantic_dict = {"robot_description_semantic": robot_description_semantic_config}
-    kinematics_yaml = PathJoinSubstitution([
-        FindPackageShare(package_name),
-        "config",
-        "kinematics.yaml"
-    ])
-    ompl_yaml = PathJoinSubstitution([
-        FindPackageShare(package_name),
-        "config",
-        "ompl_planning.yaml"
-    ])
     
+    
+    kinematics_yaml = load_yaml(package_name, "config/kinematics.yaml")
+
+    ompl_yaml = load_yaml(package_name, "config/ompl_planning.yaml")
+     
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(package_name),

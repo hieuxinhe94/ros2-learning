@@ -39,6 +39,12 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
       <material name="gray" />
     </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.025" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </collision>
     <inertial>
       <origin xyz="0 0 0" />
       <mass value="0.2" />
@@ -55,18 +61,25 @@
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
+  <!-- Upper Arm Link -->
   <link name="upper_arm_link">
     <visual>
       <geometry>
         <cylinder length="${link_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <material name="blue">
         <color rgba="0 0 1 1" />
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+    </collision>
     <inertial>
-      <origin xyz="${link_length/2} 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <mass value="0.15" />
       <inertia ixx="0.00012" iyy="0.00012" izz="0.00002" ixy="0" ixz="0" iyz="0" />
     </inertial>
@@ -76,23 +89,30 @@
   <joint name="elbow_joint" type="revolute">
     <parent link="upper_arm_link" />
     <child link="forearm_link" />
-    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
     <axis xyz="0 0 1" />
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
+  <!-- Forearm Link -->
   <link name="forearm_link">
     <visual>
       <geometry>
         <cylinder length="${link_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <material name="green">
         <color rgba="0 1 0 1" />
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+    </collision>
     <inertial>
-      <origin xyz="${link_length/2} 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <mass value="0.12" />
       <inertia ixx="0.00010" iyy="0.00010" izz="0.000015" ixy="0" ixz="0" iyz="0" />
     </inertial>
@@ -102,23 +122,30 @@
   <joint name="wrist_joint" type="revolute">
     <parent link="forearm_link" />
     <child link="wrist_link" />
-    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
     <axis xyz="0 0 1" />
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
+  <!-- Wrist Link -->
   <link name="wrist_link">
     <visual>
       <geometry>
         <cylinder length="${link_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="${link_length/2} 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <material name="red">
         <color rgba="1 0 0 1" />
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${link_length}" radius="${link_radius}" />
+      </geometry>
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+    </collision>
     <inertial>
-      <origin xyz="${link_length/2} 0 0" />
+      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
       <mass value="0.08" />
       <inertia ixx="0.00007" iyy="0.00007" izz="0.00001" ixy="0" ixz="0" iyz="0" />
     </inertial>
@@ -135,6 +162,12 @@
         <color rgba="1 1 0 1" />
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.015" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </collision>
     <inertial>
       <origin xyz="0 0 0" />
       <mass value="0.02" />
@@ -143,10 +176,11 @@
   </link>
 
 
+  <!-- End Effector Joint -->
   <joint name="ee_fixed_joint" type="fixed">
     <parent link="wrist_link" />
     <child link="end_effector_link" />
-    <origin xyz="${link_length} 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
   </joint>
 
 
