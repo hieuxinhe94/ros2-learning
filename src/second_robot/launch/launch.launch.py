@@ -18,11 +18,13 @@ from launch.event_handlers import OnProcessExit, OnProcessStart
 import launch_ros
 import yaml
 
+
 def load_yaml(package_name, file_path):
     pkg_path = get_package_share_directory(package_name)
     abs_path = os.path.join(pkg_path, file_path)
-    with open(abs_path, 'r') as file:
+    with open(abs_path, "r") as file:
         return yaml.safe_load(file)
+
 
 def generate_launch_description():
 
@@ -87,21 +89,18 @@ def generate_launch_description():
         ]
     )
     robot_description_dict = {"robot_description": robot_description_content}
-    robot_description_semantic = PathJoinSubstitution([
-        FindPackageShare(package_name),
-        "config",
-        "second_robot.srdf"
-    ])
-    robot_description_semantic_config = Command([
-        "cat ", robot_description_semantic
-    ])
-    robot_description_semantic_dict = {"robot_description_semantic": robot_description_semantic_config}
-    
-    
+    robot_description_semantic = PathJoinSubstitution(
+        [FindPackageShare(package_name), "config", "second_robot.srdf"]
+    )
+    robot_description_semantic_config = Command(["cat ", robot_description_semantic])
+    robot_description_semantic_dict = {
+        "robot_description_semantic": robot_description_semantic_config
+    }
+
     kinematics_yaml = load_yaml(package_name, "config/kinematics.yaml")
 
     ompl_yaml = load_yaml(package_name, "config/ompl_planning.yaml")
-     
+
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(package_name),
@@ -109,7 +108,7 @@ def generate_launch_description():
             "ros_control.yaml",
         ]
     )
-    
+
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
@@ -123,12 +122,12 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time},
         ],
     )
-    
+
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        # arguments=['--ros-args', '--log-level', 'debug'],
+        arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[{"use_sim_time": use_sim_time}, robot_description_dict],
     )
 
@@ -137,9 +136,10 @@ def generate_launch_description():
         executable="ros2_control_node",
         # arguments=['--ros-args', '--log-level', 'debug'],
         arguments=[
+            '--ros-args', '--log-level', 'debug',
             "--controller-manager-timeout",
             "60",
-            "joint_trajectory_controller",
+            "arm_trajectory_controller",
         ],
         parameters=[
             {"use_sim_time": use_sim_time},
@@ -148,6 +148,9 @@ def generate_launch_description():
         ],
         output="both",
     )
+    
+       
+
     delay_control_node = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=robot_state_pub_node,
@@ -155,13 +158,12 @@ def generate_launch_description():
         )
     )
 
-    
     # gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", [" -r -v 3 ", world_with_empty ])],
+        launch_arguments=[("gz_args", [" -r -v 3 ", world_with_empty])],
         condition=IfCondition(gui),
     )
     gazebo_headless = IncludeLaunchDescription(
@@ -212,25 +214,32 @@ def generate_launch_description():
                     "0.55",  # 👈 nâng z lên chút
                     "-allow_renaming",
                     "true",
-                   
                 ],
             )
         ],
     )
-     
 
-    delay_imu_node =  TimerAction(
-            period=8.0,  # delay 8 giây
-            actions=[Node(
-            package="tf2_ros",
-            executable="static_transform_publisher",
-            arguments=['0', '0', '0.1', '0', '0', '0', '1', 'base_link', 'imu_link'],
-            output='screen'
+    delay_imu_node = TimerAction(
+        period=8.0,  # delay 8 giây
+        actions=[
+            Node(
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                arguments=[
+                    "0",
+                    "0",
+                    "0.1",
+                    "0",
+                    "0",
+                    "0",
+                    "1",
+                    "base_link",
+                    "imu_link",
+                ],
+                output="screen",
             )
         ],
     )
-
- 
 
     # rviz_node = TimerAction(
     #     period=8.0,  # delay 5 giây
@@ -246,23 +255,17 @@ def generate_launch_description():
     #         )
     #     ],
     # )
-    
- 
+
+
     nodes = [
         gazebo,
-        #
         gazebo_headless,
-        #
         gazebo_bridge,
-        #
         robot_state_pub_node,
-        #
         delay_control_node,
-        #
         # move_group_node,
-        #
         gz_spawn_entity,
-     
+       
     ]
 
     return LaunchDescription(declared_arguments + nodes)
