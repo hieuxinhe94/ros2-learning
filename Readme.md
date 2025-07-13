@@ -143,4 +143,6 @@ Copy
 sudo apt update
 sudo apt upgrade
 <!-- need to compose all to single file  run  xacro first_robot/description/robot.urdf.xacro > robot.urdf -->
-
+ros2 launch moveit_setup_assistant setup_assistant.launch.py
+ros2 launch second_robot launch.launch.py
+ros2 launch moveit_helper moveit_only.launch.py

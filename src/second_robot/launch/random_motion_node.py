@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from builtin_interfaces.msg import Duration
 import random
 
 class RandomMotionNode(Node):
@@ -13,14 +14,14 @@ class RandomMotionNode(Node):
 
     def timer_callback(self):
         msg = JointTrajectory()
+        msg.header.stamp = self.get_clock().now().to_msg()
         msg.joint_names = self.joint_names
         point = JointTrajectoryPoint()
-        # Random positions in [-2, 2] radians
         point.positions = [random.uniform(-2.0, 2.0) for _ in self.joint_names]
-        point.time_from_start.sec = 1
+        point.time_from_start = Duration(sec=1, nanosec=0)  # Sử dụng Duration đúng kiểu
         msg.points.append(point)
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Published: {point.positions}')
+        self.get_logger().info(f'Published positions: {point.positions}')
 
 def main(args=None):
     rclpy.init(args=args)

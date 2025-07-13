@@ -127,7 +127,7 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        arguments=['--ros-args', '--log-level', 'debug'],
+        # arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[{"use_sim_time": use_sim_time}, robot_description_dict],
     )
 
@@ -136,7 +136,9 @@ def generate_launch_description():
         executable="ros2_control_node",
         # arguments=['--ros-args', '--log-level', 'debug'],
         arguments=[
-            '--ros-args', '--log-level', 'debug',
+            "--ros-args",
+            "--log-level",
+            "debug",
             "--controller-manager-timeout",
             "60",
             "arm_trajectory_controller",
@@ -148,8 +150,23 @@ def generate_launch_description():
         ],
         output="both",
     )
-    
-       
+
+    control_nodes = TimerAction(
+        period=4.0,  # delay 3 giây
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_state_broadcaster"],
+            ),
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["arm_trajectory_controller"],
+                output="screen",
+            ),
+        ],
+    )
 
     delay_control_node = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -218,45 +235,41 @@ def generate_launch_description():
             )
         ],
     )
+    
+    rviz_config_file = PathJoinSubstitution(
+        [FindPackageShare(package_name), "config", "view_bot.rviz"]
+    )
 
-    delay_imu_node = TimerAction(
-        period=8.0,  # delay 8 giây
+    rviz_node = TimerAction(
+        period=8.0,  # delay 5 giây
         actions=[
             Node(
-                package="tf2_ros",
-                executable="static_transform_publisher",
-                arguments=[
-                    "0",
-                    "0",
-                    "0.1",
-                    "0",
-                    "0",
-                    "0",
-                    "1",
-                    "base_link",
-                    "imu_link",
-                ],
-                output="screen",
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                output="log",
+                arguments=["-d", rviz_config_file, "-f", fixed_frame_id],
+                condition=IfCondition(gui),
+                parameters=[{"use_sim_time": use_sim_time}],
             )
         ],
     )
+    
+    # Include MoveIt launch file
+    # This assumes you have a moveit_helper package with the moveit_only.launch.py file
+    moveit_helper_pkg = FindPackageShare("moveit_helper").find("moveit_helper")
+    moveit_launch = TimerAction(
+        period=5.0,  # Delay 5 giây
+        actions=[
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(moveit_helper_pkg, "launch", "moveit_only.launch.py")
+                )
+            )
+        ]
+    )
 
-    # rviz_node = TimerAction(
-    #     period=8.0,  # delay 5 giây
-    #     actions=[
-    #         Node(
-    #             package="rviz2",
-    #             executable="rviz2",
-    #             name="rviz2",
-    #             output="log",
-    #             arguments=["-d", rviz_config_file, "-f", fixed_frame_id],
-    #             condition=IfCondition(gui),
-    #             parameters=[{"use_sim_time": use_sim_time}],
-    #         )
-    #     ],
-    # )
-
-
+  
     nodes = [
         gazebo,
         gazebo_headless,
@@ -265,7 +278,9 @@ def generate_launch_description():
         delay_control_node,
         # move_group_node,
         gz_spawn_entity,
-       
+        control_nodes,
+        # rviz_node,
+        moveit_launch,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

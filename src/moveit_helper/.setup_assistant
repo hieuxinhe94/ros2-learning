@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: second_robot
+    relative_path: description/robot.urdf.xacro
+  srdf:
+    relative_path: config/second_robot.srdf
+  package_settings:
+    author_name: Hieu
+    author_email: hieu@gmail.com
+    generated_timestamp: 1752424987

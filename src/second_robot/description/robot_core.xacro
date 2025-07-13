@@ -28,6 +28,7 @@
     <parent link="base_link" />
     <child link="shoulder_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
+    <limit lower="-2.0" upper="2.0" effort="5.0" velocity="1.0"/>
   </joint>
 
   <!-- Shoulder Link -->
@@ -184,6 +185,37 @@
   </joint>
 
 
+<transmission name="trans_shoulder">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="shoulder_joint">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="shoulder_motor">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 
+<transmission name="trans_elbow">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="elbow_joint">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="elbow_motor">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="trans_wrist">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="wrist_joint">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="wrist_motor">
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 
 </robot>
