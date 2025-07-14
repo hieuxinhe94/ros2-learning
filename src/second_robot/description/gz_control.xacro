@@ -38,5 +38,10 @@
       <robot_param_node>robot_state_publisher</robot_param_node>
     </plugin>
   </gazebo>
-
+  <gazebo reference="base_link">
+    <static>true</static>
+  </gazebo>
+   <gazebo reference="shoulder_link">
+    <static>true</static>
+  </gazebo>
 </robot>

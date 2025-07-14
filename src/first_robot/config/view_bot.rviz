@@ -28,6 +28,7 @@ Panels:
     Splitter Ratio: 0.5
 Visualization Manager:
   Class: ""
+  UseSimTime: true
   Displays:
     - Alpha: 0.5
       Cell Size: 1

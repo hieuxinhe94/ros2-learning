@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Thêm biến xacro cho kích thước giống tay người -->
+  <xacro:property name="link_length" value="0.30" />    <!-- upper arm -->
+  <xacro:property name="forearm_length" value="0.25" /> <!-- forearm -->
+  <xacro:property name="wrist_length" value="0.125" />   <!-- wrist -->
+  <xacro:property name="link_radius" value="0.04" />
+
+  <!-- Góc khởi tạo khớp -->
+  <xacro:property name="shoulder_init" value="${0.785}" /> <!-- 45 độ -->
+  <xacro:property name="elbow_init" value="${1.57}" />     <!-- 90 độ -->
+  <xacro:property name="wrist_init" value="0" />
+
 
   <!-- Base Link -->
   <link name="base_link">
@@ -28,7 +39,7 @@
     <parent link="base_link" />
     <child link="shoulder_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
-    <limit lower="-2.0" upper="2.0" effort="5.0" velocity="1.0"/>
+    <limit lower="-2.0" upper="2.0" effort="5.0" velocity="1.0" />
   </joint>
 
   <!-- Shoulder Link -->
@@ -53,12 +64,13 @@
     </inertial>
   </link>
 
+
   <!-- Shoulder Joint -->
   <joint name="shoulder_joint" type="revolute">
     <parent link="shoulder_link" />
     <child link="upper_arm_link" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <axis xyz="0 0 1" />
+    <origin xyz="0 0 0" rpy="0 0 ${shoulder_init}" />
+    <axis xyz="0 1 0" />
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
@@ -90,8 +102,8 @@
   <joint name="elbow_joint" type="revolute">
     <parent link="upper_arm_link" />
     <child link="forearm_link" />
-    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
-    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${link_length}" rpy="0 0 ${elbow_init}" />
+    <axis xyz="0 1 0" />
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
@@ -99,21 +111,21 @@
   <link name="forearm_link">
     <visual>
       <geometry>
-        <cylinder length="${link_length}" radius="${link_radius}" />
+        <cylinder length="${forearm_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${forearm_length/2}" rpy="0 0 0" />
       <material name="green">
         <color rgba="0 1 0 1" />
       </material>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="${link_length}" radius="${link_radius}" />
+        <cylinder length="${forearm_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${forearm_length/2}" rpy="0 0 0" />
     </collision>
     <inertial>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${forearm_length/2}" rpy="0 0 0" />
       <mass value="0.12" />
       <inertia ixx="0.00010" iyy="0.00010" izz="0.000015" ixy="0" ixz="0" iyz="0" />
     </inertial>
@@ -123,8 +135,8 @@
   <joint name="wrist_joint" type="revolute">
     <parent link="forearm_link" />
     <child link="wrist_link" />
-    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
-    <axis xyz="0 0 1" />
+    <origin xyz="0 0 ${forearm_length}" rpy="0 0 ${wrist_init}" />
+    <axis xyz="0 1 0" />
     <limit lower="-3.14" upper="3.14" effort="1.0" velocity="2.0" />
   </joint>
 
@@ -132,21 +144,21 @@
   <link name="wrist_link">
     <visual>
       <geometry>
-        <cylinder length="${link_length}" radius="${link_radius}" />
+        <cylinder length="${wrist_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${wrist_length/2}" rpy="0 0 0" />
       <material name="red">
         <color rgba="1 0 0 1" />
       </material>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="${link_length}" radius="${link_radius}" />
+        <cylinder length="${wrist_length}" radius="${link_radius}" />
       </geometry>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${wrist_length/2}" rpy="0 0 0" />
     </collision>
     <inertial>
-      <origin xyz="0 0 ${link_length/2}" rpy="0 0 0" />
+      <origin xyz="0 0 ${wrist_length/2}" rpy="0 0 0" />
       <mass value="0.08" />
       <inertia ixx="0.00007" iyy="0.00007" izz="0.00001" ixy="0" ixz="0" iyz="0" />
     </inertial>
@@ -156,7 +168,7 @@
   <link name="end_effector_link">
     <visual>
       <geometry>
-        <sphere radius="0.015" />
+        <box size="0.08 0.02 0.01" /> <!-- hình hộp nhỏ, giống lòng bàn tay -->
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <material name="yellow">
@@ -165,7 +177,7 @@
     </visual>
     <collision>
       <geometry>
-        <sphere radius="0.015" />
+        <box size="0.08 0.02 0.01" />
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0" />
     </collision>
@@ -181,41 +193,43 @@
   <joint name="ee_fixed_joint" type="fixed">
     <parent link="wrist_link" />
     <child link="end_effector_link" />
-    <origin xyz="0 0 ${link_length}" rpy="0 0 0" />
+    <origin xyz="0 0 ${wrist_length}" rpy="0 0 0" />
   </joint>
 
 
-<transmission name="trans_shoulder">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="shoulder_joint">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="shoulder_motor">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
+  <transmission name="trans_shoulder">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="shoulder_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="shoulder_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
 
-<transmission name="trans_elbow">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="elbow_joint">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="elbow_motor">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
+  <transmission name="trans_elbow">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="elbow_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="elbow_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
 
-<transmission name="trans_wrist">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="wrist_joint">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="wrist_motor">
-    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-    <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
+  <transmission name="trans_wrist">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wrist_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wrist_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
 
 </robot>

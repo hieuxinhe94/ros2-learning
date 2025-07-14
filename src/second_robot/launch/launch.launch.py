@@ -89,17 +89,6 @@ def generate_launch_description():
         ]
     )
     robot_description_dict = {"robot_description": robot_description_content}
-    robot_description_semantic = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "second_robot.srdf"]
-    )
-    robot_description_semantic_config = Command(["cat ", robot_description_semantic])
-    robot_description_semantic_dict = {
-        "robot_description_semantic": robot_description_semantic_config
-    }
-
-    kinematics_yaml = load_yaml(package_name, "config/kinematics.yaml")
-
-    ompl_yaml = load_yaml(package_name, "config/ompl_planning.yaml")
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -107,20 +96,6 @@ def generate_launch_description():
             "config",
             "ros_control.yaml",
         ]
-    )
-
-    move_group_node = Node(
-        package="moveit_ros_move_group",
-        executable="move_group",
-        output="screen",
-        parameters=[
-            robot_description_dict,
-            robot_description_semantic_dict,
-            kinematics_yaml,
-            ompl_yaml,
-            robot_controllers,
-            {"use_sim_time": use_sim_time},
-        ],
     )
 
     robot_state_pub_node = Node(
@@ -131,34 +106,41 @@ def generate_launch_description():
         parameters=[{"use_sim_time": use_sim_time}, robot_description_dict],
     )
 
-    control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        # arguments=['--ros-args', '--log-level', 'debug'],
-        arguments=[
-            "--ros-args",
-            "--log-level",
-            "debug",
-            "--controller-manager-timeout",
-            "60",
-            "arm_trajectory_controller",
-        ],
-        parameters=[
-            {"use_sim_time": use_sim_time},
-            robot_description_dict,
-            robot_controllers,
-        ],
-        output="both",
-    )
-
-    control_nodes = TimerAction(
-        period=4.0,  # delay 3 giây
+    control_node = TimerAction(
+        period=3.0,  # hoặc 4.0 giây, tuỳ mức chắc ăn
         actions=[
             Node(
                 package="controller_manager",
-                executable="spawner",
-                arguments=["joint_state_broadcaster"],
-            ),
+                executable="ros2_control_node",
+                # arguments=['--ros-args', '--log-level', 'debug'],
+                arguments=[
+                    "--ros-args",
+                    "--log-level",
+                    "debug",
+                    "--controller-manager-timeout",
+                    "60",
+                    "arm_trajectory_controller",
+                ],
+                parameters=[
+                    {"use_sim_time": use_sim_time},
+                    robot_description_dict,
+                    robot_controllers,
+                ],
+                output="both",
+            )
+        ],
+    )
+
+    # joint_state_broadcaster = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["joint_state_broadcaster"],
+    # )
+
+    control_node_spawners = TimerAction(
+        period=4.0,  # delay 3 giây
+        actions=[
+            # joint_state_broadcaster,
             Node(
                 package="controller_manager",
                 executable="spawner",
@@ -168,12 +150,12 @@ def generate_launch_description():
         ],
     )
 
-    delay_control_node = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=robot_state_pub_node,
-            on_exit=[control_node],
-        )
-    )
+    # delay_control_node = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=robot_state_pub_node,
+    #         on_exit=[control_node],
+    #     )
+    # )
 
     # gazebo
     gazebo = IncludeLaunchDescription(
@@ -235,26 +217,7 @@ def generate_launch_description():
             )
         ],
     )
-    
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(package_name), "config", "view_bot.rviz"]
-    )
 
-    rviz_node = TimerAction(
-        period=8.0,  # delay 5 giây
-        actions=[
-            Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz2",
-                output="log",
-                arguments=["-d", rviz_config_file, "-f", fixed_frame_id],
-                condition=IfCondition(gui),
-                parameters=[{"use_sim_time": use_sim_time}],
-            )
-        ],
-    )
-    
     # Include MoveIt launch file
     # This assumes you have a moveit_helper package with the moveit_only.launch.py file
     moveit_helper_pkg = FindPackageShare("moveit_helper").find("moveit_helper")
@@ -266,20 +229,17 @@ def generate_launch_description():
                     os.path.join(moveit_helper_pkg, "launch", "moveit_only.launch.py")
                 )
             )
-        ]
+        ],
     )
 
-  
     nodes = [
         gazebo,
         gazebo_headless,
         gazebo_bridge,
         robot_state_pub_node,
-        delay_control_node,
-        # move_group_node,
+        control_node,
         gz_spawn_entity,
-        control_nodes,
-        # rviz_node,
+        control_node_spawners,
         moveit_launch,
     ]
 

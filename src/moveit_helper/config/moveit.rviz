@@ -9,6 +9,7 @@ Panels:
   - Class: rviz_common/Views
     Name: Views
 Visualization Manager:
+  UseSimTime: true
   Displays:
     - Class: rviz_default_plugins/Grid
       Name: Grid

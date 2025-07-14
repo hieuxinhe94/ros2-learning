@@ -14,3 +14,5 @@ moveit_simple_controller_manager:
       - wrist_joint
     action_ns: follow_joint_trajectory
     default: true
+    
+
