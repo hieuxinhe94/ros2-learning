@@ -1,7 +1,7 @@
 controller_manager:
   ros__parameters:
     use_sim_time: true
-    update_rate: 10
+    update_rate: 100
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -20,7 +20,7 @@ arm_trajectory_controller:
       - shoulder_joint
       - elbow_joint
       - wrist_joint
-    state_publish_rate: 50
+    state_publish_rate: 100
     command_interfaces:
       - position
     action_monitor_rate: 20.0

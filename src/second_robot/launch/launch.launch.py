@@ -107,7 +107,7 @@ def generate_launch_description():
     )
 
     control_node = TimerAction(
-        period=3.0,  # hoặc 4.0 giây, tuỳ mức chắc ăn
+        period=4.0,  # hoặc 4.0 giây, tuỳ mức chắc ăn
         actions=[
             Node(
                 package="controller_manager",
@@ -116,10 +116,10 @@ def generate_launch_description():
                 arguments=[
                     "--ros-args",
                     "--log-level",
-                    "debug",
-                    "--controller-manager-timeout",
-                    "60",
-                    "arm_trajectory_controller",
+                    "warn",
+                    # "--controller-manager-timeout",
+                    # "60",
+                    # "arm_trajectory_controller",
                 ],
                 parameters=[
                     {"use_sim_time": use_sim_time},
@@ -131,16 +131,16 @@ def generate_launch_description():
         ],
     )
 
-    # joint_state_broadcaster = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["joint_state_broadcaster"],
-    # )
+    joint_state_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster"],
+    )
 
     control_node_spawners = TimerAction(
-        period=4.0,  # delay 3 giây
+        period=8.0,  # delay 6 giây
         actions=[
-            # joint_state_broadcaster,
+            joint_state_broadcaster,
             Node(
                 package="controller_manager",
                 executable="spawner",
@@ -222,7 +222,7 @@ def generate_launch_description():
     # This assumes you have a moveit_helper package with the moveit_only.launch.py file
     moveit_helper_pkg = FindPackageShare("moveit_helper").find("moveit_helper")
     moveit_launch = TimerAction(
-        period=5.0,  # Delay 5 giây
+        period=15.0,  # Delay 5 giây
         actions=[
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(

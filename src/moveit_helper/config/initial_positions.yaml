@@ -1,6 +1,6 @@
 # Default initial positions for second_robot's ros2_control fake system
 
 initial_positions:
-  elbow_joint: 0.5
-  shoulder_joint: 0.5 
-  wrist_joint: 0
+  elbow_joint: 0.0
+  shoulder_joint: 0.0
+  wrist_joint: 0.0
