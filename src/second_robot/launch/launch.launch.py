@@ -106,9 +106,11 @@ def generate_launch_description():
         parameters=[{"use_sim_time": use_sim_time}, robot_description_dict],
     )
 
+  
     control_node = TimerAction(
-        period=4.0,  # hoặc 4.0 giây, tuỳ mức chắc ăn
+        period=2.0,  # hoặc 4.0 giây, tuỳ mức chắc ăn
         actions=[
+         
             Node(
                 package="controller_manager",
                 executable="ros2_control_node",
@@ -127,20 +129,19 @@ def generate_launch_description():
                     robot_controllers,
                 ],
                 output="both",
-            )
+            ),
         ],
     )
 
-    joint_state_broadcaster = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster"],
-    )
-
     control_node_spawners = TimerAction(
-        period=8.0,  # delay 6 giây
+        period=4.0,  # delay 6 giây
         actions=[
-            joint_state_broadcaster,
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_state_broadcaster"],
+                output="screen",
+            ),
             Node(
                 package="controller_manager",
                 executable="spawner",
@@ -150,12 +151,12 @@ def generate_launch_description():
         ],
     )
 
-    # delay_control_node = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=robot_state_pub_node,
-    #         on_exit=[control_node],
-    #     )
-    # )
+    delay_control_node = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=robot_state_pub_node,
+            on_exit=[control_node],
+        )
+    )
 
     # gazebo
     gazebo = IncludeLaunchDescription(
@@ -237,7 +238,7 @@ def generate_launch_description():
         gazebo_headless,
         gazebo_bridge,
         robot_state_pub_node,
-        control_node,
+        delay_control_node,
         gz_spawn_entity,
         control_node_spawners,
         moveit_launch,
